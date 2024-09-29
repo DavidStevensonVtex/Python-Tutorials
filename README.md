@@ -736,3 +736,31 @@ This is exemplified in the following for loop, which searches for prime numbers:
 (Yes, this is the correct code. Look closely: the else clause belongs to the for loop, not the if statement.)
 
 When used with a loop, the else clause has more in common with the else clause of a try statement than it does with that of if statements: a try statement’s else clause runs when no exception occurs, and a loop’s else clause runs when no break occurs. For more on the try statement and exceptions, see Handling Exceptions.
+
+## 4.6. pass Statements
+
+The pass statement does nothing. It can be used when a statement is required
+syntactically but the program requires no action. For example:
+
+```
+>>> while True:
+...     pass # Busy-wait for keyboard input
+```
+
+This is commonly used for creating minimal classes:
+
+```
+>>> class MyEmptyClass:
+...     pass
+...
+```
+
+Another place pass can be used is as a place-holder for a function or
+conditional body when you are working on new code, allowing you to keep
+thinking at a more abstract level. The pass is silently ignored:
+
+```
+>>> def initlog(*args):
+...     pass # Remember to implement this!
+...
+```
