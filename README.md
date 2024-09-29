@@ -697,3 +697,42 @@ Found an odd number 7
 Found an even number 8
 Found an odd number 9
 ```
+
+## 4.5. else Clauses on Loops
+
+In a for or while loop the break statement may be paired with an else clause.
+If the loop finishes without executing the break, the else clause executes.
+
+In a for loop, the else clause is executed after the loop finishes its final
+iteration, that is, if no break occurred.
+
+In a while loop, it’s executed after the loop’s condition becomes false.
+
+In either kind of loop, the else clause is not executed if the loop was
+terminated by a break.
+
+This is exemplified in the following for loop, which searches for prime numbers:
+
+```
+>>> for n in range(2,10):
+...     for x in range(2,n):
+...             if n % x == 0:
+...                     print(n, 'equals', x, '*', n//x)
+...                     break
+...     else:
+...             # Loop fell through without finding a factor
+...             print(n, 'is a prime number')
+...
+2 is a prime number
+3 is a prime number
+4 equals 2 * 2
+5 is a prime number
+6 equals 2 * 3
+7 is a prime number
+8 equals 2 * 4
+9 equals 3 * 3
+```
+
+(Yes, this is the correct code. Look closely: the else clause belongs to the for loop, not the if statement.)
+
+When used with a loop, the else clause has more in common with the else clause of a try statement than it does with that of if statements: a try statement’s else clause runs when no exception occurs, and a loop’s else clause runs when no break occurs. For more on the try statement and exceptions, see Handling Exceptions.
