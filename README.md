@@ -588,3 +588,76 @@ to loop over a copy of the collection or to create a new collection:
 >>> active_users
 {'Hans': 'active', '景太郎': 'active'}
 ```
+
+## 4.3. The range() Function
+
+If you do need to iterate over a sequence of numbers, the built-in
+function range() comes in handy. It generates arithmetic progressions:
+
+```
+>>> for i in range(5):
+...     print(i)
+...
+0
+1
+2
+3
+4
+```
+
+The given end point is never part of the generated sequence; range(10) generates 10 values, the legal indices for items of a sequence of length 10. It is possible to let the range start at another number, or to specify a different increment (even negative; sometimes this is called the ‘step’):
+
+```
+>>> list(range(5,10))
+[5, 6, 7, 8, 9]
+>>> list(range(0, 10, 3))
+[0, 3, 6, 9]
+>>> list(range(-10, -100, -30))
+[-10, -40, -70]
+```
+
+To iterate over the indices of a sequence, you can combine range() and len() as follows:
+
+```
+>>> a = [ ' Mary', 'had', 'a', 'little', 'lamb' ]
+>>> for i in range(len(a)):
+...     print(i, a[i])
+...
+0  Mary
+1 had
+2 a
+3 little
+4 lamb
+```
+
+In most such cases, however, it is convenient to use the
+[enumerate()](https://docs.python.org/3/library/functions.html#enumerate)
+function, see Looping Techniques.
+
+```
+>>> seasons = ['Spring', 'Summer', 'Fall', 'Winter']
+>>> list(enumerate(seasons))
+[(0, 'Spring'), (1, 'Summer'), (2, 'Fall'), (3, 'Winter')]
+>>> list(enumerate(seasons, start=1))
+[(1, 'Spring'), (2, 'Summer'), (3, 'Fall'), (4, 'Winter')]
+```
+
+A strange thing happens if you just print a range:
+
+```
+>>> range(10)
+range(0, 10)
+```
+
+In many ways the object returned by [range()](https://docs.python.org/3/library/stdtypes.html#range) behaves as if it is a list, but in fact it isn’t. It is an object which returns the successive items of the desired sequence when you iterate over it, but it doesn’t really make the list, thus saving space.
+
+We say such an object is [iterable](https://docs.python.org/3/glossary.html#term-iterable), that is, suitable as a target for functions and constructs that expect something from which they can obtain successive items until the supply is exhausted. We have seen that the for statement is such a construct, while an example of a function that takes an iterable is sum():
+
+```
+>>> sum(range(4))  # 0 + 1 + 2 + 3
+6
+```
+
+Later we will see more functions that return iterables and take iterables as arguments.
+In chapter [Data Structures](https://docs.python.org/3/tutorial/datastructures.html#tut-structures),
+we will discuss in more detail about [list()](https://docs.python.org/3/library/stdtypes.html#list).
