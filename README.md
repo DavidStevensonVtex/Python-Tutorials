@@ -70,3 +70,22 @@ text = "# This is not a comment because it's inside quotes."
 ```
 py .\001-example.py
 ```
+
+## 3.1. Using Python as a Calculator
+
+### 3.1.1. Numbers
+
+```
+py
+Python 3.12.6 (tags/v3.12.6:a4a2d2b, Sep  6 2024, 20:11:23) [MSC v.1940 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 2 + 2
+4
+>>> 50 - 5*6
+20
+>>> (50 - 5*6) / 4
+5.0
+>>> 8 / 5 # division always returns a floating-point number
+1.6
+>>> ^Z
+```
