@@ -764,3 +764,44 @@ thinking at a more abstract level. The pass is silently ignored:
 ...     pass # Remember to implement this!
 ...
 ```
+
+## 4.7. match Statements
+
+A [match](https://docs.python.org/3/reference/compound_stmts.html#match) statement takes an expression and compares its value to successive patterns given as one or more case blocks. This is superficially similar to a switch statement in C, Java or JavaScript (and many other languages), but it’s more similar to pattern matching in languages like Rust or Haskell.
+
+```
+>>> status = 418
+>>> def http_error(status):
+...     match status:
+...         case 400:
+...             return "Bad request"
+...         case 404:
+...             return "Not found"
+...         case 418:
+...             return "I'm a teapot"
+...         case _:
+...             return "Something's wrong with the internet"
+...
+>>> print(http_error(status))
+I'm a teapot
+```
+
+```
+>>> x = 45
+>>> y = 90
+>>> point = (x,y)
+>>> # point is an (x, y) tuple
+>>> match point:
+...     case (0, 0):
+...         print("Origin")
+...     case (0, y):
+...         print(f"Y={y}")
+...     case (x, 0):
+...         print(f"X={x}")
+...     case (x, y):
+...         print(f"X={x}, Y={y}")
+...     case _:
+...         raise ValueError("Not a point")
+...
+X=45, Y=90
+```
