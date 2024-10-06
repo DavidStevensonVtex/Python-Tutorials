@@ -1004,3 +1004,17 @@ List comprehensions can contain complex expressions and nested functions:
 >>> [str(round(pi, i)) for i in range(1, 6)]
 ['3.1', '3.14', '3.142', '3.1416', '3.14159']
 ```
+
+### 5.1.4. Nested List Comprehensions
+
+Consider the following example of a 3x4 matrix implemented as a list of 3 lists of length 4:
+
+```
+>>> matrix = [
+...     [1, 2, 3, 4],
+...     [5, 6, 7, 8],
+...     [9, 10, 11, 12],
+... ]
+>>> matrix
+[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]
+```
