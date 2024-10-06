@@ -1054,3 +1054,15 @@ which, in turn, is the same as:
 >>> transposed
 [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
 ```
+
+In the real world, you should prefer built-in functions to complex flow
+statements. The zip() function would do a great job for this use case:
+
+```
+>>> list(zip(*matrix))
+[(1, 5, 9), (2, 6, 10), (3, 7, 11), (4, 8, 12)]
+```
+
+See
+[Unpacking Argument Lists](https://docs.python.org/3/tutorial/controlflow.html#tut-unpacking-arguments)
+for details on the asterisk in this line.
