@@ -1379,3 +1379,12 @@ It is sometimes tempting to change a list while you are looping over it; however
 >>> filtered_data
 [56.2, 51.7, 55.3, 52.5, 47.8]
 ```
+
+## 5.7. More on Conditions
+
+```
+>>> string1, string2, string3 = '', 'Trondheim', 'Hammer Dance'
+>>> non_null = string1 or string2 or string3
+>>> non_null
+'Trondheim'
+```
