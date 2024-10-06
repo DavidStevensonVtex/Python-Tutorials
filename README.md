@@ -914,3 +914,24 @@ deque(['Michael', 'Terry', 'Graham'])
 >>> deque(['Michael', 'Terry', 'Graham'])
 deque(['Michael', 'Terry', 'Graham'])
 ```
+
+### 5.1.3. List Comprehensions
+
+List comprehensions provide a concise way to create lists.
+
+```
+>>> squares = []
+>>> for x in range(10):
+...     squares.append(x**2)
+...
+>>> squares
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+```
+
+Using List Comprehension:
+
+```
+>>> squares = list(map(lambda x: x**2, range(10)))
+>>> squares
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+```
