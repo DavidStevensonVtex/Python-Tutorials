@@ -928,10 +928,25 @@ List comprehensions provide a concise way to create lists.
 [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 ```
 
-Using List Comprehension:
+Alternatively (not a list comprehension)
 
 ```
 >>> squares = list(map(lambda x: x**2, range(10)))
 >>> squares
 [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+```
+
+or, equivalently:
+
+```
+>>> squares = [x**2 for x in range(10)]
+>>> squares
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+```
+
+A list comprehension consists of brackets containing an expression followed by a for clause, then zero or more for or if clauses.
+
+```
+>>> [(x, y) for x in [1,2,3] for y in [3,1,4] if x != y]
+[(1, 3), (1, 4), (2, 3), (2, 1), (2, 4), (3, 1), (3, 4)]
 ```
