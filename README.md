@@ -1131,3 +1131,20 @@ TypeError: 'tuple' object does not support item assignment
 >>> v
 ([1, 2, 3], [3, 2, 1])
 ```
+
+A special problem is the construction of tuples containing 0 or 1 items:
+the syntax has some extra quirks to accommodate these. Empty tuples are
+constructed by an empty pair of parentheses; a tuple with one item is
+constructed by following a value with a comma (it is not sufficient to
+enclose a single value in parentheses). Ugly, but effective.
+
+```
+>>> empty = ()
+>>> singleton = 'hello',    # <-- note trailing comma
+>>> len(empty)
+0
+>>> len(singleton)
+1
+>>> singleton
+('hello',)
+```
