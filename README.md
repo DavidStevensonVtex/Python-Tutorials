@@ -1388,3 +1388,24 @@ It is sometimes tempting to change a list while you are looping over it; however
 >>> non_null
 'Trondheim'
 ```
+
+## 5.8. Comparing Sequences and Other Types
+
+Sequence objects typically may be compared to other objects with the same sequence type.
+
+```
+>>> (1, 2, 3)              < (1, 2, 4)
+True
+>>> [1, 2, 3]              < [1, 2, 4]
+True
+>>> 'ABC' < 'C' < 'Pascal' < 'Python'
+True
+>>> (1, 2, 3, 4)           < (1, 2, 4)
+True
+>>> (1, 2)                 < (1, 2, -1)
+True
+>>> (1, 2, 3)             == (1.0, 2.0, 3.0)
+True
+>>> (1, 2, ('aa', 'ab'))   < (1, 2, ('abc', 'a'), 4)
+True
+```
