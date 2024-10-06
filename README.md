@@ -873,3 +873,21 @@ This chapter describes some things you’ve learned about already in more detail
 >>> fruits.pop()
 'pear'
 ```
+
+### 5.1.1. Using Lists as Stacks
+
+```
+>>> stack = [3, 4, 5]
+>>> stack.append(6)
+>>> stack.append(7)
+>>> stack
+[3, 4, 5, 6, 7]
+>>> stack.pop()
+7
+>>> stack
+[3, 4, 5, 6]
+>>> stack.pop()
+6
+>>> stack.pop()
+5
+```
