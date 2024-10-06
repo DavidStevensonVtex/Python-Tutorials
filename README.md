@@ -1066,3 +1066,34 @@ statements. The zip() function would do a great job for this use case:
 See
 [Unpacking Argument Lists](https://docs.python.org/3/tutorial/controlflow.html#tut-unpacking-arguments)
 for details on the asterisk in this line.
+
+## 5.2. The del statement
+
+There is a way to remove an item from a list given its
+index instead of its value: the del statement.
+
+```
+>>> a = [-1, 1, 66.25, 333, 333, 1234.5]
+>>> a[:]
+[-1, 1, 66.25, 333, 333, 1234.5]
+>>> del a[0]
+>>> a
+[1, 66.25, 333, 333, 1234.5]
+>>> del a[2:4]
+>>> a
+[1, 66.25, 1234.5]
+>>> del a[:]
+>>> a
+[]
+```
+
+del can also be used to delete entire variables:
+
+```
+>>> a = [-1, 1, 66.25, 333, 333, 1234.5]
+>>> del a
+>>> a
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'a' is not defined
+```
