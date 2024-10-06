@@ -1162,3 +1162,39 @@ is really just a combination of tuple packing and sequence unpacking.
 >>> print(x, y, z)
 12345 54321 hello!
 ```
+
+## 5.4. Sets
+
+Python also includes a data type for _sets_. A set is an unordered collection
+with no duplicate elements. Basic uses include membership testing and
+eliminating duplicate entries. Set objects also support mathematical
+operations like union, intersection, difference, and symmetric difference.
+
+Curly braces or the set() function can be used to create sets. Note: to create
+an empty set you have to use set(), not {}; the latter creates an empty dictionary,
+a data structure that we discuss in the next section.
+
+```
+>>> basket = {'apple', 'orange', 'apple', 'pear', 'orange', 'banana'}
+>>> print(basket)                      # show that duplicates have been removed
+{'pear', 'apple', 'banana', 'orange'}
+>>> 'orange' in basket                 # fast membership testing
+True
+>>> 'crabgrass' in basket
+False
+>>>
+>>> # Demonstrate set operations on unique letters from two words
+>>>
+>>> a = set('abracadabra')
+>>> b = set('alacazam')
+>>> a                                  # unique letters in a
+{'d', 'r', 'b', 'c', 'a'}
+>>> a - b                              # letters in a but not in b
+{'d', 'r', 'b'}
+>>> a | b                              # letters in a or b or both
+{'d', 'r', 'b', 'z', 'l', 'c', 'm', 'a'}
+>>> a & b                              # letters in both a and b
+{'a', 'c'}
+>>> a ^ b                              # letters in a or b but not both
+{'m', 'd', 'r', 'b', 'z', 'l'}
+```
