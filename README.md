@@ -1198,3 +1198,15 @@ False
 >>> a ^ b                              # letters in a or b but not both
 {'m', 'd', 'r', 'b', 'z', 'l'}
 ```
+
+Similarly to list comprehensions, set comprehensions are also supported:
+
+```
+>>> b = {x for x in 'abracadabra' }
+>>> b
+{'d', 'r', 'b', 'c', 'a'}
+>>>
+>>> a = {x for x in 'abracadabra' if x not in 'abc'}
+>>> a
+{'d', 'r'}
+```
