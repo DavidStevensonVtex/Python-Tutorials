@@ -996,3 +996,11 @@ SyntaxError: did you forget parentheses around the comprehension target?
 >>> [num for elem in vec for num in elem]
 [1, 2, 3, 4, 5, 6, 7, 8, 9]
 ```
+
+List comprehensions can contain complex expressions and nested functions:
+
+```
+>>> from math import pi
+>>> [str(round(pi, i)) for i in range(1, 6)]
+['3.1', '3.14', '3.142', '3.1416', '3.14159']
+```
