@@ -1148,3 +1148,17 @@ enclose a single value in parentheses). Ugly, but effective.
 >>> singleton
 ('hello',)
 ```
+
+This is called, appropriately enough, _sequence unpacking_ and works
+for any sequence on the right-hand side. Sequence unpacking requires
+that there are as many variables on the left side of the equals sign
+as there are elements in the sequence. Note that multiple assignment
+is really just a combination of tuple packing and sequence unpacking.
+
+```
+>>> t
+(12345, 54321, 'hello!')
+>>> x, y, z = t
+>>> print(x, y, z)
+12345 54321 hello!
+```
