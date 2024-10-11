@@ -1479,3 +1479,30 @@ to use it to save typing in interactive sessions.
 >>> fibonacci(500)
 0 1 1 2 3 5 8 13 21 34 55 89 144 233 377
 ```
+
+### 6.1.1. Executing modules as scripts
+
+Add this code to fibo.py:
+
+```
+if __name__ == "__main__":
+    import sys
+
+    fib(int(sys.argv[1]))
+```
+
+When you run a Python module with
+
+python fibo.py <arguments>
+
+```
+python fibo.py 50
+0 1 1 2 3 5 8 13 21 34
+```
+
+If the module is imported, the code is not run:
+
+```
+>>> import fibo
+>>>
+```
