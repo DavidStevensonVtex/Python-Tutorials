@@ -1536,3 +1536,34 @@ After initialization, Python programs can modify sys.path.
 
 To speed up loading modules, Python caches the compiled version of each module
 in the \_\_pycache\_\_ directory under the name module.version.pyc
+
+## 6.2. Standard Modules
+
+Python comes with a library of standard modules, described in a separate document,
+the Python Library Reference (“Library Reference” hereafter).
+
+One particular module deserves some attention: sys, which is built into every Python
+interpreter. The variables sys.ps1 and sys.ps2 define the strings used as primary
+and secondary prompts:
+
+```
+>>>
+>>> import sys
+>>> sys.ps1
+'>>> '
+>>> sys.ps2
+'... '
+>>>
+>>> sys.ps1 = 'C> '
+C> print('Yuck')
+Yuck
+```
+
+These two variables are only defined if the interpreter is in interactive mode.
+
+```
+>>> import sys
+>>> sys.path.append('/ufs/guido/lib/python')
+>>> sys.path
+['', 'C:\\Program Files\\Python312\\python312.zip', 'C:\\Program Files\\Python312\\DLLs', 'C:\\Program Files\\Python312\\Lib', 'C:\\Program Files\\Python312', 'C:\\Program Files\\Python312\\Lib\\site-packages', '/ufs/guido/lib/python']
+```
