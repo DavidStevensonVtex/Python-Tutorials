@@ -1599,3 +1599,43 @@ If you want a list of those, they are defined in the standard module
 ['ArithmeticError', 'AssertionError', 'AttributeError', 'BaseException', 'BaseExceptionGroup', 'BlockingIOError', 'BrokenPipeError', 'BufferError', 'BytesWarning', 'ChildProcessError', 'ConnectionAbortedError', 'ConnectionError', 'ConnectionRefusedError', 'ConnectionResetError', 'DeprecationWarning', 'EOFError', 'Ellipsis', 'EncodingWarning', 'EnvironmentError', 'Exception', 'ExceptionGroup', 'False', 'FileExistsError', 'FileNotFoundError', 'FloatingPointError', 'FutureWarning', 'GeneratorExit', 'IOError', 'ImportError', 'ImportWarning', 'IndentationError', 'IndexError', 'InterruptedError', 'IsADirectoryError', 'KeyError', 'KeyboardInterrupt', 'LookupError', 'MemoryError', 'ModuleNotFoundError', 'NameError', 'None', 'NotADirectoryError', 'NotImplemented', 'NotImplementedError', 'OSError',
 'OverflowError', 'PendingDeprecationWarning', 'PermissionError', 'ProcessLookupError', 'RecursionError', 'ReferenceError', 'ResourceWarning', 'RuntimeError', 'RuntimeWarning', 'StopAsyncIteration', 'StopIteration', 'SyntaxError', 'SyntaxWarning', 'SystemError', 'SystemExit', 'TabError', 'TimeoutError', 'True', 'TypeError', 'UnboundLocalError', 'UnicodeDecodeError', 'UnicodeEncodeError', 'UnicodeError', 'UnicodeTranslateError', 'UnicodeWarning', 'UserWarning', 'ValueError', 'Warning', 'WindowsError', 'ZeroDivisionError', '__build_class__', '__debug__', '__doc__', '__import__', '__loader__', '__name__', '__package__', '__spec__', 'abs', 'aiter', 'all', 'anext', 'any', 'ascii', 'bin', 'bool', 'breakpoint', 'bytearray', 'bytes', 'callable', 'chr', 'classmethod', 'compile', 'complex', 'copyright', 'credits', 'delattr', 'dict', 'dir', 'divmod', 'enumerate', 'eval', 'exec', 'exit', 'filter', 'float', 'format', 'frozenset', 'getattr', 'globals', 'hasattr', 'hash', 'help', 'hex', 'id', 'input', 'int', 'isinstance', 'issubclass', 'iter', 'len', 'license', 'list', 'locals', 'map', 'max', 'memoryview', 'min', 'next', 'object', 'oct', 'open', 'ord', 'pow', 'print', 'property', 'quit', 'range', 'repr', 'reversed', 'round', 'set', 'setattr', 'slice', 'sorted', 'staticmethod', 'str', 'sum', 'super', 'tuple', 'type', 'vars', 'zip']
 ```
+
+## 6.4. Packages
+
+Packages are a way of structuring Python’s module namespace by using “dotted module names”.
+For example, the module name A.B designates a submodule named B in a package named A.
+Just like the use of modules saves the authors of different modules from having to worry
+about each other’s global variable names, the use of dotted module names saves the authors
+of multi-module packages like NumPy or Pillow from having to worry about each other’s
+module names.
+
+The \_\_init\_\_.py files are required to make Python treat directories containing the
+file as packages (unless using a namespace package, a relatively advanced feature).
+
+In the simplest case, \_\_init\_\_.py can just be an empty file, but it can also execute
+initialization code for the package or set the \_\_all\_\d\_ variable, described later.
+
+```
+import sound.effects.echo
+sound.effects.echo.echofilter(input, output, delay=0.7, atten=4)
+```
+
+An alternative way of importing the submodule is:
+
+```
+from sound.effects import echo
+echo.echofilter(input, output, delay=0.7, atten=4)
+```
+
+```
+from sound.effects.echo import echofilter
+echofilter(input, output, delay=0.7, atten=4)
+```
+
+Note that when using from package import item, the item can be either a submodule
+(or subpackage) of the package, or some other name defined in the package, like
+a function, class or variable.
+
+Contrarily, when using syntax like import item.subitem.subsubitem, each item except
+for the last must be a package; the last item can be a module or a package but can’t
+be a class or function or variable defined in the previous item.
