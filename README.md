@@ -1531,3 +1531,8 @@ sys.path is initialized from these locations:
 -   python -c code and python (REPL) command lines: prepend an empty string, which means the current working directory.
 
 After initialization, Python programs can modify sys.path.
+
+### 6.1.3. “Compiled” Python files
+
+To speed up loading modules, Python caches the compiled version of each module
+in the \_\_pycache\_\_ directory under the name module.version.pyc
