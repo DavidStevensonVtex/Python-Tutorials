@@ -1409,3 +1409,73 @@ True
 >>> (1, 2, ('aa', 'ab'))   < (1, 2, ('abc', 'a'), 4)
 True
 ```
+
+# 6. Modules
+
+fibo.py
+
+```
+# Fibonacci numbers module
+
+def fib(n):    # write Fibonacci series up to n
+    a, b = 0, 1
+    while a < n:
+        print(a, end=' ')
+        a, b = b, a+b
+    print()
+
+def fib2(n):   # return Fibonacci series up to n
+    result = []
+    a, b = 0, 1
+    while a < n:
+        result.append(a)
+        a, b = b, a+b
+    return result
+```
+
+\_\_name\_\_ is the module name.
+
+```
+>>> import fibo
+>>> fibo.fib(1000)
+0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987
+>>> fibo.__name__
+'fibo'
+>>> fib = fibo.fib
+>>> fib(500)
+0 1 1 2 3 5 8 13 21 34 55 89 144 233 377
+```
+
+## 6.1. More on Modules
+
+A module can contain executable statements as well as function definitions.
+These statements are intended to initialize the module. They are executed
+only the first time the module name is encountered in an import statement.
+(They are also run if the file is executed as a script.)
+
+Each module has its own private namespace, which is used as the global
+namespace by all functions defined in the module.
+
+```
+>>> from fibo import fib, fib2
+>>> fib(500)
+0 1 1 2 3 5 8 13 21 34 55 89 144 233 377
+>>> fib2(500)
+[0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377]
+```
+
+Note that in general the practice of importing \* from a module or package is
+rowned upon, since it often causes poorly readable code. However, it is okay
+to use it to save typing in interactive sessions.
+
+```
+>>> import fibo as fib
+>>> fib.fib(500)
+0 1 1 2 3 5 8 13 21 34 55 89 144 233 377
+```
+
+```
+>>> from fibo import fib as fibonacci
+>>> fibonacci(500)
+0 1 1 2 3 5 8 13 21 34 55 89 144 233 377
+```
