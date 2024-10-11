@@ -1506,3 +1506,28 @@ If the module is imported, the code is not run:
 >>> import fibo
 >>>
 ```
+
+### 6.1.2. The Module Search Path
+
+When a module named spam is imported, the interpreter first searches for a
+built-in module with that name. These module names are listed in
+[sys.builtin_module_names](https://docs.python.org/3/library/sys.html#sys.builtin_module_names).
+
+```
+>>> import sys
+>>> print(sys.builtin_module_names)
+('_abc', '_ast', '_bisect', '_blake2', '_codecs', '_codecs_cn', '_codecs_hk', '_codecs_iso2022', '_codecs_jp', '_codecs_kr', '_codecs_tw', '_collections', '_contextvars', '_csv', '_datetime', '_functools', '_heapq', '_imp', '_io', '_json', '_locale', '_lsprof', '_md5', '_multibytecodec', '_opcode', '_operator', '_pickle', '_random', '_sha1', '_sha2', '_sha3', '_signal', '_sre', '_stat', '_statistics', '_string', '_struct', '_symtable', '_thread', '_tokenize', '_tracemalloc',
+'_typing', '_warnings', '_weakref', '_winapi', '_xxinterpchannels', '_xxsubinterpreters', 'array', 'atexit', 'audioop', 'binascii', 'builtins', 'cmath', 'errno', 'faulthandler', 'gc', 'itertools', 'marshal', 'math', 'mmap', 'msvcrt', 'nt', 'sys', 'time', 'winreg', 'xxsubtype', 'zlib')
+```
+
+If not found, it then searches for a file named spam.py in a list of directories
+given by the variable [sys.path](https://docs.python.org/3/library/sys.html#sys.path).
+sys.path is initialized from these locations:
+
+-   python -m module command line: prepend the current working directory.
+
+-   python script.py command line: prepend the script’s directory. If it’s a symbolic link, resolve symbolic links.
+
+-   python -c code and python (REPL) command lines: prepend an empty string, which means the current working directory.
+
+After initialization, Python programs can modify sys.path.
