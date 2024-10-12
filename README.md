@@ -1929,3 +1929,16 @@ with zeros. It understands about plus and minus signs:
 >>> '3.14159265359'.zfill(5)
 '3.14159265359'
 ```
+
+### 7.1.4. Old string formatting
+
+The % operator (modulo) can also be used for string formatting. Given format % values (where format is a string), % conversion specifications in format are replaced with zero or more elements of values. This operation is commonly known as string interpolation. For example:
+
+```
+>>> import math
+>>> print('The value of pi is approximately %5.3f.' % math.pi)
+The value of pi is approximately 3.142.
+```
+
+More information can be found in the
+[printf-style String Formatting](https://docs.python.org/3/library/stdtypes.html#old-string-formatting) section.
