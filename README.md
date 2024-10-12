@@ -1881,3 +1881,51 @@ As an example, the following lines produce a tidily aligned set of columns givin
 
 For a complete overview of string formatting with str.format(), see
 [Format String Syntax](https://docs.python.org/3/library/string.html#formatstrings).
+
+### 7.1.3. Manual String Formatting
+
+```
+>>> for x in range(1, 11):
+...     print(repr(x).rjust(2), repr(x*x).rjust(3), end=' ')
+...     # Note use of 'end' on previous line
+...     print(repr(x*x*x).rjust(4))
+...
+ 1   1    1
+ 2   4    8
+ 3   9   27
+ 4  16   64
+ 5  25  125
+ 6  36  216
+ 7  49  343
+ 8  64  512
+ 9  81  729
+10 100 1000
+```
+
+```
+>>> for x in range(1,11):
+...     print(str(x).rjust(2), str(x*x).rjust(3), str(x*x*x).rjust(4))
+...
+ 1   1    1
+ 2   4    8
+ 3   9   27
+ 4  16   64
+ 5  25  125
+ 6  36  216
+ 7  49  343
+ 8  64  512
+ 9  81  729
+10 100 1000
+```
+
+There is another method, str.zfill(), which pads a numeric string on the left
+with zeros. It understands about plus and minus signs:
+
+```
+>>> '12'.zfill(5)
+'00012'
+>>> '-3.14'.zfill(7)
+'-003.14'
+>>> '3.14159265359'.zfill(5)
+'3.14159265359'
+```
