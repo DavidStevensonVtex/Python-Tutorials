@@ -1775,3 +1775,45 @@ The value of x is 32.5, and y is 40000...
 >>> repr((x, y, ('spam', 'eggs')))
 "(32.5, 40000, ('spam', 'eggs'))"
 ```
+
+### 7.1.1. Formatted String Literals
+
+[Formatted string literals](https://docs.python.org/3/reference/lexical_analysis.html#f-strings) (also called f-strings for short) let you include the value of Python expressions inside a string by prefixing the string with f or F and writing expressions as {expression}.
+
+```
+>>> import math
+>>> print(f'The value of pi is approximately {math.pi:.3f}.')
+The value of pi is approximately 3.142.
+```
+
+Passing an integer after the ':' will cause that field to be a minimum number of characters wide. This is useful for making columns line up.
+
+```
+>>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 7678}
+>>> for name, phone in table.items():
+...     print(f'{name:10} ==> {phone:10d}')
+...
+Sjoerd     ==>       4127
+Jack       ==>       4098
+Dcab       ==>       7678
+```
+
+Other modifiers can be used to convert the value before it is formatted. '!a' applies ascii(), '!s' applies str(), and '!r' applies repr():
+
+```
+>>> animals = 'eels'
+>>> print(f'My hovercraft is full of {animals}.')
+My hovercraft is full of eels.
+>>> print(f'My overcraft is full of {animals!r}.')
+My overcraft is full of 'eels'.
+```
+
+The = specifier can be used to expand an expression to the text of the expression, an equal sign, then the representation of the evaluated expression:
+
+```
+>>> bugs = 'roaches'
+>>> count = 13
+>>> area = 'living room'
+>>> print(f'Debugging {bugs} {count=} {area=}')
+Debugging roaches count=13 area='living room'
+```
