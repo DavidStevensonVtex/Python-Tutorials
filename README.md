@@ -2031,3 +2031,41 @@ b'5'
 >>> f.read(1)
 b'f'
 ```
+
+### 7.2.2. Saving structured data with [json](https://docs.python.org/3/library/json.html#module-json)
+
+The standard module called json can take Python data hierarchies, and convert them to string representations; this process is called serializing. Reconstructing the data from the string representation is called deserializing. Between serializing and deserializing, the string representing the object may have been stored in a file or data, or sent over a network connection to some distant machine.
+
+```
+>>> import json
+>>> x = [1, 'simple', 'list' ]
+>>> json.dumps(x)
+'[1, "simple", "list"]'
+```
+
+Another variant of the dumps() function, called dump(), simply serializes the object to a text file. So if f is a text file object opened for writing, we can do this:
+
+```
+json.dump(x, f)
+```
+
+To decode the object again, if f is a binary file or text file object which has been opened for reading:
+
+```
+x = json.load(f)
+```
+
+**Note:** JSON files must be encoded in UTF-8.
+Use encoding="utf-8" when opening JSON file
+as a text file for both of reading and writing.
+
+This simple serialization technique can handle lists and dictionaries, but serializing arbitrary class instances in JSON requires a bit of extra effort.
+The reference for the
+[json](https://docs.python.org/3/library/json.html#module-json)
+module contains an explanation of this.
+
+See also pickle - the pickle module
+
+Contrary to JSON,
+[pickle](https://docs.python.org/3/library/pickle.html#module-pickle)
+is a protocol which allows the serialization of arbitrarily complex Python objects. As such, it is specific to Python and cannot be used to communicate with applications written in other languages. It is also insecure by default: deserializing pickle data coming from an untrusted source can execute arbitrary code, if the data was crafted by a skilled attacker.
