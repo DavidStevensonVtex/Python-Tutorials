@@ -2069,3 +2069,17 @@ See also pickle - the pickle module
 Contrary to JSON,
 [pickle](https://docs.python.org/3/library/pickle.html#module-pickle)
 is a protocol which allows the serialization of arbitrarily complex Python objects. As such, it is specific to Python and cannot be used to communicate with applications written in other languages. It is also insecure by default: deserializing pickle data coming from an untrusted source can execute arbitrary code, if the data was crafted by a skilled attacker.
+
+# 8. Errors and Exceptions
+
+## 8.1. Syntax Errors
+
+```
+>>> while True print('Hello world')
+  File "<stdin>", line 1
+    while True print('Hello world')
+               ^^^^^
+SyntaxError: invalid syntax
+```
+
+The parser repeats the offending line and displays little ‘arrow’s pointing at the token in the line where the error was detected.
