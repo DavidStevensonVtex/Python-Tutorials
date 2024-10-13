@@ -2104,3 +2104,112 @@ TypeError: can only concatenate str (not "int") to str
 ```
 
 [Built-in Exceptions](https://docs.python.org/3/library/exceptions.html#bltin-exceptions) lists the built-in exceptions and their meanings.
+
+## 8.3. Handling Exceptions
+
+```
+>>> while True:
+...     try:
+...             x = int(input("Please enter a number: "))
+...     except ValueError:
+...             print("Oops!  That was no valid number.  Try again...")
+...
+Please enter a number: abc
+Oops!  That was no valid number.  Try again...
+Please enter a number: 123
+```
+
+A try statement may have more than one except clause, to specify handlers for different exceptions.
+
+```
+... except (RuntimeError, TypeError, NameError):
+...     pass
+```
+
+A class in an except clause matches exceptions which are instances of the class itself or one of its derived classes (but not the other way around — an except clause listing a derived class does not match instances of its base classes).
+
+```
+>>> class B(Exception):
+...     pass
+...
+>>> class C(B):
+...     pass
+...
+>>> class D(C):
+...     pass
+...
+>>> for cls in [B, C, D]:
+...     try:
+...         raise cls()
+...     except D:
+...         print("D")
+...     except C:
+...         print("C")
+...     except B:
+...         print("B")
+...
+B
+C
+D
+```
+
+```
+>>> try:
+...     raise Exception('spam', 'eggs')
+... except Exception as inst:
+...     print(type(inst))    # the exception type
+...     print(inst.args)     # arguments stored in .args
+...     print(inst)          # __str__ allows args to be printed directly,
+...                          # but may be overridden in exception subclasses
+...     x, y = inst.args     # unpack args
+...     print('x =', x)
+...     print('y =', y)
+...
+<class 'Exception'>
+('spam', 'eggs')
+('spam', 'eggs')
+x = spam
+y = eggs
+```
+
+BaseException is the common base class of all exceptions.
+
+One of its subclasses, Exception, is the base class of all the non-fatal exceptions.
+
+Exceptions which are not subclasses of Exception are not typically handled, because they are used to indicate that the program should terminate. They include SystemExit which is raised by sys.exit() and KeyboardInterrupt which is raised when a user wishes to interrupt the program.
+
+The most common pattern for handling Exception is to print or log the exception and then re-raise it (allowing a caller to handle the exception as well):
+
+```
+>>> import sys
+>>>
+>>> try:
+...     f = open('myfile.txt')
+...     s = f.readline()
+...     i = int(s.strip())
+... except OSError as err:
+...     print("OS error:", err)
+... except ValueError:
+...     print("Could not convert data to an integer.")
+... except Exception as err:
+...     print(f"Unexpected {err=}, {type(err)=}")
+...     raise
+...
+OS error: [Errno 2] No such file or directory: 'myfile.txt'
+```
+
+The try … except statement has an optional else clause, which, when present, must follow all except clauses. It is useful for code that must be executed if the try clause does not raise an exception.
+
+Exception handlers do not handle only exceptions that occur immediately in the try clause, but also those that occur inside functions that are called (even indirectly) in the try clause. For example:
+
+```
+>>> def this_fails():
+...     x = 1/0
+...
+>>> try:
+...     this_fails()
+... except ZeroDivisionError as err:
+...     print('Handling run-time error:', err)
+...
+Handling run-time error: division by zero
+```
