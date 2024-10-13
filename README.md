@@ -1976,3 +1976,58 @@ If you’re not using the
 keyword, then you should call f.close() to close the file and immediately free up any system resources used by it.
 
 After a file object is closed, either by a with statement or by calling f.close(), attempts to use the file object will automatically fail.
+
+### 7.2.1. Methods of File Objects
+
+The rest of the examples in this section will assume that a file object called f has already been created.
+
+To read a file’s contents, call f.read(size), which reads some quantity of data and returns it as a string (in text mode) or bytes object (in binary mode). size is an optional numeric argument.
+
+When size is omitted or negative, the entire contents of the file will be read and returned; it’s your problem if the file is twice as large as your machine’s memory.
+
+f.readline() reads a single line from the file; a newline character (\n) is left at the end of the string, and is only omitted on the last line of the file if the file doesn’t end in a newline.
+
+For reading lines from a file, you can loop over the file object.
+This is memory efficient, fast, and leads to simple code:
+
+```
+>>> with open('workfile', encoding="utf-8") as f:
+...     for line in f:
+...             print(line, end='')
+...
+This is the first line of the file.
+Second line of the file
+```
+
+f.write(string) writes the contents of string to the file, returning the number of characters written.
+
+Other types of objects need to be converted – either to a string (in text mode) or a bytes object (in binary mode) – before writing them:
+
+```
+>>> with open('outputfile', 'w', encoding="utf-8") as f:
+...     value = ('the answer', 42)
+...     s = str(value)
+...     f.write(s)
+...
+18
+```
+
+outputfile:
+
+```
+('the answer', 42)
+```
+
+```
+>>> f = open('outputfile', 'rb+')
+>>> f.write(b'0123456789abcdef')
+16
+>>> f.seek(5)    # Go to the 6th byte in the file
+5
+>>> f.read(1)
+b'5'
+>>> f.seek(-3,2)  # Go to the 3rd byte before the end
+15
+>>> f.read(1)
+b'f'
+```
