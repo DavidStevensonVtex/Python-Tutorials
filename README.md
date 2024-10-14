@@ -2372,3 +2372,22 @@ executing finally clause
 ```
 
 In real world applications, the finally clause is useful for releasing external resources (such as files or network connections), regardless of whether the use of the resource was successful.
+
+## 8.8. Predefined Clean-up Actions
+
+```
+for line in open("myfile.txt"):
+    print(line, end="")
+```
+
+The problem with this code is that it leaves the file open for an indeterminate amount of time after this part of the code has finished executing.
+
+The with statement allows objects like files to be used in a way that ensures they are always cleaned up promptly and correctly.
+
+```
+with open("myfile.txt") as f:
+    for line in f:
+        print(line, end="")
+```
+
+After the statement is executed, the file f is always closed, even if a problem was encountered while processing the lines.
