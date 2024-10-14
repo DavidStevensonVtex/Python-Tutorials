@@ -2323,3 +2323,52 @@ Programs may name their own exceptions by creating a new exception class (see Cl
 Exception classes can be defined which do anything any other class can do, but are usually kept simple, often only offering a number of attributes that allow information about the error to be extracted by handlers for the exception.
 
 Most exceptions are defined with names that end in “Error”, similar to the naming of the standard exceptions.
+
+## 8.7. Defining Clean-up Actions
+
+The try statement has another optional clause which is intended to define clean-up actions that must be executed under all circumstances. For example:
+
+```
+>>> try:
+...     raise KeyboardInterrupt
+... finally:
+...     print('Goodbye, world!')
+...
+Goodbye, world!
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+KeyboardInterrupt
+```
+
+If a finally clause is present, the finally clause will execute as the last task before the try statement completes. The finally clause runs whether or not the try statement produces an exception.
+
+-   If an exception occurs during execution of the try clause, the exception may be handled by an except clause.
+
+```
+>>> def bool_return():
+...     try:
+...         return True
+...     finally:
+...         return False
+...
+>>> bool_return()
+False
+```
+
+```
+>>> def divide(x, y):
+...     try:
+...         result = x / y
+...     except ZeroDivisionError:
+...         print("division by zero!")
+...     else:
+...         print("result is", result)
+...     finally:
+...         print("executing finally clause")
+...
+>>> divide(2, 1)
+result is 2.0
+executing finally clause
+```
+
+In real world applications, the finally clause is useful for releasing external resources (such as files or network connections), regardless of whether the use of the resource was successful.
