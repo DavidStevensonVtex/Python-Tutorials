@@ -2391,3 +2391,35 @@ with open("myfile.txt") as f:
 ```
 
 After the statement is executed, the file f is always closed, even if a problem was encountered while processing the lines.
+
+## 8.9. Raising and Handling Multiple Unrelated Exceptions
+
+There are situations where it is necessary to report several exceptions that have occurred. This is often the case in concurrency frameworks, when several tasks may have failed in parallel, but there are also other use cases where it is desirable to continue execution and collect multiple errors rather than raise the first exception.
+
+The builtin ExceptionGroup wraps a list of exception instances so that they can be raised together. It is an exception itself, so it can be caught like any other exception.
+
+```
+>>> def f():
+...     excs = [OSError('error 1'), SystemError('error 2')]
+...     raise ExceptionGroup('there were problems', excs)
+...
+>>> f()
+  + Exception Group Traceback (most recent call last):
+  |   File "<stdin>", line 1, in <module>
+  |   File "<stdin>", line 3, in f
+  | ExceptionGroup: there were problems (2 sub-exceptions)
+  +-+---------------- 1 ----------------
+    | OSError: error 1
+    +---------------- 2 ----------------
+    | SystemError: error 2
+    +------------------------------------
+```
+
+```
+>>> try:
+...     f()
+... except Exception as e:
+...     print(f'caught {type(e)}: e')
+...
+caught <class 'ExceptionGroup'>: e
+```
