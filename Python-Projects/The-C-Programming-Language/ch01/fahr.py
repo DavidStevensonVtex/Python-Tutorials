@@ -1,12 +1,6 @@
-lower = 0.0
-upper = 300.0
-step = 20.0
-
-fahr = lower
-while (fahr <= upper):
+for fahr in range(0,301,20):
     celsius = (5.0 / 9.0) * (fahr -32.0)
     print("%3.0f\t%6.1f" %  (fahr, celsius))
-    fahr = fahr + step
 
 #   0      -17.8
 #  20       -6.7
