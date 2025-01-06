@@ -1,9 +1,6 @@
 import sys
 
-while True:
-    c = sys.stdin.read(1);
-    if not c:
-        break   # Exit the loop if no more input
+while (c := sys.stdin.read(1)):
     sys.stdout.write(c)
 
 # $ python copy.py < rain-in-Spain.txt 
