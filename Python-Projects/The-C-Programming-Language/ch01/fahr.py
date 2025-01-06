@@ -1,4 +1,7 @@
-for fahr in range(0,301,20):
+LOWER=0
+UPPER=300
+STEP=20
+for fahr in range(LOWER,UPPER+1,STEP):
     celsius = (5.0 / 9.0) * (fahr -32.0)
     print("%3.0f\t%6.1f" %  (fahr, celsius))
 
