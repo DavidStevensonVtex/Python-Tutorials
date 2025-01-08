@@ -143,3 +143,20 @@ The other kind of instance attribute reference is a _method_. A method is a func
 
 By definition, all attributes of a class that are function objects define corresponding methods of its instances.
 x.f is not the same thing as MyClass.f — it is a _method object_, not a function object.
+
+#### 9.3.4. Method Objects
+
+Usually, a method is called right after it is bound:
+
+`x.f()`
+
+It is not necessary to call a method right away: x.f is a method object, and can be stored away and called at a later time. For example:
+
+```
+xf = x.f
+while True:
+    print(xf())
+```
+
+The special thing about methods is that the instance object is passed as the first argument of the function.
+x.f() is exactly equivalent to MyClass.f(x). In general, calling a method with a list of _n_ arguments is equivalent to calling the corresponding function with an argument list that is created by inserting the method’s instance object before the first argument.
