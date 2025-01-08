@@ -122,3 +122,24 @@ Of course, the \_\_init\_\_() method may have arguments for greater flexibility.
 >>> x.r, x.i
 (3.0, -4.5)
 ```
+
+#### 9.3.3. Instance Objects
+
+Now what can we do with instance objects? The only operations understood by instance objects are attribute references. There are two kinds of valid attribute names: data attributes and methods.
+
+_data attributes_ correspond to “instance variables”. Data attributes need not be declared; like local variables, they spring into existence when they are first assigned to.
+
+For example, if x is the instance of MyClass created above, the following piece of code will print the value 16, without leaving a trace:
+
+```
+x.counter = 1
+while x.counter < 10:
+    x.counter = x.counter * 2
+print(x.counter)
+del x.counter
+```
+
+The other kind of instance attribute reference is a _method_. A method is a function that “belongs to” an object.
+
+By definition, all attributes of a class that are function objects define corresponding methods of its instances.
+x.f is not the same thing as MyClass.f — it is a _method object_, not a function object.
