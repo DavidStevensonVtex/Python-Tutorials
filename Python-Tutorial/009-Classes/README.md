@@ -49,3 +49,5 @@ Although scopes are determined statically, they are used dynamically. At any tim
 -   the outermost scope (searched last) is the namespace containing built-in names
 
 A special quirk of Python is that – if no [global](https://docs.python.org/3/reference/simple_stmts.html#global) or [nonlocal](https://docs.python.org/3/reference/simple_stmts.html#nonlocal) statement is in effect – assignments to names always go into the innermost scope.
+
+#### 9.2.1. Scopes and Namespaces Example
