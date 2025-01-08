@@ -51,3 +51,27 @@ Although scopes are determined statically, they are used dynamically. At any tim
 A special quirk of Python is that – if no [global](https://docs.python.org/3/reference/simple_stmts.html#global) or [nonlocal](https://docs.python.org/3/reference/simple_stmts.html#nonlocal) statement is in effect – assignments to names always go into the innermost scope.
 
 #### 9.2.1. Scopes and Namespaces Example
+
+### 9.3. A First Look at Classes
+
+#### 9.3.1. Class Definition Syntax
+
+The simplest form of class definition looks like this:
+
+```
+class ClassName:
+    <statement-1>
+    .
+    .
+    .
+    <statement-N>
+```
+
+Class definitions, like function definitions (def statements) must be executed before they have any effect.
+
+In practice, the statements inside a class definition will usually be function definitions, but other statements are allowed. The function definitions inside a class normally have a peculiar form of argument list.
+
+When a class definition is entered, a new namespace is created, and used as the local scope.
+
+When a class definition is left normally (via the end), a _class object_ is created.
+This is basically a wrapper around the contents of the namespace created by the class definition.
