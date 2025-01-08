@@ -13,3 +13,6 @@ def squeeze(s1, s2):
 
 str = " squeeze  ;  me  :  tight   "
 print(repr(str), repr(squeeze(str, " ;:")))
+
+# $ python exercise-2-4.py
+# ' squeeze  ;  me  :  tight   ' 'squeezemetight'
