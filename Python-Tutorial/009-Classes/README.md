@@ -164,3 +164,7 @@ x.f() is exactly equivalent to MyClass.f(x). In general, calling a method with a
 #### 9.3.5. Class and Instance Variables
 
 Generally speaking, instance variables are for data unique to each instance and class variables are for attributes and methods shared by all instances of the class:
+
+### 9.4. Random Remarks
+
+If the same attribute name occurs in both an instance and in a class, then attribute lookup prioritizes the instance:
