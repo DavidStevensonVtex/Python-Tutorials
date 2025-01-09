@@ -278,3 +278,40 @@ For most purposes, in the simplest cases, you can think of the search for attrib
 In fact, it is slightly more complex than that; the method resolution order changes dynamically to support cooperative calls to super(). This approach is known in some other multiple-inheritance languages as call-next-method and is more powerful than the super call found in single-inheritance languages.
 
 Dynamic ordering is necessary because all cases of multiple inheritance exhibit one or more diamond relationships (where at least one of the parent classes can be accessed through multiple paths from the bottommost class). For example, all classes inherit from object, so any case of multiple inheritance provides more than one path to reach object. To keep the base classes from being accessed more than once, the dynamic algorithm linearizes the search order in a way that preserves the left-to-right ordering specified in each class, that calls each parent only once, and that is monotonic (meaning that a class can be subclassed without affecting the precedence order of its parents). Taken together, these properties make it possible to design reliable and extensible classes with multiple inheritance. For more detail, see [The Python 2.3 Method Resolution Order](https://docs.python.org/3/howto/mro.html#python-2-3-mro).
+
+### 9.6. Private Variables
+
+“Private” instance variables that cannot be accessed except from inside an object don’t exist in Python. However, there is a convention that is followed by most Python code: a name prefixed with an underscore (e.g. \_spam) should be treated as a non-public part of the API (whether it is a function, a method or a data member). It should be considered an implementation detail and subject to change without notice.
+
+Since there is a valid use-case for class-private members (namely to avoid name clashes of names with names defined by subclasses), there is limited support for such a mechanism, called _name mangling_. Any identifier of the form \_\_spam (at least two leading underscores, at most one trailing underscore) is textually replaced with \_classname\_\_spam, where classname is the current class name with leading underscore(s) stripped. This mangling is done without regard to the syntactic position of the identifier, as long as it occurs within the definition of a class.
+
+See also The [private name mangling specifications](https://docs.python.org/3/reference/expressions.html#private-name-mangling) for details and special cases.
+
+Name mangling is helpful for letting subclasses override methods without breaking intraclass method calls. For example:
+
+```
+class Mapping:
+    def __init__(self, iterable):
+        self.items_list = []
+        self.__update(iterable)
+
+    def update(self, iterable):
+        for item in iterable:
+            self.items_list.append(item)
+
+    __update = update   # private copy of original update() method
+
+class MappingSubclass(Mapping):
+
+    def update(self, keys, values):
+        # provides new signature for update()
+        # but does not break __init__()
+        for item in zip(keys, values):
+            self.items_list.append(item)
+```
+
+The above example would work even if MappingSubclass were to introduce a \_\_update identifier since it is replaced with \_Mapping\_\_update in the Mapping class and \_MappingSubclass\_\_update in the MappingSubclass class respectively.
+
+Note that the mangling rules are designed mostly to avoid accidents; it still is possible to access or modify a variable that is considered private. This can even be useful in special circumstances, such as in the debugger.
+
+Notice that code passed to exec() or eval() does not consider the classname of the invoking class to be the current class; this is similar to the effect of the global statement, the effect of which is likewise restricted to code that is byte-compiled together. The same restriction applies to getattr(), setattr() and delattr(), as well as when referencing \_\_dict\_\_ directly.
