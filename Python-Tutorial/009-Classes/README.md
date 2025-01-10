@@ -354,3 +354,5 @@ for char in "123":
 for line in open("myfile.txt"):
     print(line, end='')
 ```
+
+This style of access is clear, concise, and convenient. The use of iterators pervades and unifies Python. Behind the scenes, the for statement calls [iter()](https://docs.python.org/3/library/functions.html#iter) on the container object. The function returns an iterator object that defines the method \_\_next\_\_() which accesses elements in the container one at a time. When there are no more elements, [\_\_next\_\_()](https://docs.python.org/3/library/stdtypes.html#iterator.__next__) raises a [StopIteration](https://docs.python.org/3/library/exceptions.html#StopIteration) exception which tells the for loop to terminate. You can call the \_\_next\_\_() method using the next() built-in function; this example shows how it all works:
