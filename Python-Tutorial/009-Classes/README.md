@@ -337,3 +337,20 @@ class Employee:
 >>> john.salary
 1000
 ```
+
+### 9.8 Iterators
+
+By now you have probably noticed that most container objects can be looped over using a for statement:
+
+```
+for element in [1, 2, 3]:
+    print(element)
+for element in (1, 2, 3):
+    print(element)
+for key in {'one':1, 'two':2}:
+    print(key)
+for char in "123":
+    print(char)
+for line in open("myfile.txt"):
+    print(line, end='')
+```
