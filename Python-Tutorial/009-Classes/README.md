@@ -362,3 +362,22 @@ Having seen the mechanics behind the iterator protocol, it is easy to add iterat
 ### 9.9 Generators
 
 [Generators](https://docs.python.org/3/glossary.html#term-generator) are a simple and powerful tool for creating iterators. They are written like regular functions but use the [yield](https://docs.python.org/3/reference/simple_stmts.html#yield) statement whenever they want to return data. Each time next() is called on it, the generator resumes where it left off (it remembers all the data values and which statement was last executed). An example shows that generators can be trivially easy to create:
+
+```
+def reverse(data):
+    for index in range(len(data)-1, -1, -1):
+        yield data[index]
+
+for char in reverse('golf'):
+    print(char, end=" ")
+print()
+
+# $ python generators.py
+# f l o g
+```
+
+Anything that can be done with generators can also be done with class-based iterators as described in the previous section. What makes generators so compact is that the \_\_iter\_\_() and \_\_next\_\_() methods are created automatically.
+
+Another key feature is that the local variables and execution state are automatically saved between calls. This made the function easier to write and much more clear than an approach using instance variables like self.index and self.data.
+
+In addition to automatic method creation and saving program state, when generators terminate, they automatically raise StopIteration. In combination, these features make it easy to create iterators with no more effort than writing a regular function.
