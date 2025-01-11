@@ -65,3 +65,14 @@ print(args)
 ```
 
 When run at the command line with python top.py --lines=5 alpha.txt beta.txt, the script sets args.lines to 5 and args.filenames to ['alpha.txt', 'beta.txt'].
+
+### 10.4. Error Output Redirection and Program Termination
+
+The [sys](https://docs.python.org/3/library/sys.html#module-sys) module also has attributes for stdin, stdout, and stderr. The latter is useful for emitting warnings and error messages to make them visible even when stdout has been redirected:
+
+```
+sys.stderr.write('Warning, log file not found starting a new one\n')
+Warning, log file not found starting a new one
+```
+
+The most direct way to terminate a script is to use sys.exit().
