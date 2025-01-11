@@ -37,3 +37,13 @@ shutil.copyfile('data.db', 'archive.db')
 shutil.move('/build/executables', 'installdir')
 'installdir'
 ```
+
+### 10.2. File Wildcards
+
+The [glob](https://docs.python.org/3/library/glob.html#module-glob) module provides a function for making file lists from directory wildcard searches:
+
+```
+import glob
+glob.glob('*.py')
+['primes.py', 'random.py', 'quote.py']
+```
