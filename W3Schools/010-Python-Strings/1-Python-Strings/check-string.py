@@ -7,5 +7,9 @@
 txt = "The best things in life are free!"
 print("free" in txt)
 
-# $ python3 check-string.py 
-# True
+txt = "The best things in life are free!"
+if "free" in txt:
+  print("Yes, 'free' is present.")
+
+txt = "The best things in life are free!"
+print("expensive" not in txt)
