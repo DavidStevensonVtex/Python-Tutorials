@@ -10,7 +10,17 @@ sed do eiusmod tempor incididunt
 ut labore et dolore magna aliqua."""
 print(a)
 
-# $ python3 multiline-strings.py 
+a = '''Lorem ipsum dolor sit amet,
+consectetur adipiscing elit,
+sed do eiusmod tempor incididunt
+ut labore et dolore magna aliqua.'''
+print(a)
+
+$ python3 multiline-strings.py 
+# Lorem ipsum dolor sit amet,
+# consectetur adipiscing elit,
+# sed do eiusmod tempor incididunt
+# ut labore et dolore magna aliqua.
 # Lorem ipsum dolor sit amet,
 # consectetur adipiscing elit,
 # sed do eiusmod tempor incididunt
