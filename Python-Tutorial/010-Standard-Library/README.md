@@ -147,3 +147,30 @@ The [statistics](https://docs.python.org/3/library/statistics.html#module-statis
 ```
 
 The [SciPy project](https://scipy.org) has many other modules for numerical computations.
+
+### 10.7. Internet Access
+
+There are a number of modules for accessing the internet and processing internet protocols. Two of the simplest are [urllib.request](https://docs.python.org/3/library/urllib.request.html#module-urllib.request) for retrieving data from URLs and [smtplib](https://docs.python.org/3/library/smtplib.html#module-smtplib) for sending mail:
+
+```
+from urllib.request import urlopen
+with urlopen('http://worldtimeapi.org/api/timezone/etc/UTC.txt') as response:
+    for line in response:
+        line = line.decode()             # Convert bytes to a str
+        if line.startswith('datetime'):
+            print(line.rstrip())         # Remove trailing newline
+
+datetime: 2025-01-12T18:00:11.882054+00:00
+```
+
+```
+import smtplib
+server = smtplib.SMTP('localhost')
+server.sendmail('soothsayer@example.org', 'jcaesar@example.org',
+"""To: jcaesar@example.org
+From: soothsayer@example.org
+
+Beware the Ides of March.
+""")
+server.quit()
+```
