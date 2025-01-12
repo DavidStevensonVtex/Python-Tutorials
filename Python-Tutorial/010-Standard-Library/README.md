@@ -212,3 +212,19 @@ b'witch which has which witches wrist watch'
 >>> zlib.crc32(s)
 226805979
 ```
+
+### 10.10. Performance Measurement
+
+Some Python users develop a deep interest in knowing the relative performance of different approaches to the same problem. Python provides a measurement tool that answers those questions immediately.
+
+For example, it may be tempting to use the tuple packing and unpacking feature instead of the traditional approach to swapping arguments. The [timeit]() module quickly demonstrates a modest performance advantage:
+
+```
+>>> from timeit import Timer
+>>> Timer('t=a; a=b; b=t', 'a=1; b=2').timeit()
+0.029449516998283798
+>>> Timer('a,b = b,a', 'a=1; b=2').timeit()
+0.02822032800031593
+```
+
+In contrast to timeit’s fine level of granularity, the [profile](https://docs.python.org/3/library/profile.html#module-profile) and [pstats](https://docs.python.org/3/library/profile.html#module-pstats) modules provide tools for identifying time critical sections in larger blocks of code.
