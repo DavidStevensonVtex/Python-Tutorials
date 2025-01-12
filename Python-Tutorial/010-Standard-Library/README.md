@@ -174,3 +174,23 @@ Beware the Ides of March.
 """)
 server.quit()
 ```
+
+### 10.8. Dates and Times
+
+The [datetime](https://docs.python.org/3/library/datetime.html#module-datetime) module supplies classes for manipulating dates and times in both simple and complex ways. While date and time arithmetic is supported, the focus of the implementation is on efficient member extraction for output formatting and manipulation. The module also supports objects that are timezone aware.
+
+```
+>>> # dates are easily constructed and formatted
+>>> from datetime import date
+>>> now = date.today()
+>>> now
+datetime.date(2025, 1, 12)
+>>> now.strftime("%m-%d-%y. %d %b %Y is a %A on the %d day of %B.")
+'01-12-25. 12 Jan 2025 is a Sunday on the 12 day of January.'
+>>> 
+>>> # dates support calendar arithmetic
+>>> birthday = date(1964, 7, 31)
+>>> age = now - birthday
+>>> age.days
+22080
+```
