@@ -70,5 +70,13 @@ Operator	Description	Example	Try it
 Identity operators are used to compare the objects, not if they are equal, but if they are actually the same object, with the same memory location:
 
 Operator	Description	Example
-* is 	Returns True if both variables are the same object	x is y	
-* is not	Returns True if both variables are not the same object	x is not y
+* **is** 	Returns True if both variables are the same object	x is y	
+* **is not**	Returns True if both variables are not the same object	x is not y
+
+### Python Membership Operators
+
+Membership operators are used to test if a sequence is presented in an object:
+
+Operator	Description	Example	Try it
+* **in** 	Returns True if a sequence with the specified value is present in the object	x in y	
+* **not in**	Returns True if a sequence with the specified value is not present in the object
