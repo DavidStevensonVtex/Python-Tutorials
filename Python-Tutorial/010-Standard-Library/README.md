@@ -265,3 +265,17 @@ class TestStatisticalFunctions(unittest.TestCase):
 
 unittest.main()  # Calling from the command line invokes all tests
 ```
+
+### 10.12. Batteries Included
+
+Python has a “batteries included” philosophy. This is best seen through the sophisticated and robust capabilities of its larger packages. For example:
+
+* The [xmlrpc.client](https://docs.python.org/3/library/xmlrpc.client.html#module-xmlrpc.client) and [xmlrpc.server](https://docs.python.org/3/library/xmlrpc.server.html#module-xmlrpc.server) modules make implementing remote procedure calls into an almost trivial task. Despite the modules’ names, no direct knowledge or handling of XML is needed.
+
+* The [email](https://docs.python.org/3/library/email.html#module-email) package is a library for managing email messages, including MIME and other [RFC 2822-based](https://datatracker.ietf.org/doc/html/rfc2822.html) message documents. Unlike [smtplib](https://docs.python.org/3/library/smtplib.html#module-smtplib) and [poplib](https://docs.python.org/3/library/poplib.html#module-poplib) which actually send and receive messages, the email package has a complete toolset for building or decoding complex message structures (including attachments) and for implementing internet encoding and header protocols.
+
+* The [json](https://docs.python.org/3/library/json.html#module-json) package provides robust support for parsing this popular data interchange format. The csv module supports direct reading and writing of files in Comma-Separated Value format, commonly supported by databases and spreadsheets. XML processing is supported by the [xml.etree.ElementTree](https://docs.python.org/3/library/xml.etree.elementtree.html#module-xml.etree.ElementTree), [xml.dom](https://docs.python.org/3/library/xml.dom.html#module-xml.dom) and [xml.sax](https://docs.python.org/3/library/xml.sax.html#module-xml.sax) packages. Together, these modules and packages greatly simplify data interchange between Python applications and other tools.
+
+* The [sqlite3](https://docs.python.org/3/library/sqlite3.html#module-sqlite3) module is a wrapper for the SQLite database library, providing a persistent database that can be updated and accessed using slightly nonstandard SQL syntax.
+
+* Internationalization is supported by a number of modules including [gettext](https://docs.python.org/3/library/gettext.html#module-gettext), [locale](https://docs.python.org/3/library/locale.html#module-locale), and the [codecs](https://docs.python.org/3/library/codecs.html#module-codecs) package.
