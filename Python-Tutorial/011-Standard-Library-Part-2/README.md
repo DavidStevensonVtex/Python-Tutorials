@@ -123,3 +123,28 @@ img_1077.jpg --> Ashley_2.jpg
 ```
 
 Another application for templating is separating program logic from the details of multiple output formats. This makes it possible to substitute custom templates for XML files, plain text reports, and HTML web reports.
+
+### 11.3. Working with Binary Data Record Layouts
+
+The [struct](https://docs.python.org/3/library/struct.html#module-struct) module provides [pack()](https://docs.python.org/3/library/struct.html#struct.pack) and [unpack()](https://docs.python.org/3/library/struct.html#struct.unpack) functions for working with variable length binary record formats. The following example shows how to loop through header information in a ZIP file without using the [zipfile](https://docs.python.org/3/library/zipfile.html#module-zipfile) module. Pack codes "H" and "I" represent two and four byte unsigned numbers respectively. The "<" indicates that they are standard size and in little-endian byte order:
+
+```
+import struct
+
+with open('myfile.zip', 'rb') as f:
+    data = f.read()
+
+start = 0
+for i in range(3):                      # show the first 3 file headers
+    start += 14
+    fields = struct.unpack('<IIIHH', data[start:start+16])
+    crc32, comp_size, uncomp_size, filenamesize, extra_size = fields
+
+    start += 16
+    filename = data[start:start+filenamesize]
+    start += filenamesize
+    extra = data[start:start+extra_size]
+    print(filename, hex(crc32), comp_size, uncomp_size)
+
+    start += extra_size + comp_size     # skip to the next header
+```
