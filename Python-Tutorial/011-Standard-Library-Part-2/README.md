@@ -181,3 +181,32 @@ print('Main program waited until background was done.')
 The principal challenge of multi-threaded applications is coordinating threads that share data or other resources. To that end, the threading module provides a number of synchronization primitives including locks, events, condition variables, and semaphores.
 
 While those tools are powerful, minor design errors can result in problems that are difficult to reproduce. So, the preferred approach to task coordination is to concentrate all access to a resource in a single thread and then use the [queue](https://docs.python.org/3/library/queue.html#module-queue) module to feed that thread with requests from other threads. Applications using [Queue](https://docs.python.org/3/library/queue.html#queue.Queue) objects for inter-thread communication and coordination are easier to design, more readable, and more reliable.
+
+### 11.5. Logging
+
+The logging module offers a full featured and flexible logging system. At its simplest, log messages are sent to a file or to sys.stderr:
+
+```
+import logging
+logging.debug('Debugging information')
+logging.info('Informational message')
+logging.warning('Warning:config file %s not found', 'server.conf')
+logging.error('Error occurred')
+logging.critical('Critical error -- shutting down')
+```
+
+This produces the following output:
+
+```
+WARNING:root:Warning:config file server.conf not found
+ERROR:root:Error occurred
+CRITICAL:root:Critical error -- shutting down
+```
+
+By default, informational and debugging messages are suppressed and the output is sent to standard error. Other output options include routing messages through email, datagrams, sockets, or to an HTTP Server. New filters can select different routing based on message priority: [DEBUG](https://docs.python.org/3/library/logging.html#logging.DEBUG), INFO, WARNING, ERROR, and CRITICAL.
+
+The logging system can be configured directly from Python or can be loaded from a user editable configuration file for customized logging without altering the application.
+
+* [Logging Basic Tutorial](https://docs.python.org/3/howto/logging.html#logging-basic-tutorial)
+* [Advanced Logging Tutorial](https://docs.python.org/3/howto/logging.html#logging-advanced-tutorial)
+* [Logging Cookbook](https://docs.python.org/3/howto/logging-cookbook.html#logging-cookbook)
