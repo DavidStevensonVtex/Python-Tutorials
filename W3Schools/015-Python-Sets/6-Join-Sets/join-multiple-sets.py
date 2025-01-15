@@ -17,6 +17,9 @@ print(myset)
 secondset = set1 | set2 | set3 | set4
 print(secondset)
 
+# Note: The  | operator only allows you to join sets with sets, and not with 
+# other data types like you can with the  union() method.
+    
 # $ python3 join-multiple-sets.py 
 # {1, 2, 3, 'John', 'bananas', 'b', 'a', 'cherry', 'c', 'Elena', 'apple'}
 # {1, 2, 3, 'John', 'bananas', 'b', 'a', 'cherry', 'c', 'Elena', 'apple'}
