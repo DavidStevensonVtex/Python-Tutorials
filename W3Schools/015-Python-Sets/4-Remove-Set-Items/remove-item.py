@@ -11,3 +11,5 @@ print(thisset)
 
 # $ python3 remove-item.py 
 # {'apple', 'cherry'}
+
+# Note: If the item to remove does not exist, remove() will raise an error.
