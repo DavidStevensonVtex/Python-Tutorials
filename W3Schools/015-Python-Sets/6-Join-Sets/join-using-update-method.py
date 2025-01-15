@@ -14,3 +14,5 @@ print(set1)
 
 # $ python3 join-using-update-method.py 
 # {1, 2, 3, 'b', 'c', 'a'}
+
+# Note: Both union() and update() will exclude any duplicate items.
