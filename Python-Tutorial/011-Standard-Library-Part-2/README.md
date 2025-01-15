@@ -210,3 +210,36 @@ The logging system can be configured directly from Python or can be loaded from 
 * [Logging Basic Tutorial](https://docs.python.org/3/howto/logging.html#logging-basic-tutorial)
 * [Advanced Logging Tutorial](https://docs.python.org/3/howto/logging.html#logging-advanced-tutorial)
 * [Logging Cookbook](https://docs.python.org/3/howto/logging-cookbook.html#logging-cookbook)
+
+### 11.6. Weak References¶
+Python does automatic memory management (reference counting for most objects and [garbage collection](https://docs.python.org/3/glossary.html#term-garbage-collection) to eliminate cycles). The memory is freed shortly after the last reference to it has been eliminated.
+
+garbage collection
+
+The process of freeing memory when it is not used anymore. Python performs garbage collection via reference counting and a cyclic garbage collector that is able to detect and break reference cycles. The garbage collector can be controlled using the [gc](https://docs.python.org/3/library/gc.html#module-gc) module.
+
+This approach works fine for most applications but occasionally there is a need to track objects only as long as they are being used by something else. Unfortunately, just tracking them creates a reference that makes them permanent. The [weakref](https://docs.python.org/3/library/weakref.html#module-weakref) module provides tools for tracking objects without creating a reference. When the object is no longer needed, it is automatically removed from a weakref table and a callback is triggered for weakref objects. Typical applications include caching objects that are expensive to create:
+
+```
+>>> import weakref, gc
+>>> class A:
+...     def __init__(self, value):
+...         self.value = value
+...     def __repr__(self):
+...         return str(self.value)
+... 
+>>> a = A(10)                   # create a reference
+>>> d = weakref.WeakValueDictionary()
+>>> d['primary'] = a            # does not create a reference
+>>> d['primary']                # fetch the object if it is still alive
+10
+>>> del a                       # remove the one reference
+>>> gc.collect()                # run garbage collection right away
+0
+>>> d['primary']                # entry was automatically removed
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/usr/lib/python3.8/weakref.py", line 131, in __getitem__
+    o = self.data[key]()
+KeyError: 'primary'
+```
