@@ -10,3 +10,7 @@ Python supports the usual logical conditions from mathematics:
 * Greater than or equal to: a \>= b
 
 These conditions can be used in several ways, most commonly in "if statements" and loops.
+
+## Indentation
+
+Python relies on indentation (whitespace at the beginning of a line) to define scope in the code. Other programming languages often use curly-brackets for this purpose.
