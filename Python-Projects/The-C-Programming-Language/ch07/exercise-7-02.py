@@ -2,6 +2,10 @@
 # as a minimum, it should print non-graphic characters in octal or hexadecimal
 # according to local custom, and break long text lines.
 
+# Note: match is not supported in Python 3.8, but is supported in Python 3.10
+# $ python3 --version
+# Python 3.8.10
+
 # Other escape characters used in Python:
 
 # Code	Result	Try it
