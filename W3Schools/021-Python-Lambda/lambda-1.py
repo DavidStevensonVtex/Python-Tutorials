@@ -15,5 +15,5 @@
 x = lambda a : a + 10
 print(x(5))
 
-# $ python3 lambda.py 
+# $ python3 lambda-1.py 
 # 15
