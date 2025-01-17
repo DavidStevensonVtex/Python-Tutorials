@@ -46,3 +46,15 @@ The Quick Brown Fox Jumped Over The Lazy Dog.
 * \$identifier names a substitution placeholder 
 
 * \${identifier} is equivalent to $identifier.
+
+#### 1.1.3 Advanced Templates
+
+Advanced usage: you can derive subclasses of Template to customize the placeholder syntax, delimiter character, or the entire regular expression used to parse template strings. To do this, you can override these class attributes:
+
+* delimiter – The default value is $. Note that this should not be a regular expression
+
+* idpattern – This is the regular expression describing the pattern for non-braced placeholders. The default value is the regular expression (?a:[_a-z][_a-z0-9]*). 
+
+* braceidpattern – This is like idpattern but describes the pattern for braced placeholders. Defaults to None which means to fall back to idpattern. Added in version 3.7.
+
+* flags 
