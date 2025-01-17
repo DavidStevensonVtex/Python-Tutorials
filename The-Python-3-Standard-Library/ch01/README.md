@@ -58,3 +58,9 @@ Advanced usage: you can derive subclasses of Template to customize the placehold
 * braceidpattern – This is like idpattern but describes the pattern for braced placeholders. Defaults to None which means to fall back to idpattern. Added in version 3.7.
 
 * flags 
+
+#### 1.1.4 Formatter
+
+The [Formatter class](https://docs.python.org/3/library/string.html#string.Formatter) implements the same layout specification language as the [format() method](https://docs.python.org/3/library/stdtypes.html#str.format) of `str`.
+
+[Format String Syntax](https://docs.python.org/3/library/string.html#format-string-syntax)
