@@ -39,3 +39,10 @@ The quick brown fox jumped over the lazy dog.
 The Quick Brown Fox Jumped Over The Lazy Dog.
 ```
 
+#### 1.1.2 Templates
+
+* \$\$ is an escape; it is replaced with a single \$.
+
+* \$identifier names a substitution placeholder 
+
+* \${identifier} is equivalent to $identifier.
