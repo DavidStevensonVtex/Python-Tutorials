@@ -9,6 +9,6 @@ print("before pop", cars)
 cars.pop(1)
 print("after pop(1)", cars)
 
-# $ python3 remove-element.py 
+# $ python3 remove-element-1.py 
 # before pop ['Ford', 'Volvo', 'BMW']
 # after pop(1) ['Ford', 'BMW']
