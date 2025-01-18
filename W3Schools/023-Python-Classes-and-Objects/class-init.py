@@ -23,3 +23,6 @@ print(p1.age)
 # $ python3 class-init.py 
 # John
 # 36
+
+# Note: The __init__() function is called automatically every time the class is \
+# being used to create a new object.
