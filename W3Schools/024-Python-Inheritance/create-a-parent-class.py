@@ -25,15 +25,14 @@ class Person:
 x = Person("John", "Doe")
 x.printname()
 
-# Use the super() Function
+# Add Properties
 
-# Python also has a super() function that will make the child class inherit all the
-# methods and properties from its parent:
-
-# Example
+# Add a property called graduationyear to the Student class:
+  
 class Student(Person):
   def __init__(self, fname, lname):
     super().__init__(fname, lname)
+    self.graduationyear = 2019
 
 s = Student("Sam", "Spade")
 s.printname()
