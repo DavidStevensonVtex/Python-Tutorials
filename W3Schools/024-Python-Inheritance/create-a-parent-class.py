@@ -25,15 +25,21 @@ class Person:
 x = Person("John", "Doe")
 x.printname()
 
-# Create a Child Class
+# Add the __init__() Function
 
-# To create a class that inherits the functionality from another class, send the parent class as a parameter when creating the child class:
+# So far we have created a child class that inherits the properties and methods from its parent.
+
+# We want to add the __init__() function to the child class (instead of the pass keyword).
+
+# Note: The __init__() function is called automatically every time the class is being used to create a new object.
 
 # Example
-# Create a class named Student, which will inherit the properties and methods from the Person class:
+# Add the __init__() function to the Student class:
 
 class Student(Person):
-  pass
+  def __init__(self, fname, lname):
+    self.firstname = fname
+    self.lastname = lname
 
 s = Student("Sam", "Spade")
 s.printname()
