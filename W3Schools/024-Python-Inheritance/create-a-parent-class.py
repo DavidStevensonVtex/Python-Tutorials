@@ -25,30 +25,15 @@ class Person:
 x = Person("John", "Doe")
 x.printname()
 
-# Add the __init__() Function
+# Use the super() Function
 
-# So far we have created a child class that inherits the properties and methods from its parent.
-
-# We want to add the __init__() function to the child class (instead of the pass keyword).
-
-# Note: The __init__() function is called automatically every time the class is being used to create a new object.
-
-# Example
-# Add the __init__() function to the Student class:
-
-# When you add the __init__() function, the child class will no longer inherit the 
-# parent's __init__() function.
-
-# Note: The child's __init__() function overrides the inheritance of the 
-# parent's __init__() function.
-
-# To keep the inheritance of the parent's __init__() function, add a call 
-# to the parent's __init__() function:
+# Python also has a super() function that will make the child class inherit all the
+# methods and properties from its parent:
 
 # Example
 class Student(Person):
   def __init__(self, fname, lname):
-    Person.__init__(self, fname, lname)
+    super().__init__(fname, lname)
 
 s = Student("Sam", "Spade")
 s.printname()
