@@ -25,18 +25,18 @@ class Person:
 x = Person("John", "Doe")
 x.printname()
 
-# Add Properties
+# Example
 
-# Add a property called graduationyear to the Student class:
-  
+# Add a year parameter, and pass the correct year when creating objects:
+
 class Student(Person):
-  def __init__(self, fname, lname):
+  def __init__(self, fname, lname, year):
     super().__init__(fname, lname)
-    self.graduationyear = 2019
+    self.graduationyear = year
 
-s = Student("Sam", "Spade")
+s = Student("Mike", "Olsen", 2019)
 s.printname()
 
 # $ python3 create-a-parent-class.py 
 # John Doe
-# Sam Spade
+# Mike Olsen
