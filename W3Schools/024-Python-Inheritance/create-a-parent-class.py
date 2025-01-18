@@ -25,18 +25,21 @@ class Person:
 x = Person("John", "Doe")
 x.printname()
 
-# Example
+# Add Methods
 
-# Add a year parameter, and pass the correct year when creating objects:
+# Add a method called welcome to the Student class:
 
 class Student(Person):
   def __init__(self, fname, lname, year):
     super().__init__(fname, lname)
     self.graduationyear = year
 
+  def welcome(self):
+    print("Welcome", self.firstname, self.lastname, "to the class of", self.graduationyear)
+
 s = Student("Mike", "Olsen", 2019)
-s.printname()
+s.welcome()
 
 # $ python3 create-a-parent-class.py 
 # John Doe
-# Mike Olsen
+# Welcome Mike Olsen to the class of 2019
