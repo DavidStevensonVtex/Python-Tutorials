@@ -22,5 +22,5 @@ class MyClass:
 p1 = MyClass()
 print(p1.x)
 
-$ python3 class-1.py 
-5
+# $ python3 class-1.py 
+# 5
