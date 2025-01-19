@@ -450,3 +450,48 @@ $ python3 re_finditer.py
 Found 'ab' at 0:2
 Found 'ab' at 5:7
 ```
+
+#### 1.3.4 Pattern Syntax
+
+Regular expressions support more powerful patterns than simple literal text strings. Patterns can repeat, can be anchored to different logical locations within the input, and can be expressed in compact forms that do not require every literal character to be present in the pattern. All of these features are used by combining literal text values with meta-characters that are part of the regular expression pattern syntax implemented by re.
+
+```
+# re_test_patterns.py
+import re
+
+def test_patterns(text, patterns):
+    """Given source text and a list of patterns, look for
+    matches for each pattern within the text and print
+    them to stdout.
+    """
+    # Look for each pattern in the text and print the results
+    for pattern, desc in patterns:
+        print("'{}' ({})\n".format(pattern, desc))
+        print("  '{}'".format(text))
+        for match in re.finditer(pattern, text):
+            s = match.start()
+            e = match.end()
+            substr = text[s:e]
+            n_backslashes = text[:s].count('\\')
+            prefix = '.' * (s + n_backslashes)
+            print("  {}'{}'".format(prefix, substr))
+        print()
+    return
+
+
+if __name__ == '__main__':
+    test_patterns('abbaaabbbbaaaaa',
+                  [('ab', "'a' followed by 'b'"),
+                   ])
+```
+
+The following examples will use test_patterns() to explore how variations in patterns change the way they match the same input text. The output shows the input text and the substring range from each portion of the input that matches the pattern.
+
+```
+$ python3 re_test_patterns.py
+'ab' ('a' followed by 'b')
+
+  'abbaaabbbbaaaaa'
+  'ab'
+  .....'ab'
+```
