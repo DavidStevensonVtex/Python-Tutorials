@@ -282,3 +282,43 @@ The textwrap module can be used to format text for
     similar to the paragraph wrapping or filling
     features found in many text editors.
 ```
+
+#### 1.2.7 Truncating Long Text
+
+To truncate text to create a summary or preview, use shorten(). All existing whitespace, such as tabs, newlines, and series of multiple spaces, will be standardized to a single space. Then the text will be truncated to a length less than or equal to what is requested, between word boundaries so that no partial words are included.
+
+```
+# textwrap_shorten.py
+import textwrap
+from textwrap_example import sample_text
+
+dedented_text = textwrap.dedent(sample_text)
+original = textwrap.fill(dedented_text, width=50)
+
+print('Original:\n')
+print(original)
+
+shortened = textwrap.shorten(original, 100)
+shortened_wrapped = textwrap.fill(shortened, width=50)
+
+print('\nShortened:\n')
+print(shortened_wrapped)
+```
+
+If non-whitespace text is removed from the original text as part of the truncation, it is replaced with a placeholder value. The default value [...] can be replaced by providing a placeholder argument to shorten().
+
+```
+$ python3 textwrap_shorten.py
+Original:
+
+ The textwrap module can be used to format text
+for output in situations where pretty-printing is
+desired.  It offers programmatic functionality
+similar to the paragraph wrapping or filling
+features found in many text editors.
+
+Shortened:
+
+The textwrap module can be used to format text for
+output in situations where pretty-printing [...]
+```
