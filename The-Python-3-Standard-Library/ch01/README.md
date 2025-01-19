@@ -495,3 +495,115 @@ $ python3 re_test_patterns.py
   'ab'
   .....'ab'
 ```
+
+##### 1.3.4.1 Repetition
+
+There are five ways to express repetition in a pattern. A pattern followed by the meta-character * is repeated zero or more times (allowing a pattern to repeat zero times means it does not need to appear at all to match). If the * is replaced with +, the pattern must appear at least once. Using ? means the pattern appears zero or one time. For a specific number of occurrences, use {m} after the pattern, where m is the number of times the pattern should repeat. Finally, to allow a variable but limited number of repetitions, use {m,n}, where m is the minimum number of repetitions and n is the maximum. Leaving out n ({m,}) means the value must appear at least m times, with no maximum.
+
+```
+# re_repetition.py
+from re_test_patterns import test_patterns
+
+test_patterns(
+    'abbaabbba',
+    [('ab*', 'a followed by zero or more b'),
+     ('ab+', 'a followed by one or more b'),
+     ('ab?', 'a followed by zero or one b'),
+     ('ab{3}', 'a followed by three b'),
+     ('ab{2,3}', 'a followed by two to three b')],
+)
+```
+
+There are more matches for ab* and ab? than ab+.
+
+```
+$ python3 re_repetition.py 
+'ab*' (a followed by zero or more b)
+
+  'abbaabbba'
+  'abb'
+  ...'a'
+  ....'abbb'
+  ........'a'
+
+'ab+' (a followed by one or more b)
+
+  'abbaabbba'
+  'abb'
+  ....'abbb'
+
+'ab?' (a followed by zero or one b)
+
+  'abbaabbba'
+  'ab'
+  ...'a'
+  ....'ab'
+  ........'a'
+
+'ab{3}' (a followed by three b)
+
+  'abbaabbba'
+  ....'abbb'
+
+'ab{2,3}' (a followed by two to three b)
+
+  'abbaabbba'
+  'abb'
+  ....'abbb'
+```
+
+When processing a repetition instruction, re will usually consume as much of the input as possible while matching the pattern. This so-called greedy behavior may result in fewer individual matches, or the matches may include more of the input text than intended. Greediness can be turned off by following the repetition instruction with ?.
+
+```
+# re_repetition_non_greedy.py
+from re_test_patterns import test_patterns
+
+test_patterns(
+    'abbaabbba',
+    [('ab*?', 'a followed by zero or more b'),
+     ('ab+?', 'a followed by one or more b'),
+     ('ab??', 'a followed by zero or one b'),
+     ('ab{3}?', 'a followed by three b'),
+     ('ab{2,3}?', 'a followed by two to three b')],
+)
+```
+
+Disabling greedy consumption of the input for any of the patterns where zero occurrences of b are allowed means the matched substring does not include any b characters.
+
+```
+
+$ python3 re_repetition_non_greedy.py 
+'ab*?' (a followed by zero or more b)
+
+  'abbaabbba'
+  'a'
+  ...'a'
+  ....'a'
+  ........'a'
+
+'ab+?' (a followed by one or more b)
+
+  'abbaabbba'
+  'ab'
+  ....'ab'
+
+'ab??' (a followed by zero or one b)
+
+  'abbaabbba'
+  'a'
+  ...'a'
+  ....'a'
+  ........'a'
+
+'ab{3}?' (a followed by three b)
+
+  'abbaabbba'
+  ....'abbb'
+
+'ab{2,3}?' (a followed by two to three b)
+
+  'abbaabbba'
+  'abb'
+  ....'abb'
+
+```
