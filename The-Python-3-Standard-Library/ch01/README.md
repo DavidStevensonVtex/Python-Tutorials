@@ -104,7 +104,7 @@ punctuation='!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
 whitespace=' \t\n\r\x0b\x0c'
 ```
 
-### 1.2 textwrap: Formatting Text Paragraphs
+### [1.2 textwrap: Formatting Text Paragraphs](https://pymotw.com/3/textwrap/index.html)
 
 The `textwrap` module can be used to format text for output in situations where pretty-printing is desired. It offers programmatic functinality simlar to the paragrap wrapping or filling features found in many text editors and word processors.
 
@@ -143,4 +143,39 @@ from textwrap_example import sample_text
 dedented_text = textwrap.dedent(sample_text)
 print('Dedented:')
 print(dedented_text)
+``` 
+
+#### 1.2.4 Combining Dedent and Fill
+
+Next, the dedented text can be passed through fill() with a few different width values.
+
+```
+# textwrap_fill_width.py
+import textwrap
+from textwrap_example import sample_text
+
+dedented_text = textwrap.dedent(sample_text).strip()
+for width in [45, 60]:
+    print('{} Columns:\n'.format(width))
+    print(textwrap.fill(dedented_text, width=width))
+    print()
+```
+
+```
+$ python3 textwrap_fill_width.py
+45 Columns:
+
+The textwrap module can be used to format
+text for output in situations where pretty-
+printing is desired.  It offers programmatic
+functionality similar to the paragraph
+wrapping or filling features found in many
+text editors.
+
+60 Columns:
+
+The textwrap module can be used to format text for output in
+situations where pretty-printing is desired.  It offers
+programmatic functionality similar to the paragraph wrapping
+or filling features found in many text editors.
 ```
