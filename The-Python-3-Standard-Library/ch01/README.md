@@ -130,3 +130,17 @@ from textwrap_example import sample_text
 
 print(textwrap.fill(sample_text, width=50))
 ```
+
+#### 1.2.3 Removing Existing Indentation
+
+The previous example has embedded tabs and extra spaces mixed into the middle of the output, so it is not formatted very cleanly. Removing the common whitespace prefix from all of the lines in the sample text with dedent() produces better results and allows the use of docstrings or embedded multiline strings straight from Python code while removing the formatting of the code itself. The sample string has an artificial indent level introduced for illustrating this feature.
+
+```
+# textwrap_dedent.py
+import textwrap
+from textwrap_example import sample_text
+
+dedented_text = textwrap.dedent(sample_text)
+print('Dedented:')
+print(dedented_text)
+```
