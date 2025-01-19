@@ -108,3 +108,15 @@ whitespace=' \t\n\r\x0b\x0c'
 
 The `textwrap` module can be used to format text for output in situations where pretty-printing is desired. It offers programmatic functinality simlar to the paragrap wrapping or filling features found in many text editors and word processors.
 
+#### 1.2.1 Example Data
+
+```
+# textwrap_example.py
+
+sample_text = '''
+    The textwrap module can be used to format text for output in
+    situations where pretty-printing is desired.  It offers
+    programmatic functionality similar to the paragraph wrapping
+    or filling features found in many text editors.
+    '''
+```
