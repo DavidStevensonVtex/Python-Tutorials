@@ -108,6 +108,8 @@ whitespace=' \t\n\r\x0b\x0c'
 
 The `textwrap` module can be used to format text for output in situations where pretty-printing is desired. It offers programmatic functinality simlar to the paragrap wrapping or filling features found in many text editors and word processors.
 
+[textwrap — Text wrapping and filling](https://docs.python.org/3/library/textwrap.html)
+
 #### 1.2.1 Example Data
 
 ```
@@ -178,4 +180,77 @@ The textwrap module can be used to format text for output in
 situations where pretty-printing is desired.  It offers
 programmatic functionality similar to the paragraph wrapping
 or filling features found in many text editors.
+```
+
+#### 1.2.5 Indenting Blocks
+
+Use the indent() function to add consistent prefix text to all of the lines in a string. This example formats the same example text as though it was part of an email message being quoted in the reply, using > as the prefix for each line.
+
+```
+# textwrap_indent.py
+import textwrap
+from textwrap_example import sample_text
+
+dedented_text = textwrap.dedent(sample_text)
+wrapped = textwrap.fill(dedented_text, width=50)
+wrapped += '\n\nSecond paragraph after a blank line.'
+final = textwrap.indent(wrapped, '> ')
+
+print('Quoted block:\n')
+print(final)
+```
+
+The block of text is split on newlines, the prefix is added to each line that contains text, and then the lines are combined back into a new string and returned.
+
+
+```
+$ python3 textwrap_indent.py 
+Quoted block:
+
+>  The textwrap module can be used to format text
+> for output in situations where pretty-printing is
+> desired.  It offers programmatic functionality
+> similar to the paragraph wrapping or filling
+> features found in many text editors.
+
+> Second paragraph after a blank line.
+```
+
+To control which lines receive the new prefix, pass a callable as the predicate argument to indent(). The callable will be invoked for each line of text in turn and the prefix will be added for lines where the return value is true.
+
+```
+# textwrap_indent_predicate.py
+import textwrap
+from textwrap_example import sample_text
+
+
+def should_indent(line):
+    print('Indent {!r}?'.format(line))
+    return len(line.strip()) % 2 == 0
+
+
+dedented_text = textwrap.dedent(sample_text)
+wrapped = textwrap.fill(dedented_text, width=50)
+final = textwrap.indent(wrapped, 'EVEN ',
+                        predicate=should_indent)
+
+print('\nQuoted block:\n')
+print(final)
+```
+
+```
+$ python3 textwrap_indent_predicate.py 
+Indent ' The textwrap module can be used to format text\n'?
+Indent 'for output in situations where pretty-printing is\n'?
+Indent 'desired.  It offers programmatic functionality\n'?
+Indent 'similar to the paragraph wrapping or filling\n'?
+Indent 'features found in many text editors.'?
+
+Quoted block:
+
+EVEN  The textwrap module can be used to format text
+for output in situations where pretty-printing is
+EVEN desired.  It offers programmatic functionality
+EVEN similar to the paragraph wrapping or filling
+EVEN features found in many text editors.
 ```
