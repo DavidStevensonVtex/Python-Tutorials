@@ -10,5 +10,7 @@ import mymodule
 
 mymodule.greeting("Jonathan")
 
+# Note: When using a function from a module, use the syntax: module_name.function_name.
+
 # $ python3 use-a-module.py 
 # Hello, Jonathan
