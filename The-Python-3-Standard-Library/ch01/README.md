@@ -401,3 +401,52 @@ Text: 'Does this text match the pattern?'
 Seeking "this" -> match!
 Seeking "that" -> no match
 ```
+
+#### 1.3.3 Multiple Matches
+
+So far, the example patterns have all used search() to look for single instances of literal text strings. The findall() function returns all of the substrings of the input that match the pattern without overlapping.
+
+```
+# re_findall.py
+import re
+
+text = 'abbaaabbbbaaaaa'
+
+pattern = 'ab'
+
+for match in re.findall(pattern, text):
+    print('Found {!r}'.format(match))
+```
+
+This example input string includes two instances of ab.
+
+```
+$ python3 re_findall.py 
+Found 'ab'
+Found 'ab'
+```
+
+The finditer() function returns an iterator that produces Match instances instead of the strings returned by findall().
+
+```
+# re_finditer.py
+import re
+
+text = 'abbaaabbbbaaaaa'
+
+pattern = 'ab'
+
+for match in re.finditer(pattern, text):
+    s = match.start()
+    e = match.end()
+    print('Found {!r} at {:d}:{:d}'.format(
+        text[s:e], s, e))
+```
+
+This example finds the same two occurrences of ab, and the Match instance shows where they are found in the original input.
+
+```
+$ python3 re_finditer.py 
+Found 'ab' at 0:2
+Found 'ab' at 5:7
+```
