@@ -334,3 +334,33 @@ Multiple open source implementations of regular expressions exist, each sharing 
 Note
 
 Although the formal definition of “regular expression” is limited to expressions that describe regular languages, some of the extensions supported by re go beyond describing regular languages. The term “regular expression” is used here in a more general sense to mean any expression that can be evaluated by Python’s re module.
+
+#### 1.3.1 Finding Patterns in Text
+
+The most common use for re is to search for patterns in text. The search() function takes the pattern and text to scan, and returns a Match object when the pattern is found. If the pattern is not found, search() returns None.
+
+Each Match object holds information about the nature of the match, including the original input string, the regular expression used, and the location within the original string where the pattern occurs.
+
+```
+# re_simple_match.py
+import re
+
+pattern = 'this'
+text = 'Does this text match the pattern?'
+
+match = re.search(pattern, text)
+
+s = match.start()
+e = match.end()
+
+print('Found "{}"\nin "{}"\nfrom {} to {} ("{}")'.format(
+    match.re.pattern, match.string, s, e, text[s:e]))
+```
+
+The start() and end() methods give the indexes into the string showing where the text matched by the pattern occurs.
+
+```
+Found "this"
+in "Does this text match the pattern?"
+from 5 to 9 ("this")
+```
