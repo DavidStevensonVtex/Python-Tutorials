@@ -120,3 +120,13 @@ sample_text = '''
     or filling features found in many text editors.
     '''
 ```
+
+#### 1.2.2 Filling Paragraphs
+
+```
+# textwrap_fill.py
+import textwrap
+from textwrap_example import sample_text
+
+print(textwrap.fill(sample_text, width=50))
+```

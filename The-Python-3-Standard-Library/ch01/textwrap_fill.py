@@ -1,0 +1,12 @@
+# textwrap_fill.py
+import textwrap
+from textwrap_example import sample_text
+
+print(textwrap.fill(sample_text, width=50))
+
+# $ python3 textwrap_fill.py 
+#      The textwrap module can be used to format
+# text for output in     situations where pretty-
+# printing is desired.  It offers     programmatic
+# functionality similar to the paragraph wrapping
+# or filling features found in many text editors.
