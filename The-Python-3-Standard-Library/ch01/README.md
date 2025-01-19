@@ -607,3 +607,172 @@ $ python3 re_repetition_non_greedy.py
   ....'abb'
 
 ```
+
+##### 1.3.4.2 Character Sets
+
+A *character set* is a group of characters, any one of which can match at that point in the pattern. For example, [ab] would match either a or b.
+
+```
+# re_charset.py
+from re_test_patterns import test_patterns
+
+test_patterns(
+    'abbaabbba',
+    [('[ab]', 'either a or b'),
+     ('a[ab]+', 'a followed by 1 or more a or b'),
+     ('a[ab]+?', 'a followed by 1 or more a or b, not greedy')],
+)
+```
+
+The greedy form of the expression (a[ab]+) consumes the entire string because the first letter is a and every subsequent character is either a or b.
+
+```
+$ python3 re_charset.py 
+'[ab]' (either a or b)
+
+  'abbaabbba'
+  'a'
+  .'b'
+  ..'b'
+  ...'a'
+  ....'a'
+  .....'b'
+  ......'b'
+  .......'b'
+  ........'a'
+
+'a[ab]+' (a followed by 1 or more a or b)
+
+  'abbaabbba'
+  'abbaabbba'
+
+'a[ab]+?' (a followed by 1 or more a or b, not greedy)
+
+  'abbaabbba'
+  'ab'
+  ...'aa'
+
+```
+
+A character set can also be used to exclude specific characters. The carat (^) means to look for characters that are not in the set following the carat.
+
+```
+# re_charset_exclude.py
+from re_test_patterns import test_patterns
+
+test_patterns(
+    'This is some text -- with punctuation.',
+    [('[^-. ]+', 'sequences without -, ., or space')],
+)
+```
+
+This pattern finds all of the substrings that do not contain the characters -, ., or a space.
+
+```
+$ python3 re_charset_exclude.py
+'[^-. ]+' (sequences without -, ., or space)
+
+  'This is some text -- with punctuation.'
+  'This'
+  .....'is'
+  ........'some'
+  .............'text'
+  .....................'with'
+  ..........................'punctuation'
+```
+
+As character sets grow larger, typing every character that should (or should not) match becomes tedious. A more compact format using character ranges can be used to define a character set to include all of the contiguous characters between the specified start and stop points.
+
+```
+# re_charset_ranges.py
+from re_test_patterns import test_patterns
+
+test_patterns(
+    'This is some text -- with punctuation.',
+    [('[a-z]+', 'sequences of lowercase letters'),
+     ('[A-Z]+', 'sequences of uppercase letters'),
+     ('[a-zA-Z]+', 'sequences of letters of either case'),
+     ('[A-Z][a-z]+', 'one uppercase followed by lowercase')],
+)
+```
+
+Here the range a-z includes the lowercase ASCII letters, and the range A-Z includes the uppercase ASCII letters. The ranges can also be combined into a single character set.
+
+```
+$ python3 re_charset_ranges.py
+'[a-z]+' (sequences of lowercase letters)
+
+  'This is some text -- with punctuation.'
+  .'his'
+  .....'is'
+  ........'some'
+  .............'text'
+  .....................'with'
+  ..........................'punctuation'
+
+'[A-Z]+' (sequences of uppercase letters)
+
+  'This is some text -- with punctuation.'
+  'T'
+
+'[a-zA-Z]+' (sequences of letters of either case)
+
+  'This is some text -- with punctuation.'
+  'This'
+  .....'is'
+  ........'some'
+  .............'text'
+  .....................'with'
+  ..........................'punctuation'
+
+'[A-Z][a-z]+' (one uppercase followed by lowercase)
+
+  'This is some text -- with punctuation.'
+  'This'
+
+```
+
+As a special case of a character set, the meta-character dot, or period (.), indicates that the pattern should match any single character in that position.
+
+```
+# re_charset_dot.py
+from re_test_patterns import test_patterns
+
+test_patterns(
+    'abbaabbba',
+    [('a.', 'a followed by any one character'),
+     ('b.', 'b followed by any one character'),
+     ('a.*b', 'a followed by anything, ending in b'),
+     ('a.*?b', 'a followed by anything, ending in b')],
+)
+```
+
+Combining the dot with repetition can result in very long matches, unless the non-greedy form is used.
+
+```
+$ python3 re_charset_dot.py
+'a.' (a followed by any one character)
+
+  'abbaabbba'
+  'ab'
+  ...'aa'
+
+'b.' (b followed by any one character)
+
+  'abbaabbba'
+  .'bb'
+  .....'bb'
+  .......'ba'
+
+'a.*b' (a followed by anything, ending in b)
+
+  'abbaabbba'
+  'abbaabbb'
+
+'a.*?b' (a followed by anything, ending in b)
+
+  'abbaabbba'
+  'ab'
+  ...'aab'
+
+```
