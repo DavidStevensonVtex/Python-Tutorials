@@ -103,3 +103,8 @@ punctuation='!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
 
 whitespace=' \t\n\r\x0b\x0c'
 ```
+
+### 1.2 textwrap: Formatting Text Paragraphs
+
+The `textwrap` module can be used to format text for output in situations where pretty-printing is desired. It offers programmatic functinality simlar to the paragrap wrapping or filling features found in many text editors and word processors.
+
