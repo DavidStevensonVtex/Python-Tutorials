@@ -962,3 +962,96 @@ $ python3 re_anchoring.py
   .................................'t'
 
 ```
+
+#### 1.3.5 Constraining the Search
+
+In situations where it is known in advance that only a subset of the full input should be searched, the regular expression match can be further constrained by telling re to limit the search range. For example, if the pattern must appear at the front of the input, then using match() instead of search() will anchor the search without having to explicitly include an anchor in the search pattern.
+
+```
+# re_match.py
+import re
+
+text = 'This is some text -- with punctuation.'
+pattern = 'is'
+
+print('Text   :', text)
+print('Pattern:', pattern)
+
+m = re.match(pattern, text)
+print('Match  :', m)
+s = re.search(pattern, text)
+print('Search :', s)
+```
+
+Since the literal text is does not appear at the start of the input text, it is not found using match(). The sequence appears two other times in the text, though, so search() finds it.
+
+```
+$ python3 re_match.py
+Text   : This is some text -- with punctuation.
+Pattern: is
+Match  : None
+Search : <re.Match object; span=(2, 4), match='is'>
+```
+
+The fullmatch() method requires that the entire input string match the pattern.
+
+```
+# re_fullmatch.py
+import re
+
+text = 'This is some text -- with punctuation.'
+pattern = 'is'
+
+print('Text       :', text)
+print('Pattern    :', pattern)
+
+m = re.search(pattern, text)
+print('Search     :', m)
+s = re.fullmatch(pattern, text)
+print('Full match :', s)
+```
+
+Here search() shows that the pattern does appear in the input, but it does not consume all of the input so fullmatch() does not report a match.
+
+```
+$ python3 re_fullmatch.py
+Text       : This is some text -- with punctuation.
+Pattern    : is
+Search     : <re.Match object; span=(2, 4), match='is'>
+Full match : None
+```
+
+The search() method of a compiled regular expression accepts optional start and end position parameters to limit the search to a substring of the input.
+
+```
+# re_search_substring.py
+import re
+
+text = 'This is some text -- with punctuation.'
+pattern = re.compile(r'\b\w*is\w*\b')
+
+print('Text:', text)
+print()
+
+pos = 0
+while True:
+    match = pattern.search(text, pos)
+    if not match:
+        break
+    s = match.start()
+    e = match.end()
+    print('  {:>2d} : {:>2d} = "{}"'.format(
+        s, e - 1, text[s:e]))
+    # Move forward in text for the next search
+    pos = e
+```
+
+This example implements a less efficient form of iterall(). Each time a match is found, the end position of that match is used for the next search.
+
+```
+$ python3 re_search_substring.py
+Text: This is some text -- with punctuation.
+
+   0 :  3 = "This"
+   5 :  6 = "is"
+```
