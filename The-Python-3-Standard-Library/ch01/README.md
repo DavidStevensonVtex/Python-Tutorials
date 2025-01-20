@@ -881,3 +881,84 @@ $ python3 re_escape_escapes.py
   .....'\D+'
   ..........'\s+'
 ```
+
+##### 1.3.4.4 Anchoring
+
+In addition to describing the content of a pattern to match, the relative location can be specified in the input text where the pattern should appear by using anchoring instructions. the table below lists valid anchoring codes.
+
+Regular Expression Anchoring Codes
+Code	Meaning
+
+* \^	start of string, or line
+* \$	end of string, or line
+* \\A	start of string
+* \\Z	end of string
+* \\b	empty string at the beginning or end of a word
+* \\B	empty string not at the beginning or end of a word
+
+```
+# re_anchoring.py
+from re_test_patterns import test_patterns
+
+test_patterns(
+    'This is some text -- with punctuation.',
+    [(r'^\w+', 'word at start of string'),
+     (r'\A\w+', 'word at start of string'),
+     (r'\w+\S*$', 'word near end of string'),
+     (r'\w+\S*\Z', 'word near end of string'),
+     (r'\w*t\w*', 'word containing t'),
+     (r'\bt\w+', 't at start of word'),
+     (r'\w+t\b', 't at end of word'),
+     (r'\Bt\B', 't, not start or end of word')],
+)
+```
+
+The patterns in the example for matching words at the beginning and the end of the string are different because the word at the end of the string is followed by punctuation to terminate the sentence. The pattern \w+$ would not match, since . is not considered an alphanumeric character.
+
+```
+$ python3 re_anchoring.py
+'^\w+' (word at start of string)
+
+  'This is some text -- with punctuation.'
+  'This'
+
+'\A\w+' (word at start of string)
+
+  'This is some text -- with punctuation.'
+  'This'
+
+'\w+\S*$' (word near end of string)
+
+  'This is some text -- with punctuation.'
+  ..........................'punctuation.'
+
+'\w+\S*\Z' (word near end of string)
+
+  'This is some text -- with punctuation.'
+  ..........................'punctuation.'
+
+'\w*t\w*' (word containing t)
+
+  'This is some text -- with punctuation.'
+  .............'text'
+  .....................'with'
+  ..........................'punctuation'
+
+'\bt\w+' (t at start of word)
+
+  'This is some text -- with punctuation.'
+  .............'text'
+
+'\w+t\b' (t at end of word)
+
+  'This is some text -- with punctuation.'
+  .............'text'
+
+'\Bt\B' (t, not start or end of word)
+
+  'This is some text -- with punctuation.'
+  .......................'t'
+  ..............................'t'
+  .................................'t'
+
+```
