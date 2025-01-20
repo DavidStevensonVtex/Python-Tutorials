@@ -1055,3 +1055,306 @@ Text: This is some text -- with punctuation.
    0 :  3 = "This"
    5 :  6 = "is"
 ```
+
+#### 1.3.6 Dissecting Matches with Groups
+
+Searching for pattern matches is the basis of the powerful capabilities provided by regular expressions. Adding groups to a pattern isolates parts of the matching text, expanding those capabilities to create a parser. Groups are defined by enclosing patterns in parentheses.
+
+```
+# re_groups.py
+from re_test_patterns import test_patterns
+
+test_patterns(
+    'abbaaabbbbaaaaa',
+    [('a(ab)', 'a followed by literal ab'),
+     ('a(a*b*)', 'a followed by 0-n a and 0-n b'),
+     ('a(ab)*', 'a followed by 0-n ab'),
+     ('a(ab)+', 'a followed by 1-n ab')],
+)
+```
+
+Any complete regular expression can be converted to a group and nested within a larger expression. All of the repetition modifiers can be applied to a group as a whole, requiring the entire group pattern to repeat.
+
+```
+$ python3 re_groups.py
+'a(ab)' (a followed by literal ab)
+
+  'abbaaabbbbaaaaa'
+  ....'aab'
+
+'a(a*b*)' (a followed by 0-n a and 0-n b)
+
+  'abbaaabbbbaaaaa'
+  'abb'
+  ...'aaabbbb'
+  ..........'aaaaa'
+
+'a(ab)*' (a followed by 0-n ab)
+
+  'abbaaabbbbaaaaa'
+  'a'
+  ...'a'
+  ....'aab'
+  ..........'a'
+  ...........'a'
+  ............'a'
+  .............'a'
+  ..............'a'
+
+'a(ab)+' (a followed by 1-n ab)
+
+  'abbaaabbbbaaaaa'
+  ....'aab'
+
+```
+
+To access the substrings matched by the individual groups within a pattern, use the groups() method of the Match object.
+
+```
+# re_groups_match.py
+import re
+
+text = 'This is some text -- with punctuation.'
+
+print(text)
+print()
+
+patterns = [
+    (r'^(\w+)', 'word at start of string'),
+    (r'(\w+)\S*$', 'word at end, with optional punctuation'),
+    (r'(\bt\w+)\W+(\w+)', 'word starting with t, another word'),
+    (r'(\w+t)\b', 'word ending with t'),
+]
+
+for pattern, desc in patterns:
+    regex = re.compile(pattern)
+    match = regex.search(text)
+    print("'{}' ({})\n".format(pattern, desc))
+    print('  ', match.groups())
+    print()
+```
+
+Match.groups() returns a sequence of strings in the order of the groups within the expression that matches the string.
+
+```
+$ python3 re_groups_match.py
+This is some text -- with punctuation.
+
+'^(\w+)' (word at start of string)
+
+   ('This',)
+
+'(\w+)\S*$' (word at end, with optional punctuation)
+
+   ('punctuation',)
+
+'(\bt\w+)\W+(\w+)' (word starting with t, another word)
+
+   ('text', 'with')
+
+'(\w+t)\b' (word ending with t)
+
+   ('text',)
+```
+
+To ask for the match of a single group, use the group() method. This is useful when grouping is being used to find parts of the string, but some of the parts matched by groups are not needed in the results.
+
+```
+# re_groups_individual.py
+import re
+
+text = 'This is some text -- with punctuation.'
+
+print('Input text            :', text)
+
+# word starting with 't' then another word
+regex = re.compile(r'(\bt\w+)\W+(\w+)')
+print('Pattern               :', regex.pattern)
+
+match = regex.search(text)
+print('Entire match          :', match.group(0))
+print('Word starting with "t":', match.group(1))
+print('Word after "t" word   :', match.group(2))
+```
+
+Group 0 represents the string matched by the entire expression, and subgroups are numbered starting with 1 in the order that their left parenthesis appears in the expression.
+
+```
+$ python3 re_groups_individual.py
+Input text            : This is some text -- with punctuation.
+Pattern               : (\bt\w+)\W+(\w+)
+Entire match          : text -- with
+Word starting with "t": text
+Word after "t" word   : with
+```
+
+Python extends the basic grouping syntax to add named groups. Using names to refer to groups makes it easier to modify the pattern over time, without having to also modify the code using the match results. To set the name of a group, use the syntax (?P\<name\>pattern).
+
+```
+# re_groups_named.py
+import re
+
+text = 'This is some text -- with punctuation.'
+
+print(text)
+print()
+
+patterns = [
+    r'^(?P<first_word>\w+)',
+    r'(?P<last_word>\w+)\S*$',
+    r'(?P<t_word>\bt\w+)\W+(?P<other_word>\w+)',
+    r'(?P<ends_with_t>\w+t)\b',
+]
+
+for pattern in patterns:
+    regex = re.compile(pattern)
+    match = regex.search(text)
+    print("'{}'".format(pattern))
+    print('  ', match.groups())
+    print('  ', match.groupdict())
+    print()
+```
+
+Use groupdict() to retrieve the dictionary mapping group names to substrings from the match. Named patterns are included in the ordered sequence returned by groups() as well.
+
+```
+$ python3 re_groups_named.py
+This is some text -- with punctuation.
+
+'^(?P<first_word>\w+)'
+   ('This',)
+   {'first_word': 'This'}
+
+'(?P<last_word>\w+)\S*$'
+   ('punctuation',)
+   {'last_word': 'punctuation'}
+
+'(?P<t_word>\bt\w+)\W+(?P<other_word>\w+)'
+   ('text', 'with')
+   {'t_word': 'text', 'other_word': 'with'}
+
+'(?P<ends_with_t>\w+t)\b'
+   ('text',)
+   {'ends_with_t': 'text'}
+```
+
+An updated version of test_patterns() that shows the numbered and named groups matched by a pattern will make the following examples easier to follow.
+
+```
+# re_test_patterns_groups.py
+import re
+
+def test_patterns(text, patterns):
+    """Given source text and a list of patterns, look for
+    matches for each pattern within the text and print
+    them to stdout.
+    """
+    # Look for each pattern in the text and print the results
+    for pattern, desc in patterns:
+        print('{!r} ({})\n'.format(pattern, desc))
+        print('  {!r}'.format(text))
+        for match in re.finditer(pattern, text):
+            s = match.start()
+            e = match.end()
+            prefix = ' ' * (s)
+            print(
+                '  {}{!r}{} '.format(prefix,
+                                     text[s:e],
+                                     ' ' * (len(text) - e)),
+                end=' ',
+            )
+            print(match.groups())
+            if match.groupdict():
+                print('{}{}'.format(
+                    ' ' * (len(text) - s),
+                    match.groupdict()),
+                )
+        print()
+    return
+```
+
+Since a group is itself a complete regular expression, groups can be nested within other groups to build even more complicated expressions.
+
+```
+# re_groups_nested.py
+from re_test_patterns_groups import test_patterns
+
+test_patterns(
+    'abbaabbba',
+    [(r'a((a*)(b*))', 'a followed by 0-n a and 0-n b')],
+)
+```
+
+In this case, the group (a*) matches an empty string, so the return value from groups() includes that empty string as the matched value.
+
+```
+$ python3 re_groups_nested.py
+'a((a*)(b*))' (a followed by 0-n a and 0-n b)
+
+  'abbaabbba'
+  'abb'        ('bb', '', 'bb')
+     'aabbb'   ('abbb', 'a', 'bbb')
+          'a'  ('', '', '')
+
+```
+
+Groups are also useful for specifying alternative patterns. Use the pipe symbol (|) to separate two patterns and indicate that either pattern should match. Consider the placement of the pipe carefully, though. The first expression in this example matches a sequence of a followed by a sequence consisting entirely of a single letter, a or b. The second pattern matches a followed by a sequence that may include either a or b. The patterns are similar, but the resulting matches are completely different.
+
+```
+# re_groups_alternative.py
+from re_test_patterns_groups import test_patterns
+
+test_patterns(
+    'abbaabbba',
+    [(r'a((a+)|(b+))', 'a then seq. of a or seq. of b'),
+     (r'a((a|b)+)', 'a then seq. of [ab]')],
+)
+```
+
+When an alternative group is not matched, but the entire pattern does match, the return value of groups() includes a None value at the point in the sequence where the alternative group should appear.
+
+```
+$ python3 re_groups_alternative.py
+'a((a+)|(b+))' (a then seq. of a or seq. of b)
+
+  'abbaabbba'
+  'abb'        ('bb', None, 'bb')
+     'aa'      ('a', 'a', None)
+
+'a((a|b)+)' (a then seq. of [ab])
+
+  'abbaabbba'
+  'abbaabbba'  ('bbaabbba', 'a')
+```
+
+Defining a group containing a subpattern is also useful in cases where the string matching the subpattern is not part of what should be extracted from the full text. These kinds of groups are called non-capturing. Non-capturing groups can be used to describe repetition patterns or alternatives, without isolating the matching portion of the string in the value returned. To create a non-capturing group, use the syntax (?:pattern).
+
+```
+# re_groups_noncapturing.py
+from re_test_patterns_groups import test_patterns
+
+test_patterns(
+    'abbaabbba',
+    [(r'a((a+)|(b+))', 'capturing form'),
+     (r'a((?:a+)|(?:b+))', 'noncapturing')],
+)
+```
+
+In the following example, compare the groups returned for the capturing and non-capturing forms of a pattern that matches the same results.
+
+```
+$ python3 re_groups_noncapturing.py
+'a((a+)|(b+))' (capturing form)
+
+  'abbaabbba'
+  'abb'        ('bb', None, 'bb')
+     'aa'      ('a', 'a', None)
+
+'a((?:a+)|(?:b+))' (noncapturing)
+
+  'abbaabbba'
+  'abb'        ('bb',)
+     'aa'      ('a',)
+
+$ 
+```
