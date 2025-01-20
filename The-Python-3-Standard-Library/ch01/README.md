@@ -776,3 +776,108 @@ $ python3 re_charset_dot.py
   ...'aab'
 
 ```
+
+##### 1.3.4.3 Escape Codes
+
+An even more compact representation uses escape codes for several predefined character sets. The escape codes recognized by re are listed in the table below.
+
+Regular Expression Escape Codes
+Code	Meaning
+* \\d	a digit
+* \\D	a non-digit
+* \\s	whitespace (tab, space, newline, etc.)
+* \\S	non-whitespace
+* \\w	alphanumeric
+* \\W	non-alphanumeric
+
+Note
+
+Escapes are indicated by prefixing the character with a backslash (\). Unfortunately, a backslash must itself be escaped in normal Python strings, and that results in difficult-to-read expressions. Using raw strings, which are created by prefixing the literal value with r, eliminates this problem and maintains readability.
+
+```
+# re_escape_codes.py
+from re_test_patterns import test_patterns
+
+test_patterns(
+    'A prime #1 example!',
+    [(r'\d+', 'sequence of digits'),
+     (r'\D+', 'sequence of non-digits'),
+     (r'\s+', 'sequence of whitespace'),
+     (r'\S+', 'sequence of non-whitespace'),
+     (r'\w+', 'alphanumeric characters'),
+     (r'\W+', 'non-alphanumeric')],
+)
+```
+
+These sample expressions combine escape codes with repetition to find sequences of like characters in the input string.
+
+```
+$ python3 re_escape_codes.py 
+'\d+' (sequence of digits)
+
+  'A prime #1 example!'
+  .........'1'
+
+'\D+' (sequence of non-digits)
+
+  'A prime #1 example!'
+  'A prime #'
+  ..........' example!'
+
+'\s+' (sequence of whitespace)
+
+  'A prime #1 example!'
+  .' '
+  .......' '
+  ..........' '
+
+'\S+' (sequence of non-whitespace)
+
+  'A prime #1 example!'
+  'A'
+  ..'prime'
+  ........'#1'
+  ...........'example!'
+
+'\w+' (alphanumeric characters)
+
+  'A prime #1 example!'
+  'A'
+  ..'prime'
+  .........'1'
+  ...........'example'
+
+'\W+' (non-alphanumeric)
+
+  'A prime #1 example!'
+  .' '
+  .......' #'
+  ..........' '
+  ..................'!'
+
+
+```
+
+To match the characters that are part of the regular expression syntax, escape the characters in the search pattern.
+
+```
+# re_escape_escapes.py
+from re_test_patterns import test_patterns
+
+test_patterns(
+    r'\d+ \D+ \s+',
+    [(r'\\.\+', 'escape code')],
+)
+```
+
+The pattern in this example escapes the backslash and plus characters, since both are meta-characters and have special meaning in a regular expression.
+
+```
+$ python3 re_escape_escapes.py
+'\\.\+' (escape code)
+
+  '\d+ \D+ \s+'
+  '\d+'
+  .....'\D+'
+  ..........'\s+'
+```
