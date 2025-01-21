@@ -31,5 +31,5 @@ y = json.loads(x)
 # the result is a Python dictionary:
 print(y["age"])
 
-$ python3 load-json.py 
-30
+# $ python3 load-json.py 
+# 30
