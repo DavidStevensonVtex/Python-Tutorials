@@ -14,5 +14,7 @@
 import math
 
 x = math.sqrt(64)
-
 print(x)
+
+# $ python3 math-module.py 
+# 8.0
