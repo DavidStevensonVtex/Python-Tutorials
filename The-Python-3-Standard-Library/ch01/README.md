@@ -1711,3 +1711,207 @@ Flag	Abbreviation
 * VERBOSE	x
 
 Embedded flags can be combined by placing them within the same group. For example, (?im) turns on case-insensitive matching for multiline strings.
+
+##### 1.3.8 Looking Ahead or Behind
+
+In many cases, it is useful to match a part of a pattern only if some other part will also match. For example, in the email parsing expression, the angle brackets were marked as optional. Realistically, the brackets should be paired, and the expression should match only if both are present, or neither is. This modified version of the expression uses a positive look ahead assertion to match the pair. The look ahead assertion syntax is (?=pattern).
+
+```
+# re_look_ahead.py
+import re
+
+address = re.compile(
+    '''
+    # A name is made up of letters, and may include "."
+    # for title abbreviations and middle initials.
+    ((?P<name>
+       ([\w.,]+\s+)*[\w.,]+
+     )
+     \s+
+    ) # name is no longer optional
+
+    # LOOKAHEAD
+    # Email addresses are wrapped in angle brackets, but only
+    # if both are present or neither is.
+    (?= (<.*>$)       # remainder wrapped in angle brackets
+        |
+        ([^<].*[^>]$) # remainder *not* wrapped in angle brackets
+      )
+
+    <? # optional opening angle bracket
+
+    # The address itself: username@domain.tld
+    (?P<email>
+      [\w\d.+-]+       # username
+      @
+      ([\w\d.]+\.)+    # domain name prefix
+      (com|org|edu)    # limit the allowed top-level domains
+    )
+
+    >? # optional closing angle bracket
+    ''',
+    re.VERBOSE)
+
+candidates = [
+    u'First Last <first.last@example.com>',
+    u'No Brackets first.last@example.com',
+    u'Open Bracket <first.last@example.com',
+    u'Close Bracket first.last@example.com>',
+]
+
+for candidate in candidates:
+    print('Candidate:', candidate)
+    match = address.search(candidate)
+    if match:
+        print('  Name :', match.groupdict()['name'])
+        print('  Email:', match.groupdict()['email'])
+    else:
+        print('  No match')
+```
+
+There are several important changes in this version of the expression. First, the name portion is no longer optional. That means stand-alone addresses do not match, but it also prevents improperly formatted name/address combinations from matching. The positive look ahead rule after the “name” group asserts that either the remainder of the string is wrapped with a pair of angle brackets, or there is not a mismatched bracket; either both of or neither of the brackets is present. The look ahead is expressed as a group, but the match for a look ahead group does not consume any of the input text, so the rest of the pattern picks up from the same spot after the look ahead matches.
+
+```
+$ python3 re_look_ahead.py
+Candidate: First Last <first.last@example.com>
+  Name : First Last
+  Email: first.last@example.com
+Candidate: No Brackets first.last@example.com
+  Name : No Brackets
+  Email: first.last@example.com
+Candidate: Open Bracket <first.last@example.com
+  No match
+Candidate: Close Bracket first.last@example.com>
+  No match
+```
+
+A negative look ahead assertion ((?!pattern)) says that the pattern does not match the text following the current point. For example, the email recognition pattern could be modified to ignore the noreply mailing addresses commonly used by automated systems.
+
+```
+# re_negative_look_ahead.py
+import re
+
+address = re.compile(
+    '''
+    ^
+
+    # An address: username@domain.tld
+
+    # Ignore noreply addresses
+    (?!noreply@.*$)
+
+    [\w\d.+-]+       # username
+    @
+    ([\w\d.]+\.)+    # domain name prefix
+    (com|org|edu)    # limit the allowed top-level domains
+
+    $
+    ''',
+    re.VERBOSE)
+
+candidates = [
+    u'first.last@example.com',
+    u'noreply@example.com',
+]
+
+for candidate in candidates:
+    print('Candidate:', candidate)
+    match = address.search(candidate)
+    if match:
+        print('  Match:', candidate[match.start():match.end()])
+    else:
+        print('  No match')
+```
+
+The address starting with noreply does not match the pattern, since the look ahead assertion fails.
+
+```
+$ python3 re_negative_look_ahead.py
+Candidate: first.last@example.com
+  Match: first.last@example.com
+Candidate: noreply@example.com
+  No match
+```
+
+Instead of looking ahead for noreply in the username portion of the email address, the pattern can alternatively be written using a negative look behind assertion after the username is matched using the syntax (?<!pattern).
+
+```
+# re_negative_look_behind.py
+import re
+
+address = re.compile(
+    '''
+    ^
+
+    # An address: username@domain.tld
+
+    [\w\d.+-]+       # username
+
+    # Ignore noreply addresses
+    (?<!noreply)
+
+    @
+    ([\w\d.]+\.)+    # domain name prefix
+    (com|org|edu)    # limit the allowed top-level domains
+
+    $
+    ''',
+    re.VERBOSE)
+
+candidates = [
+    u'first.last@example.com',
+    u'noreply@example.com',
+]
+
+for candidate in candidates:
+    print('Candidate:', candidate)
+    match = address.search(candidate)
+    if match:
+        print('  Match:', candidate[match.start():match.end()])
+    else:
+        print('  No match')
+```
+
+Looking backward works a little differently than looking ahead, in that the expression must use a fixed-length pattern. Repetitions are allowed, as long as there is a fixed number of them (no wildcards or ranges).
+
+```
+$ python3 re_negative_look_behind.py
+Candidate: first.last@example.com
+  Match: first.last@example.com
+Candidate: noreply@example.com
+  No match
+```
+
+A positive look behind assertion can be used to find text following a pattern using the syntax \(\?\<=pattern\). In the following example, the expression finds Twitter handles.
+
+```
+# re_look_behind.py
+import re
+
+twitter = re.compile(
+    '''
+    # A twitter handle: @username
+    (?<=@)
+    ([\w\d_]+)       # username
+    ''',
+    re.VERBOSE)
+
+text = '''This text includes two Twitter handles.
+One for @ThePSF, and one for the author, @doughellmann.
+'''
+
+print(text)
+for match in twitter.findall(text):
+    print('Handle:', match)
+```
+
+The pattern matches sequences of characters that can make up a Twitter handle, as long as they are preceded by an @.
+
+```
+$ python3 re_look_behind.py
+This text includes two Twitter handles.
+One for @ThePSF, and one for the author, @doughellmann.
+
+Handle: ThePSF
+Handle: doughellmann
+```
