@@ -1400,3 +1400,80 @@ Case-insensitive:
   'This'
   'text'
 ```
+
+##### 1.3.7.2 Input with Multiple Lines
+
+Two flags affect how searching in multi-line input works: MULTILINE and DOTALL. The MULTILINE flag controls how the pattern matching code processes anchoring instructions for text containing newline characters. When multiline mode is turned on, the anchor rules for ^ and $ apply at the beginning and end of each line, in addition to the entire string.
+
+```
+# re_flags_multiline.py
+import re
+
+text = 'This is some text -- with punctuation.\nA second line.'
+pattern = r'(^\w+)|(\w+\S*$)'
+single_line = re.compile(pattern)
+multiline = re.compile(pattern, re.MULTILINE)
+
+print('Text:\n  {!r}'.format(text))
+print('Pattern:\n  {}'.format(pattern))
+print('Single Line :')
+for match in single_line.findall(text):
+    print('  {!r}'.format(match))
+print('Multline    :')
+for match in multiline.findall(text):
+    print('  {!r}'.format(match))
+```
+
+The pattern in the example matches the first or last word of the input. It matches line. at the end of the string, even though there is no newline.
+
+```
+$ python3 re_flags_multiline.py
+Text:
+  'This is some text -- with punctuation.\nA second line.'
+Pattern:
+  (^\w+)|(\w+\S*$)
+Single Line :
+  ('This', '')
+  ('', 'line.')
+Multline    :
+  ('This', '')
+  ('', 'punctuation.')
+  ('A', '')
+  ('', 'line.')
+```
+
+DOTALL is the other flag related to multiline text. Normally, the dot character (.) matches everything in the input text except a newline character. The flag allows the dot to match newlines as well.
+
+```
+# re_flags_dotall.py
+import re
+
+text = 'This is some text -- with punctuation.\nA second line.'
+pattern = r'.+'
+no_newlines = re.compile(pattern)
+dotall = re.compile(pattern, re.DOTALL)
+
+print('Text:\n  {!r}'.format(text))
+print('Pattern:\n  {}'.format(pattern))
+print('No newlines :')
+for match in no_newlines.findall(text):
+    print('  {!r}'.format(match))
+print('Dotall      :')
+for match in dotall.findall(text):
+    print('  {!r}'.format(match))
+```
+
+Without the flag, each line of the input text matches the pattern separately. Adding the flag causes the entire string to be consumed.
+
+```
+$ python3 re_flags_dotall.py
+Text:
+  'This is some text -- with punctuation.\nA second line.'
+Pattern:
+  .+
+No newlines :
+  'This is some text -- with punctuation.'
+  'A second line.'
+Dotall      :
+  'This is some text -- with punctuation.\nA second line.'
+```
