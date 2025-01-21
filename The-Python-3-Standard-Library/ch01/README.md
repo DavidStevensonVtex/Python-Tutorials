@@ -1506,3 +1506,168 @@ Pattern : \w+
 ASCII   : ['Fran', 'ais', 'z', 'oty', 'sterreich']
 Unicode : ['Français', 'złoty', 'Österreich']
 ```
+
+##### 1.3.7.4 Verbose Expression Syntax
+
+The compact format of regular expression syntax can become a hindrance as expressions grow more complicated. As the number of groups in an expression increases, it will be more work to keep track of why each element is needed and how exactly the parts of the expression interact. Using named groups helps mitigate these issues, but a better solution is to use verbose mode expressions, which allow comments and extra whitespace to be embedded in the pattern.
+
+A pattern to validate email addresses will illustrate how verbose mode makes working with regular expressions easier. The first version recognizes addresses that end in one of three top-level domains: .com, .org, or .edu.
+
+```
+# re_email_compact.py
+import re
+
+address = re.compile('[\w\d.+-]+@([\w\d.]+\.)+(com|org|edu)')
+
+candidates = [
+    u'first.last@example.com',
+    u'first.last+category@gmail.com',
+    u'valid-address@mail.example.com',
+    u'not-valid@example.foo',
+]
+
+for candidate in candidates:
+    match = address.search(candidate)
+    print('{:<30}  {}'.format(
+        candidate, 'Matches' if match else 'No match')
+    )
+```
+
+This expression is already complex. There are several character classes, groups, and repetition expressions.
+
+```
+$ python3 re_email_compact.py
+first.last@example.com          Matches
+first.last+category@gmail.com   Matches
+valid-address@mail.example.com  Matches
+not-valid@example.foo           No match
+```
+
+Converting the expression to a more verbose format will make it easier to extend.
+
+```
+# re_email_verbose.py
+import re
+
+address = re.compile(
+    '''
+    [\w\d.+-]+       # username
+    @
+    ([\w\d.]+\.)+    # domain name prefix
+    (com|org|edu)    # TODO: support more top-level domains
+    ''',
+    re.VERBOSE)
+
+candidates = [
+    u'first.last@example.com',
+    u'first.last+category@gmail.com',
+    u'valid-address@mail.example.com',
+    u'not-valid@example.foo',
+]
+
+for candidate in candidates:
+    match = address.search(candidate)
+    print('{:<30}  {}'.format(
+        candidate, 'Matches' if match else 'No match'),
+    )
+```
+
+The expression matches the same inputs, but in this extended format it is easier to read. The comments also help identify different parts of the pattern so that it can be expanded to match more inputs.
+
+```
+$ python3 re_email_verbose.py
+first.last@example.com          Matches
+first.last+category@gmail.com   Matches
+valid-address@mail.example.com  Matches
+not-valid@example.foo           No match
+```
+
+This expanded version parses inputs that include a person’s name and email address, as might appear in an email header. The name comes first and stands on its own, and the email address follows, surrounded by angle brackets (< and >).
+
+```
+# re_email_with_name.py
+import re
+
+address = re.compile(
+    '''
+
+    # A name is made up of letters, and may include "."
+    # for title abbreviations and middle initials.
+    ((?P<name>
+       ([\w.,]+\s+)*[\w.,]+)
+       \s*
+       # Email addresses are wrapped in angle
+       # brackets < >, but only if a name is
+       # found, so keep the start bracket in this
+       # group.
+       <
+    )? # the entire name is optional
+
+    # The address itself: username@domain.tld
+    (?P<email>
+      [\w\d.+-]+       # username
+      @
+      ([\w\d.]+\.)+    # domain name prefix
+      (com|org|edu)    # limit the allowed top-level domains
+    )
+
+    >? # optional closing angle bracket
+    ''',
+    re.VERBOSE)
+
+candidates = [
+    u'first.last@example.com',
+    u'first.last+category@gmail.com',
+    u'valid-address@mail.example.com',
+    u'not-valid@example.foo',
+    u'First Last <first.last@example.com>',
+    u'No Brackets first.last@example.com',
+    u'First Last',
+    u'First Middle Last <first.last@example.com>',
+    u'First M. Last <first.last@example.com>',
+    u'<first.last@example.com>',
+]
+
+for candidate in candidates:
+    print('Candidate:', candidate)
+    match = address.search(candidate)
+    if match:
+        print('  Name :', match.groupdict()['name'])
+        print('  Email:', match.groupdict()['email'])
+    else:
+        print('  No match')
+```
+
+As with other programming languages, the ability to insert comments into verbose regular expressions helps with their maintainability. This final version includes implementation notes to future maintainers and whitespace to separate the groups from each other and highlight their nesting level.
+
+```
+$ python3 re_email_with_name.py
+Candidate: first.last@example.com
+  Name : None
+  Email: first.last@example.com
+Candidate: first.last+category@gmail.com
+  Name : None
+  Email: first.last+category@gmail.com
+Candidate: valid-address@mail.example.com
+  Name : None
+  Email: valid-address@mail.example.com
+Candidate: not-valid@example.foo
+  No match
+Candidate: First Last <first.last@example.com>
+  Name : First Last
+  Email: first.last@example.com
+Candidate: No Brackets first.last@example.com
+  Name : None
+  Email: first.last@example.com
+Candidate: First Last
+  No match
+Candidate: First Middle Last <first.last@example.com>
+  Name : First Middle Last
+  Email: first.last@example.com
+Candidate: First M. Last <first.last@example.com>
+  Name : First M. Last
+  Email: first.last@example.com
+Candidate: <first.last@example.com>
+  Name : None
+  Email: first.last@example.com
+```
