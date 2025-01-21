@@ -1358,3 +1358,45 @@ $ python3 re_groups_noncapturing.py
 
 $ 
 ```
+
+#### 1.3.7 Search Options
+
+Option flags are used to change the way the matching engine processes an expression. The flags can be combined using a bitwise OR operation, then passed to compile(), search(), match(), and other functions that accept a pattern for searching.
+
+##### 1.3.7.1 Case-insensitive Matching
+
+IGNORECASE causes literal characters and character ranges in the pattern to match both uppercase and lowercase characters.
+
+```
+# re_flags_ignorecase.py
+import re
+
+text = 'This is some text -- with punctuation.'
+pattern = r'\bT\w+'
+with_case = re.compile(pattern)
+without_case = re.compile(pattern, re.IGNORECASE)
+
+print('Text:\n  {!r}'.format(text))
+print('Pattern:\n  {}'.format(pattern))
+print('Case-sensitive:')
+for match in with_case.findall(text):
+    print('  {!r}'.format(match))
+print('Case-insensitive:')
+for match in without_case.findall(text):
+    print('  {!r}'.format(match))
+```
+
+Since the pattern includes the literal T, if IGNORECASE is not set, the only match is the word This. When case is ignored, text also matches.
+
+```
+$ python3 re_flags_ignorecase.py
+Text:
+  'This is some text -- with punctuation.'
+Pattern:
+  \bT\w+
+Case-sensitive:
+  'This'
+Case-insensitive:
+  'This'
+  'text'
+```
