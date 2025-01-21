@@ -1477,3 +1477,32 @@ No newlines :
 Dotall      :
   'This is some text -- with punctuation.\nA second line.'
 ```
+
+##### 1.3.7.3 Unicode
+
+Under Python 3, str objects use the full Unicode character set, and regular expression processing on a str assumes that the pattern and input text are both Unicode. The escape codes described earlier are defined in terms of Unicode by default. Those assumptions mean that the pattern \w+ will match both the words “French” and “Français”. To restrict escape codes to the ASCII character set, as was the default in Python 2, use the ASCII flag when compiling the pattern or when calling the module-level functions search() and match().
+
+```
+# re_flags_ascii.py
+import re
+
+text = u'Français złoty Österreich'
+pattern = r'\w+'
+ascii_pattern = re.compile(pattern, re.ASCII)
+unicode_pattern = re.compile(pattern)
+
+print('Text    :', text)
+print('Pattern :', pattern)
+print('ASCII   :', list(ascii_pattern.findall(text)))
+print('Unicode :', list(unicode_pattern.findall(text)))
+```
+
+The other escape sequences (\W, \b, \B, \d, \D, \s, and \S) are also processed differently for ASCII text. Instead of consulting the Unicode database to find the properties of each character, re uses the ASCII definition of the character set.
+
+```
+$ python3 re_flags_ascii.py
+Text    : Français złoty Österreich
+Pattern : \w+
+ASCII   : ['Fran', 'ais', 'z', 'oty', 'sterreich']
+Unicode : ['Français', 'złoty', 'Österreich']
+```
