@@ -2138,3 +2138,93 @@ Candidate: no.brackets@example.com
   Match name : None
   Match email: no.brackets@example.com
 ```
+
+#### 1.3.10 Modifying Strings with Patterns
+
+In addition to searching through text, re supports modifying text using regular expressions as the search mechanism, and the replacements can reference groups matched in the pattern as part of the substitution text. Use sub() to replace all occurrences of a pattern with another string.
+
+```
+# re_sub.py
+import re
+
+bold = re.compile(r'\*{2}(.*?)\*{2}')
+
+text = 'Make this **bold**.  This **too**.'
+
+print('Text:', text)
+print('Bold:', bold.sub(r'<b>\1</b>', text))
+```
+
+References to the text matched by the pattern can be inserted using the \num syntax used for back-references.
+
+```
+$ python3 re_sub.py
+Text: Make this **bold**.  This **too**.
+Bold: Make this <b>bold</b>.  This <b>too</b>.
+```
+
+To use named groups in the substitution, use the syntax \g<name>.
+
+```
+# re_sub_named_groups.py
+import re
+
+bold = re.compile(r'\*{2}(?P<bold_text>.*?)\*{2}')
+
+text = 'Make this **bold**.  This **too**.'
+
+print('Text:', text)
+print('Bold:', bold.sub(r'<b>\g<bold_text></b>', text))
+```
+
+The `\g<name>` syntax also works with numbered references, and using it eliminates any ambiguity between group numbers and surrounding literal digits.
+
+```
+$ python3 re_sub_named_groups.py
+Text: Make this **bold**.  This **too**.
+Bold: Make this <b>bold</b>.  This <b>too</b>.
+```
+
+Pass a value to count to limit the number of substitutions performed.
+
+```
+# re_sub_count.py
+import re
+
+bold = re.compile(r'\*{2}(.*?)\*{2}')
+
+text = 'Make this **bold**.  This **too**.'
+
+print('Text:', text)
+print('Bold:', bold.sub(r'<b>\1</b>', text, count=1))
+```
+
+Only the first substitution is made because count is 1.
+
+```
+$ python3 re_sub_count.py
+Text: Make this **bold**.  This **too**.
+Bold: Make this <b>bold</b>.  This **too**.
+```
+
+`subn()` works just like `sub()` except that it returns both the modified string and the count of substitutions made.
+
+```
+# re_subn.py
+import re
+
+bold = re.compile(r'\*{2}(.*?)\*{2}')
+
+text = 'Make this **bold**.  This **too**.'
+
+print('Text:', text)
+print('Bold:', bold.subn(r'<b>\1</b>', text))
+```
+
+The search pattern matches twice in the example.
+
+```
+$ python3 re_subn.py
+Text: Make this **bold**.  This **too**.
+Bold: ('Make this <b>bold</b>.  This <b>too</b>.', 2)
+```
