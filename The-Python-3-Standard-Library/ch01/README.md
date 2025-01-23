@@ -2228,3 +2228,133 @@ $ python3 re_subn.py
 Text: Make this **bold**.  This **too**.
 Bold: ('Make this <b>bold</b>.  This <b>too</b>.', 2)
 ```
+
+#### 1.3.11 Splitting with Patterns
+
+`str.split()` is one of the most frequently used methods for breaking apart strings to parse them. It supports only the use of literal values as separators, though, and sometimes a regular expression is necessary if the input is not consistently formatted. For example, many plain text markup languages define paragraph separators as two or more newline (\n) characters. In this case, `str.split()` cannot be used because of the “or more” part of the definition.
+
+A strategy for identifying paragraphs using findall() would use a pattern like (.+?)\n{2,}.
+
+```
+# re_paragraphs_findall.py
+import re
+
+text = '''Paragraph one
+on two lines.
+
+Paragraph two.
+
+
+Paragraph three.'''
+
+for num, para in enumerate(re.findall(r'(.+?)\n{2,}',
+                                      text,
+                                      flags=re.DOTALL)
+                           ):
+    print(num, repr(para))
+    print()
+```
+
+That pattern fails for paragraphs at the end of the input text, as illustrated by the fact that “Paragraph three.” is not part of the output.
+
+```
+$ python3 re_paragraphs_findall.py
+0 'Paragraph one\non two lines.'
+
+1 'Paragraph two.'
+```
+
+Extending the pattern to say that a paragraph ends with two or more newlines or the end of input fixes the problem, but makes the pattern more complicated. Converting to re.split() instead of re.findall() handles the boundary condition automatically and keeps the pattern simpler.
+
+```
+# re_split.py
+import re
+
+text = '''Paragraph one
+on two lines.
+
+Paragraph two.
+
+
+Paragraph three.'''
+
+print('With findall:')
+for num, para in enumerate(re.findall(r'(.+?)(\n{2,}|$)',
+                                      text,
+                                      flags=re.DOTALL)):
+    print(num, repr(para))
+    print()
+
+print()
+print('With split:')
+for num, para in enumerate(re.split(r'\n{2,}', text)):
+    print(num, repr(para))
+    print()
+```
+
+The pattern argument to split() expresses the markup specification more precisely. Two or more newline characters mark a separator point between paragraphs in the input string.
+
+```
+$ python3 re_split.py
+With findall:
+0 ('Paragraph one\non two lines.', '\n\n')
+
+1 ('Paragraph two.', '\n\n\n')
+
+2 ('Paragraph three.', '')
+
+
+With split:
+0 'Paragraph one\non two lines.'
+
+1 'Paragraph two.'
+
+2 'Paragraph three.'
+```
+
+Enclosing the expression in parentheses to define a group causes split() to work more like str.partition(), so it returns the separator values as well as the other parts of the string.
+
+```
+# re_split_groups.py
+import re
+
+text = '''Paragraph one
+on two lines.
+
+Paragraph two.
+
+
+Paragraph three.'''
+
+print('With split:')
+for num, para in enumerate(re.split(r'(\n{2,})', text)):
+    print(num, repr(para))
+    print()
+```
+
+The output now includes each paragraph, as well as the sequence of newlines separating them.
+
+```
+$ python3 re_split_groups.py
+With split:
+0 'Paragraph one\non two lines.'
+
+1 '\n\n'
+
+2 'Paragraph two.'
+
+3 '\n\n\n'
+
+4 'Paragraph three.'
+
+```
+
+### See also
+
+* [Standard library documentation for re](https://docs.python.org/3/library/re.html)
+* [Regular Expression HOWTO](https://docs.python.org/3/howto/regex.html) – Andrew Kuchling’s introduction to regular expressions for Python developers.
+* [Kodos](https://kodos.sourceforge.net/) – An interactive regular expression testing tool by Phil Schwartz.
+* [pythex](https://pythex.org/) – A web-based tool for testing regular expressions created by Gabriel Rodríguez. Inspired by Rubular.
+* [Wikipedia: Regular expression](https://en.wikipedia.org/wiki/Regular_expression) – General introduction to regular expression concepts and techniques.
+* [locale](https://pymotw.com/3/locale/index.html#module-locale) – Use the locale module to set the language configuration when working with Unicode text.
+* unicodedata – Programmatic access to the Unicode character property database.
