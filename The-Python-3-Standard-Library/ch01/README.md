@@ -1712,7 +1712,7 @@ Flag	Abbreviation
 
 Embedded flags can be combined by placing them within the same group. For example, (?im) turns on case-insensitive matching for multiline strings.
 
-##### 1.3.8 Looking Ahead or Behind
+#### 1.3.8 Looking Ahead or Behind
 
 In many cases, it is useful to match a part of a pattern only if some other part will also match. For example, in the email parsing expression, the angle brackets were marked as optional. Realistically, the brackets should be paired, and the expression should match only if both are present, or neither is. This modified version of the expression uses a positive look ahead assertion to match the pair. The look ahead assertion syntax is (?=pattern).
 
@@ -1914,4 +1914,227 @@ One for @ThePSF, and one for the author, @doughellmann.
 
 Handle: ThePSF
 Handle: doughellmann
+```
+
+#### 1.3.9 Self-referencing Expressions
+
+Matched values can be used in later parts of an expression. For example, the email example can be updated to match only addresses composed of the first and last names of the person by including back-references to those groups. The easiest way to achieve this is by referring to the previously matched group by ID number, using \num.
+
+```
+# re_refer_to_group.py
+import re
+
+address = re.compile(
+    r'''
+
+    # The regular name
+    (\w+)               # first name
+    \s+
+    (([\w.]+)\s+)?      # optional middle name or initial
+    (\w+)               # last name
+
+    \s+
+
+    <
+
+    # The address: first_name.last_name@domain.tld
+    (?P<email>
+      \1               # first name
+      \.
+      \4               # last name
+      @
+      ([\w\d.]+\.)+    # domain name prefix
+      (com|org|edu)    # limit the allowed top-level domains
+    )
+
+    >
+    ''',
+    re.VERBOSE | re.IGNORECASE)
+
+candidates = [
+    u'First Last <first.last@example.com>',
+    u'Different Name <first.last@example.com>',
+    u'First Middle Last <first.last@example.com>',
+    u'First M. Last <first.last@example.com>',
+]
+
+for candidate in candidates:
+    print('Candidate:', candidate)
+    match = address.search(candidate)
+    if match:
+        print('  Match name :', match.group(1), match.group(4))
+        print('  Match email:', match.group(5))
+    else:
+        print('  No match')
+```
+
+Although the syntax is simple, creating back-references by numerical ID has a few disadvantages. From a practical standpoint, as the expression changes, the groups must be counted again and every reference may need to be updated. Another disadvantage is that only 99 references can be made using the standard back-reference syntax \n, because if the ID number is three digits long, it will be interpreted as an octal character value instead of a group reference. Of course, if there are more than 99 groups in an expression, there will be more serious maintenance challenges than simply not being able to refer to all of them.
+
+```
+$ python3 re_refer_to_group.py
+Candidate: First Last <first.last@example.com>
+  Match name : First Last
+  Match email: first.last@example.com
+Candidate: Different Name <first.last@example.com>
+  No match
+Candidate: First Middle Last <first.last@example.com>
+  Match name : First Last
+  Match email: first.last@example.com
+Candidate: First M. Last <first.last@example.com>
+  Match name : First Last
+  Match email: first.last@example.com
+```
+
+Python’s expression parser includes an extension that uses (?P=name) to refer to the value of a named group matched earlier in the expression.
+
+```
+
+# re_refer_to_named_group.py
+import re
+
+address = re.compile(
+    '''
+
+    # The regular name
+    (?P<first_name>\w+)
+    \s+
+    (([\w.]+)\s+)?      # optional middle name or initial
+    (?P<last_name>\w+)
+
+    \s+
+
+    <
+
+    # The address: first_name.last_name@domain.tld
+    (?P<email>
+      (?P=first_name)
+      \.
+      (?P=last_name)
+      @
+      ([\w\d.]+\.)+    # domain name prefix
+      (com|org|edu)    # limit the allowed top-level domains
+    )
+
+    >
+    ''',
+    re.VERBOSE | re.IGNORECASE)
+
+candidates = [
+    u'First Last <first.last@example.com>',
+    u'Different Name <first.last@example.com>',
+    u'First Middle Last <first.last@example.com>',
+    u'First M. Last <first.last@example.com>',
+]
+
+for candidate in candidates:
+    print('Candidate:', candidate)
+    match = address.search(candidate)
+    if match:
+        print('  Match name :', match.groupdict()['first_name'],
+              end=' ')
+        print(match.groupdict()['last_name'])
+        print('  Match email:', match.groupdict()['email'])
+    else:
+        print('  No match')
+```
+
+The address expression is compiled with the IGNORECASE flag on, since proper names are normally capitalized but email addresses are not.
+
+```
+$ python3 re_refer_to_named_group.py
+Candidate: First Last <first.last@example.com>
+  Match name : First Last
+  Match email: first.last@example.com
+Candidate: Different Name <first.last@example.com>
+  No match
+Candidate: First Middle Last <first.last@example.com>
+  Match name : First Last
+  Match email: first.last@example.com
+Candidate: First M. Last <first.last@example.com>
+  Match name : First Last
+  Match email: first.last@example.com
+```
+
+The other mechanism for using back-references in expressions chooses a different pattern based on whether a previous group matched. The email pattern can be corrected so that the angle brackets are required if a name is present, and not required if the email address is by itself. The syntax for testing whether if a group has matched is (?(id)yes-expression|no-expression), where id is the group name or number, yes-expression is the pattern to use if the group has a value, and no-expression is the pattern to use otherwise.
+
+```
+# re_id.py
+import re
+
+address = re.compile(
+    '''
+    ^
+
+    # A name is made up of letters, and may include "."
+    # for title abbreviations and middle initials.
+    (?P<name>
+       ([\w.]+\s+)*[\w.]+
+     )?
+    \s*
+
+    # Email addresses are wrapped in angle brackets, but
+    # only if a name is found.
+    (?(name)
+      # remainder wrapped in angle brackets because
+      # there is a name
+      (?P<brackets>(?=(<.*>$)))
+      |
+      # remainder does not include angle brackets without name
+      (?=([^<].*[^>]$))
+     )
+
+    # Look for a bracket only if the look-ahead assertion
+    # found both of them.
+    (?(brackets)<|\s*)
+
+    # The address itself: username@domain.tld
+    (?P<email>
+      [\w\d.+-]+       # username
+      @
+      ([\w\d.]+\.)+    # domain name prefix
+      (com|org|edu)    # limit the allowed top-level domains
+     )
+
+    # Look for a bracket only if the look-ahead assertion
+    # found both of them.
+    (?(brackets)>|\s*)
+
+    $
+    ''',
+    re.VERBOSE)
+
+candidates = [
+    u'First Last <first.last@example.com>',
+    u'No Brackets first.last@example.com',
+    u'Open Bracket <first.last@example.com',
+    u'Close Bracket first.last@example.com>',
+    u'no.brackets@example.com',
+]
+
+for candidate in candidates:
+    print('Candidate:', candidate)
+    match = address.search(candidate)
+    if match:
+        print('  Match name :', match.groupdict()['name'])
+        print('  Match email:', match.groupdict()['email'])
+    else:
+        print('  No match')
+```
+
+This version of the email address parser uses two tests. If the name group matches, then the look ahead assertion requires both angle brackets and sets up the brackets group. If name is not matched, the assertion requires the rest of the text to not have angle brackets around it. Later, if the brackets group is set, the actual pattern matching code consumes the brackets in the input using literal patterns; otherwise, it consumes any blank space.
+
+```
+$ python3 re_id.py
+Candidate: First Last <first.last@example.com>
+  Match name : First Last
+  Match email: first.last@example.com
+Candidate: No Brackets first.last@example.com
+  No match
+Candidate: Open Bracket <first.last@example.com
+  No match
+Candidate: Close Bracket first.last@example.com>
+  No match
+Candidate: no.brackets@example.com
+  Match name : None
+  Match email: no.brackets@example.com
 ```
