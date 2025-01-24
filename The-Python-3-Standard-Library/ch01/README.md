@@ -2494,3 +2494,62 @@ $ python3 difflib_unified.py
 ```
 
 Using context_diff() produces similar readable output.
+
+#### 1.4.2 Junk Data
+
+All of the functions that produce difference sequences accept arguments to indicate which lines should be ignored and which characters within a line should be ignored. These parameters can be used to skip over markup or whitespace changes in two versions of a file, for example.
+
+```
+# difflib_junk.py
+# This example is adapted from the source for difflib.py.
+
+from difflib import SequenceMatcher
+
+
+def show_results(match):
+    print('  a    = {}'.format(match.a))
+    print('  b    = {}'.format(match.b))
+    print('  size = {}'.format(match.size))
+    i, j, k = match
+    print('  A[a:a+size] = {!r}'.format(A[i:i + k]))
+    print('  B[b:b+size] = {!r}'.format(B[j:j + k]))
+
+
+A = " abcd"
+B = "abcd abcd"
+
+print('A = {!r}'.format(A))
+print('B = {!r}'.format(B))
+
+print('\nWithout junk detection:')
+s1 = SequenceMatcher(None, A, B)
+match1 = s1.find_longest_match(0, len(A), 0, len(B))
+show_results(match1)
+
+print('\nTreat spaces as junk:')
+s2 = SequenceMatcher(lambda x: x == " ", A, B)
+match2 = s2.find_longest_match(0, len(A), 0, len(B))
+show_results(match2)
+```
+
+The default for Differ is to not ignore any lines or characters explicitly, but rather to rely on the ability of SequenceMatcher to detect noise. The default for ndiff() is to ignore space and tab characters.
+
+```
+$ python3 difflib_junk.py
+A = ' abcd'
+B = 'abcd abcd'
+
+Without junk detection:
+  a    = 0
+  b    = 4
+  size = 5
+  A[a:a+size] = ' abcd'
+  B[b:b+size] = ' abcd'
+
+Treat spaces as junk:
+  a    = 1
+  b    = 0
+  size = 4
+  A[a:a+size] = 'abcd'
+  B[b:b+size] = 'abcd'
+```
