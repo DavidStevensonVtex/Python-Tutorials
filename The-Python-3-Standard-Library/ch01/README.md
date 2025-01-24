@@ -2349,7 +2349,7 @@ With split:
 
 ```
 
-### See also
+#### See also
 
 * [Standard library documentation for re](https://docs.python.org/3/library/re.html)
 * [Regular Expression HOWTO](https://docs.python.org/3/howto/regex.html) – Andrew Kuchling’s introduction to regular expressions for Python developers.
@@ -2358,3 +2358,42 @@ With split:
 * [Wikipedia: Regular expression](https://en.wikipedia.org/wiki/Regular_expression) – General introduction to regular expression concepts and techniques.
 * [locale](https://pymotw.com/3/locale/index.html#module-locale) – Use the locale module to set the language configuration when working with Unicode text.
 * unicodedata – Programmatic access to the Unicode character property database.
+
+#### 1.4 difflib — Compare Sequences
+
+**Purpose:**	Compare sequences, especially lines of text.
+
+The [difflib module](https://docs.python.org/3/library/difflib.html) contains tools for computing and working with differences between sequences. It is especially useful for comparing text, and includes functions that produce reports using several common difference formats.
+
+The examples in this section will all use this common test data in the difflib_data.py module:
+
+```
+# difflib_data.py
+text1 = """Lorem ipsum dolor sit amet, consectetuer adipiscing
+elit. Integer eu lacus accumsan arcu fermentum euismod. Donec
+pulvinar porttitor tellus. Aliquam venenatis. Donec facilisis
+pharetra tortor.  In nec mauris eget magna consequat
+convalis. Nam sed sem vitae odio pellentesque interdum. Sed
+consequat viverra nisl. Suspendisse arcu metus, blandit quis,
+rhoncus ac, pharetra eget, velit. Mauris urna. Morbi nonummy
+molestie orci. Praesent nisi elit, fringilla ac, suscipit non,
+tristique vel, mauris. Curabitur vel lorem id nisl porta
+adipiscing. Suspendisse eu lectus. In nunc. Duis vulputate
+tristique enim. Donec quis lectus a justo imperdiet tempus."""
+
+text1_lines = text1.splitlines()
+
+text2 = """Lorem ipsum dolor sit amet, consectetuer adipiscing
+elit. Integer eu lacus accumsan arcu fermentum euismod. Donec
+pulvinar, porttitor tellus. Aliquam venenatis. Donec facilisis
+pharetra tortor. In nec mauris eget magna consequat
+convalis. Nam cras vitae mi vitae odio pellentesque interdum. Sed
+consequat viverra nisl. Suspendisse arcu metus, blandit quis,
+rhoncus ac, pharetra eget, velit. Mauris urna. Morbi nonummy
+molestie orci. Praesent nisi elit, fringilla ac, suscipit non,
+tristique vel, mauris. Curabitur vel lorem id nisl porta
+adipiscing. Duis vulputate tristique enim. Donec quis lectus a
+justo imperdiet tempus.  Suspendisse eu lectus. In nunc."""
+
+text2_lines = text2.splitlines()
+```
