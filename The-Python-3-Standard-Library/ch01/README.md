@@ -2450,3 +2450,47 @@ $ python3 difflib_differ.py
 ```
 
 The ndiff() function produces essentially the same output. The processing is specifically tailored for working with text data and eliminating “noise” in the input.
+
+##### 1.4.1.1 Other Output Formats
+
+While the Differ class shows all of the input lines, a unified diff includes only the modified lines and a bit of context. The unified_diff() function produces this sort of output.
+
+```
+# difflib_unified.py
+import difflib
+from difflib_data import *
+
+diff = difflib.unified_diff(
+    text1_lines,
+    text2_lines,
+    lineterm='',
+)
+print('\n'.join(diff))
+```
+
+The lineterm argument is used to tell unified_diff() to skip appending newlines to the control lines that it returns because the input lines do not include them. Newlines are added to all of the lines when they are printed. The output should look familiar to users of many popular version-control tools.
+
+```
+$ python3 difflib_unified.py
+--- 
++++ 
+@@ -1,11 +1,11 @@
+ Lorem ipsum dolor sit amet, consectetuer adipiscing
+ elit. Integer eu lacus accumsan arcu fermentum euismod. Donec
+-pulvinar porttitor tellus. Aliquam venenatis. Donec facilisis
+-pharetra tortor.  In nec mauris eget magna consequat
+-convalis. Nam sed sem vitae odio pellentesque interdum. Sed
++pulvinar, porttitor tellus. Aliquam venenatis. Donec facilisis
++pharetra tortor. In nec mauris eget magna consequat
++convalis. Nam cras vitae mi vitae odio pellentesque interdum. Sed
+ consequat viverra nisl. Suspendisse arcu metus, blandit quis,
+ rhoncus ac, pharetra eget, velit. Mauris urna. Morbi nonummy
+ molestie orci. Praesent nisi elit, fringilla ac, suscipit non,
+ tristique vel, mauris. Curabitur vel lorem id nisl porta
+-adipiscing. Suspendisse eu lectus. In nunc. Duis vulputate
+-tristique enim. Donec quis lectus a justo imperdiet tempus.
++adipiscing. Duis vulputate tristique enim. Donec quis lectus a
++justo imperdiet tempus.  Suspendisse eu lectus. In nunc.
+```
+
+Using context_diff() produces similar readable output.
