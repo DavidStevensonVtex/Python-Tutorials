@@ -2645,3 +2645,8 @@ s1 == s2: True
 ```
 
 SequenceMatcher works with custom classes, as well as built-in types, as long as they are hashable.
+
+#### See also
+
+* [Standard library documentation for difflib](https://docs.python.org/3/library/difflib.html)
+* [“Pattern Matching: The Gestalt Approach”](https://www.drdobbs.com/database/pattern-matching-the-gestalt-approach/184407970) – Discussion of a similar algorithm by John W. Ratcliff and D. E. Metzener published in Dr. Dobb’s Journal in July, 1988.
