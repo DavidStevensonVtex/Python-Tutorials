@@ -2553,3 +2553,95 @@ Treat spaces as junk:
   A[a:a+size] = 'abcd'
   B[b:b+size] = 'abcd'
 ```
+
+#### 1.4.3 Comparing Arbitrary Types
+
+The SequenceMatcher class compares two sequences of any types, as long as the values are hashable. It uses an algorithm to identify the longest contiguous matching blocks from the sequences, eliminating “junk” values that do not contribute to the real data.
+
+The funct get_opcodes() returns a list of instructions for modifying the first sequence to make it match the second. The instructions are encoded as five-element tuples, including a string instruction (the “opcode”, see the table below) and two pairs of start and stop indexes into the sequences (denoted as i1, i2, j1, and j2).
+
+
+difflib.get_opcodes() Instructions
+
+Opcode	Definition
+
+* 'replace'	Replace a[i1:i2] with b[j1:j2]
+* 'delete'	Remove a[i1:i2] entirely
+* 'insert'	Insert b[j1:j2] at a[i1:i1]
+* 'equal'	The subsequences are already equal
+
+```
+# difflib_seq.py
+import difflib
+
+s1 = [1, 2, 3, 5, 6, 4]
+s2 = [2, 3, 5, 4, 6, 1]
+
+print('Initial data:')
+print('s1 =', s1)
+print('s2 =', s2)
+print('s1 == s2:', s1 == s2)
+print()
+
+matcher = difflib.SequenceMatcher(None, s1, s2)
+for tag, i1, i2, j1, j2 in reversed(matcher.get_opcodes()):
+
+    if tag == 'delete':
+        print('Remove {} from positions [{}:{}]'.format(
+            s1[i1:i2], i1, i2))
+        print('  before =', s1)
+        del s1[i1:i2]
+
+    elif tag == 'equal':
+        print('s1[{}:{}] and s2[{}:{}] are the same'.format(
+            i1, i2, j1, j2))
+
+    elif tag == 'insert':
+        print('Insert {} from s2[{}:{}] into s1 at {}'.format(
+            s2[j1:j2], j1, j2, i1))
+        print('  before =', s1)
+        s1[i1:i2] = s2[j1:j2]
+
+    elif tag == 'replace':
+        print(('Replace {} from s1[{}:{}] '
+               'with {} from s2[{}:{}]').format(
+                   s1[i1:i2], i1, i2, s2[j1:j2], j1, j2))
+        print('  before =', s1)
+        s1[i1:i2] = s2[j1:j2]
+
+    print('   after =', s1, '\n')
+
+print('s1 == s2:', s1 == s2)
+```
+
+This example compares two lists of integers and uses get_opcodes() to derive the instructions for converting the original list into the newer version. The modifications are applied in reverse order so that the list indexes remain accurate after items are added and removed.
+
+```
+$ python3 difflib_seq.py
+Initial data:
+s1 = [1, 2, 3, 5, 6, 4]
+s2 = [2, 3, 5, 4, 6, 1]
+s1 == s2: False
+
+Replace [4] from s1[5:6] with [1] from s2[5:6]
+  before = [1, 2, 3, 5, 6, 4]
+   after = [1, 2, 3, 5, 6, 1] 
+
+s1[4:5] and s2[4:5] are the same
+   after = [1, 2, 3, 5, 6, 1] 
+
+Insert [4] from s2[3:4] into s1 at 4
+  before = [1, 2, 3, 5, 6, 1]
+   after = [1, 2, 3, 5, 4, 6, 1] 
+
+s1[1:4] and s2[0:3] are the same
+   after = [1, 2, 3, 5, 4, 6, 1] 
+
+Remove [1] from positions [0:1]
+  before = [1, 2, 3, 5, 4, 6, 1]
+   after = [2, 3, 5, 4, 6, 1] 
+
+s1 == s2: True
+```
+
+SequenceMatcher works with custom classes, as well as built-in types, as long as they are hashable.
