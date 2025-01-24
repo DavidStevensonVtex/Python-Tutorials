@@ -2359,7 +2359,7 @@ With split:
 * [locale](https://pymotw.com/3/locale/index.html#module-locale) – Use the locale module to set the language configuration when working with Unicode text.
 * unicodedata – Programmatic access to the Unicode character property database.
 
-#### 1.4 difflib — Compare Sequences
+### 1.4 difflib — Compare Sequences
 
 **Purpose:**	Compare sequences, especially lines of text.
 
@@ -2397,3 +2397,56 @@ justo imperdiet tempus.  Suspendisse eu lectus. In nunc."""
 
 text2_lines = text2.splitlines()
 ```
+
+#### 1.4.1 Comparing Bodies of Text
+
+The [Differ class](https://docs.python.org/3/library/difflib.html#difflib.Differ) works on sequences of text lines and produces human-readable deltas, or change instructions, including differences within individual lines. The default output produced by Differ is similar to the diff command-line tool under Unix. It includes the original input values from both lists, including common values, and markup data to indicate which changes were made.
+
+* Lines prefixed with - were in the first sequence, but not the second.
+* Lines prefixed with + were in the second sequence, but not the first.
+* If a line has an incremental difference between versions, an extra line prefixed with ? is used to highlight the change within the new version.
+* If a line has not changed, it is printed with an extra blank space on the left column so that it is aligned with the other output that may have differences.
+
+Breaking the text up into a sequence of individual lines before passing it to compare() produces more readable output than passing in large strings.
+
+```
+# difflib_differ.py
+import difflib
+from difflib_data import *
+
+d = difflib.Differ()
+diff = d.compare(text1_lines, text2_lines)
+print('\n'.join(diff))
+```
+
+The beginning of both text segments in the sample data is the same, so the first line is printed without any extra annotation.
+
+```
+$ python3 difflib_differ.py 
+  Lorem ipsum dolor sit amet, consectetuer adipiscing
+  elit. Integer eu lacus accumsan arcu fermentum euismod. Donec
+- pulvinar porttitor tellus. Aliquam venenatis. Donec facilisis
++ pulvinar, porttitor tellus. Aliquam venenatis. Donec facilisis
+?         +
+
+- pharetra tortor.  In nec mauris eget magna consequat
+?                 -
+
++ pharetra tortor. In nec mauris eget magna consequat
+- convalis. Nam sed sem vitae odio pellentesque interdum. Sed
+?                 - --
+
++ convalis. Nam cras vitae mi vitae odio pellentesque interdum. Sed
+?               +++ +++++   +
+
+  consequat viverra nisl. Suspendisse arcu metus, blandit quis,
+  rhoncus ac, pharetra eget, velit. Mauris urna. Morbi nonummy
+  molestie orci. Praesent nisi elit, fringilla ac, suscipit non,
+  tristique vel, mauris. Curabitur vel lorem id nisl porta
+- adipiscing. Suspendisse eu lectus. In nunc. Duis vulputate
+- tristique enim. Donec quis lectus a justo imperdiet tempus.
++ adipiscing. Duis vulputate tristique enim. Donec quis lectus a
++ justo imperdiet tempus.  Suspendisse eu lectus. In nunc.
+```
+
+The ndiff() function produces essentially the same output. The processing is specifically tailored for working with text data and eliminating “noise” in the input.
