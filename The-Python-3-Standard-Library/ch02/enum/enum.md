@@ -154,3 +154,86 @@ Ordered by value:
   incomplete
   new
 ```
+
+### 2.1.4 Unique Enumeration Values
+
+Enum members with the same value are tracked as alias references to the same member object. Aliases do not cause repeated values to be present in the iterator for the Enum.
+
+```
+# enum_aliases.py
+import enum
+
+
+class BugStatus(enum.Enum):
+
+    new = 7
+    incomplete = 6
+    invalid = 5
+    wont_fix = 4
+    in_progress = 3
+    fix_committed = 2
+    fix_released = 1
+
+    by_design = 4
+    closed = 1
+
+
+for status in BugStatus:
+    print('{:15} = {}'.format(status.name, status.value))
+
+print('\nSame: by_design is wont_fix: ',
+      BugStatus.by_design is BugStatus.wont_fix)
+print('Same: closed is fix_released: ',
+      BugStatus.closed is BugStatus.fix_released)
+```
+
+Because by_design and closed are aliases for other members, they do not appear separately in the output when iterating over the Enum. The canonical name for a member is the first name attached to the value.
+
+```
+$ python3 enum_aliases.py
+new             = 7
+incomplete      = 6
+invalid         = 5
+wont_fix        = 4
+in_progress     = 3
+fix_committed   = 2
+fix_released    = 1
+
+Same: by_design is wont_fix:  True
+Same: closed is fix_released:  True
+```
+
+To require all members to have unique values, add the `@unique` decorator to the Enum.
+
+```
+# enum_unique_enforce.py
+import enum
+
+
+@enum.unique
+class BugStatus(enum.Enum):
+
+    new = 7
+    incomplete = 6
+    invalid = 5
+    wont_fix = 4
+    in_progress = 3
+    fix_committed = 2
+    fix_released = 1
+
+    # This will trigger an error with unique applied.
+    by_design = 4
+    closed = 1
+```
+
+Members with repeated values trigger a ValueError exception when the Enum class is being interpreted.
+
+```
+$ python3 enum_unique_enforce.py
+Traceback (most recent call last):
+  File "enum_unique_enforce.py", line 6, in <module>
+    class BugStatus(enum.Enum):
+  File "/usr/lib/python3.8/enum.py", line 974, in unique
+    raise ValueError('duplicate values found in %r: %s' %
+ValueError: duplicate values found in <enum 'BugStatus'>: by_design -> wont_fix, closed -> fix_released
+```
