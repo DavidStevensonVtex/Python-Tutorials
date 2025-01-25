@@ -13,3 +13,6 @@
 
 txt = f"The price is 49 dollars"
 print(txt)
+
+# $ python3 f-strings.py 
+# The price is 49 dollars
