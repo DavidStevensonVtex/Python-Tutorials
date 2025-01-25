@@ -10,3 +10,5 @@ txt = "The rain in Spain"
 x = re.search("Portugal", txt)
 print(x)
 
+# $ python3 no-match-search.py 
+# None
