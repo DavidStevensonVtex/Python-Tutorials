@@ -14,3 +14,5 @@ txt = "The rain in Spain"
 x = re.search("ai", txt)
 print(x) #this will print an object
 
+# $ python3 search-match-object.py 
+# <re.Match object; span=(5, 7), match='ai'>
