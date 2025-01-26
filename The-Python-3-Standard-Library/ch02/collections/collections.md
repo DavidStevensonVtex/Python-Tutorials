@@ -388,3 +388,31 @@ Counter({'a': 2, 'b': 1})
 Union (taking maximums):
 Counter({'b': 3, 'a': 2, 'c': 1, 'l': 1, 'p': 1, 'h': 1, 'e': 1, 't': 1})
 ```
+
+### 2.2.3 defaultdict — Missing Keys Return a Default Value
+
+The standard dictionary includes the method setdefault() for retrieving a value and establishing a default if the value does not exist. By contrast, defaultdict lets the caller specify the default up front when the container is initialized.
+
+```
+# collections_defaultdict.py
+import collections
+
+
+def default_factory():
+    return 'default value'
+
+
+d = collections.defaultdict(default_factory, foo='bar')
+print('d:', d)
+print('foo =>', d['foo'])
+print('bar =>', d['bar'])
+```
+
+This method works well as long as it is appropriate for all keys to have the same default. It can be especially useful if the default is a type used for aggregating or accumulating values, such as a list, set, or even int. The standard library documentation includes several examples in which defaultdict is used in this way.
+
+```
+$ python3 collections_defaultdict.py
+d: defaultdict(<function default_factory at 0x7f722ceb4c10>, {'foo': 'bar'})
+foo => bar
+bar => default value
+```
