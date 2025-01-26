@@ -428,3 +428,9 @@ Value: {'num': 3, 'transitions': ['new', 'fix_committed']}
 Custom attribute: ['new', 'fix_committed']
 Using attribute: True
 ```
+
+### See also
+
+* [Standard library documentation for enum](https://docs.python.org/3/library/enum.html)
+* [PEP 435](https://peps.python.org/pep-0435/) – Adding an Enum type to the Python standard library
+* [flufl.enum](https://pythonhosted.org/flufl.enum/) – The original inspiration for enum, by Barry Warsaw.
