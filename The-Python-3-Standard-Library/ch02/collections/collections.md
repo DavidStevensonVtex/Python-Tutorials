@@ -271,3 +271,73 @@ Initial : Counter()
 Sequence: Counter({'a': 3, 'b': 2, 'c': 1, 'd': 1})
 Dict    : Counter({'d': 6, 'a': 4, 'b': 2, 'c': 1})
 ```
+
+#### 2.2.2.2 Accessing Counts
+
+Once a Counter is populated, its values can be retrieved using the dictionary API.
+
+```
+# collections_counter_get_values.py
+import collections
+
+c = collections.Counter('abcdaab')
+
+for letter in 'abcde':
+    print('{} : {}'.format(letter, c[letter]))
+```
+
+Counter does not raise KeyError for unknown items. If a value has not been seen in the input (as with e in this example), its count is 0.
+
+```
+$ python3 collections_counter_get_values.py
+a : 3
+b : 2
+c : 1
+d : 1
+e : 0
+```
+
+The elements() method returns an iterator that produces all of the items known to the Counter.
+
+```
+# collections_counter_elements.py
+import collections
+
+c = collections.Counter('extremely')
+c['z'] = 0
+print(c)
+print(list(c.elements()))
+```
+
+The order of elements is not guaranteed, and items with counts less than or equal to zero are not included.
+
+```
+$ python3 collections_counter_elements.py
+Counter({'e': 3, 'x': 1, 't': 1, 'r': 1, 'm': 1, 'l': 1, 'y': 1, 'z': 0})
+['e', 'e', 'e', 'x', 't', 'r', 'm', 'l', 'y']
+```
+
+Use most_common() to produce a sequence of the n most frequently encountered input values and their respective counts.
+
+```
+# collections_counter_most_common.py
+import collections
+
+c = collections.Counter()
+with open('/usr/share/dict/words', 'rt') as f:
+    for line in f:
+        c.update(line.rstrip().lower())
+
+print('Most common:')
+for letter, count in c.most_common(3):
+    print('{}: {:>7}'.format(letter, count))
+```
+
+This example counts the letters appearing in all of the words in the system dictionary to produce a frequency distribution, then prints the three most common letters. Leaving out the argument to most_common() produces a list of all the items, in order of frequency.
+
+```
+Most common:
+s:   94661
+e:   91292
+i:   68740
+```
