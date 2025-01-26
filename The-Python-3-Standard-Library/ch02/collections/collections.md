@@ -219,3 +219,55 @@ $ python3 collections_chainmap_new_child_explicit.py
 m1["c"] = C
 m2["c"] = E
 ```
+
+
+### 2.2.2 Counter — Count Hashable Objects
+
+A Counter is a container that keeps track of how many times equivalent values are added. It can be used to implement the same algorithms for which other languages commonly use bag or multiset data structures.
+
+#### 2.2.2.1 Initializing
+
+Counter supports three forms of initialization. Its constructor can be called with a sequence of items, a dictionary containing keys and counts, or using keyword arguments that map string names to counts.
+
+```
+# collections_counter_init.py
+import collections
+
+print(collections.Counter(['a', 'b', 'c', 'a', 'b', 'b']))
+print(collections.Counter({'a': 2, 'b': 3, 'c': 1}))
+print(collections.Counter(a=2, b=3, c=1))
+```
+
+The results of all three forms of initialization are the same.
+
+```
+$ python3 collections_counter_init.py
+Counter({'b': 3, 'a': 2, 'c': 1})
+Counter({'b': 3, 'a': 2, 'c': 1})
+Counter({'b': 3, 'a': 2, 'c': 1})
+```
+
+An empty Counter can be constructed with no arguments and populated via the update() method.
+
+```
+# collections_counter_update.py
+import collections
+
+c = collections.Counter()
+print('Initial :', c)
+
+c.update('abcdaab')
+print('Sequence:', c)
+
+c.update({'a': 1, 'd': 5})
+print('Dict    :', c)
+```
+
+The count values are increased based on the new data, rather than replaced. In the preceding example, the count for a goes from 3 to 4.
+
+```
+$ python3 collections_counter_update.py
+Initial : Counter()
+Sequence: Counter({'a': 3, 'b': 2, 'c': 1, 'd': 1})
+Dict    : Counter({'d': 6, 'a': 4, 'b': 2, 'c': 1})
+```
