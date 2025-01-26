@@ -107,3 +107,115 @@ c = C
 [{'b': 'B', 'c': 'D'}, {'a': 'A', 'c': 'C'}]
 c = D
 ```
+
+#### 2.2.1.3 Updating Values
+
+A ChainMap does not cache the values in the child mappings. Thus, if their contents are modified, the results are reflected when the ChainMap is accessed.
+
+```
+# collections_chainmap_update_behind.py
+import collections
+
+a = {'a': 'A', 'c': 'C'}
+b = {'b': 'B', 'c': 'D'}
+
+m = collections.ChainMap(a, b)
+print('Before: {}'.format(m['c']))
+a['c'] = 'E'
+print('After : {}'.format(m['c']))
+```
+
+Changing the values associated with existing keys and adding new elements works the same way.
+
+```
+$ python3 collections_chainmap_update_behind.py
+Before: C
+After : E
+```
+
+It is also possible to set values through the ChainMap directly, although only the first mapping in the chain is actually modified.
+
+```
+# collections_chainmap_update_directly.py
+import collections
+
+a = {'a': 'A', 'c': 'C'}
+b = {'b': 'B', 'c': 'D'}
+
+m = collections.ChainMap(a, b)
+print('Before:', m)
+m['c'] = 'E'
+print('After :', m)
+print('a:', a)
+```
+
+When the new value is stored using m, the a mapping is updated.
+
+```
+$ python3 collections_chainmap_update_directly.py
+Before: ChainMap({'a': 'A', 'c': 'C'}, {'b': 'B', 'c': 'D'})
+After : ChainMap({'a': 'A', 'c': 'E'}, {'b': 'B', 'c': 'D'})
+a: {'a': 'A', 'c': 'E'}
+```
+
+ChainMap provides a convenience method for creating a new instance with one extra mapping at the front of the maps list to make it easy to avoid modifying the existing underlying data structures.
+
+```
+# collections_chainmap_new_child.py
+import collections
+
+a = {'a': 'A', 'c': 'C'}
+b = {'b': 'B', 'c': 'D'}
+
+m1 = collections.ChainMap(a, b)
+m2 = m1.new_child()
+
+print('m1 before:', m1)
+print('m2 before:', m2)
+
+m2['c'] = 'E'
+
+print('m1 after:', m1)
+print('m2 after:', m2)
+```
+
+This stacking behavior is what makes it convenient to use ChainMap instances as template or application contexts. Specifically, it is easy to add or update values in one iteration, then discard the changes for the next iteration.
+
+```
+$ python3 collections_chainmap_new_child.py
+m1 before: ChainMap({'a': 'A', 'c': 'C'}, {'b': 'B', 'c': 'D'})
+m2 before: ChainMap({}, {'a': 'A', 'c': 'C'}, {'b': 'B', 'c': 'D'})
+m1 after: ChainMap({'a': 'A', 'c': 'C'}, {'b': 'B', 'c': 'D'})
+m2 after: ChainMap({'c': 'E'}, {'a': 'A', 'c': 'C'}, {'b': 'B', 'c': 'D'})
+```
+
+For situations where the new context is known or built in advance, it is also possible to pass a mapping to new_child().
+
+```
+# collections_chainmap_new_child_explicit.py
+import collections
+
+a = {'a': 'A', 'c': 'C'}
+b = {'b': 'B', 'c': 'D'}
+c = {'c': 'E'}
+
+m1 = collections.ChainMap(a, b)
+m2 = m1.new_child(c)
+
+print('m1["c"] = {}'.format(m1['c']))
+print('m2["c"] = {}'.format(m2['c']))
+```
+
+This is the equivalent of
+
+```
+m2 = collections.ChainMap(c, *m1.maps)
+```
+
+and produces
+
+```
+$ python3 collections_chainmap_new_child_explicit.py
+m1["c"] = C
+m2["c"] = E
+```
