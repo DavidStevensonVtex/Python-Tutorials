@@ -416,3 +416,32 @@ d: defaultdict(<function default_factory at 0x7f722ceb4c10>, {'foo': 'bar'})
 foo => bar
 bar => default value
 ```
+
+### 2.2.4 deque — Double-Ended Queue
+
+A double-ended queue, or deque, supports adding and removing elements from either end of the queue. The more commonly used stacks and queues are degenerate forms of deques, where the inputs and outputs are restricted to a single end.
+
+```
+# collections_deque.py
+import collections
+
+d = collections.deque('abcdefg')
+print('Deque:', d)
+print('Length:', len(d))
+print('Left end:', d[0])
+print('Right end:', d[-1])
+
+d.remove('c')
+print('remove(c):', d)
+```
+
+Since deques are a type of sequence container, they support some of the same operations as list, such as examining the contents with `__getitem__()`, determining length, and removing elements from the middle of the queue by matching identity.
+
+```
+$ python3 collections_deque.py
+Deque: deque(['a', 'b', 'c', 'd', 'e', 'f', 'g'])
+Length: 7
+Left end: a
+Right end: g
+remove(c): deque(['a', 'b', 'd', 'e', 'f', 'g'])
+```
