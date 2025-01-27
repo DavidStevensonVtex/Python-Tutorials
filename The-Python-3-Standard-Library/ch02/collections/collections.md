@@ -790,3 +790,74 @@ $ python3 collections_namedtuple_rename.py
 ('name', '_1', 'age')
 ('name', 'age', '_2')
 ```
+
+#### 2.2.5.3 Special Attributes
+
+namedtuple provides several useful attributes and methods for working with subclasses and instances. All of these built-in properties have names prefixed with an underscore (\_), which by convention in most Python programs indicates a private attribute. For namedtuple, however, the prefix is intended to protect the name from collision with user-provided attribute names.
+
+The names of the fields passed to namedtuple to define the new class are saved in the `_fields` attribute.
+
+```
+# collections_namedtuple_fields.py
+import collections
+
+Person = collections.namedtuple('Person', 'name age')
+
+bob = Person(name='Bob', age=30)
+print('Representation:', bob)
+print('Fields:', bob._fields)
+```
+
+Although the argument is a single space-separated string, the stored value is the sequence of individual names.
+
+```
+$ python3 collections_namedtuple_fields.py
+Representation: Person(name='Bob', age=30)
+Fields: ('name', 'age')
+```
+
+namedtuple instances can be converted to OrderedDict instances using _asdict().
+
+```
+# collections_namedtuple_asdict.py
+import collections
+
+Person = collections.namedtuple('Person', 'name age')
+
+bob = Person(name='Bob', age=30)
+print('Representation:', bob)
+print('As Dictionary:', bob._asdict())
+```
+
+The keys of the OrderedDict are in the same order as the fields for the namedtuple.
+
+```
+$ python3 collections_namedtuple_asdict.py
+Representation: Person(name='Bob', age=30)
+As Dictionary: {'name': 'Bob', 'age': 30}
+```
+
+The `_replace()` method builds a new instance, replacing the values of some fields in the process.
+
+```
+# collections_namedtuple_replace.py
+import collections
+
+Person = collections.namedtuple('Person', 'name age')
+
+bob = Person(name='Bob', age=30)
+print('\nBefore:', bob)
+bob2 = bob._replace(name='Robert')
+print('After:', bob2)
+print('Same?:', bob is bob2)
+```
+
+Although the name implies it is modifying the existing object, because namedtuple instances are immutable the method actually returns a new object.
+
+```
+$ python3 collections_namedtuple_replace.py
+
+Before: Person(name='Bob', age=30)
+After: Person(name='Robert', age=30)
+Same?: False
+```
