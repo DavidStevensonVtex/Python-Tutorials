@@ -565,3 +565,32 @@ $ python3 collections_deque_both_ends.py
    Right done
     Left done
 ```
+
+#### 2.2.4.3 Rotating
+
+Another useful aspect of the deque is the ability to rotate it in either direction, so as to skip over some items.
+
+```
+# collections_deque_rotate.py
+import collections
+
+d = collections.deque(range(10))
+print('Normal        :', d)
+
+d = collections.deque(range(10))
+d.rotate(2)
+print('Right rotation:', d)
+
+d = collections.deque(range(10))
+d.rotate(-2)
+print('Left rotation :', d)
+```
+
+Rotating the deque to the right (using a positive rotation) takes items from the right end and moves them to the left end. Rotating to the left (with a negative value) takes items from the left end and moves them to the right end. It may help to visualize the items in the deque as being engraved along the edge of a dial.
+
+```
+$ python3 collections_deque_rotate.py
+Normal        : deque([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+Right rotation: deque([8, 9, 0, 1, 2, 3, 4, 5, 6, 7])
+Left rotation : deque([2, 3, 4, 5, 6, 7, 8, 9, 0, 1])
+```
