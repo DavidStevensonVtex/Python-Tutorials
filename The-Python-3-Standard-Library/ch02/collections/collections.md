@@ -677,3 +677,64 @@ Jane is a 29 year old female
 ```
 
 In contrast, remembering which index should be used for each value can lead to errors, especially if the tuple has a lot of fields and is constructed far from where it is used. A namedtuple assigns names, as well as the numerical index, to each member.
+
+#### 2.2.5.1 Defining
+
+namedtuple instances are just as memory efficient as regular tuples because they do not have per-instance dictionaries. Each kind of namedtuple is represented by its own class, which is created by using the namedtuple() factory function. The arguments are the name of the new class and a string containing the names of the elements.
+
+```
+# collections_namedtuple_person.py
+import collections
+
+Person = collections.namedtuple('Person', 'name age')
+
+bob = Person(name='Bob', age=30)
+print('\nRepresentation:', bob)
+
+jane = Person(name='Jane', age=29)
+print('\nField by name:', jane.name)
+
+print('\nFields by index:')
+for p in [bob, jane]:
+    print('{} is {} years old'.format(*p))
+```
+
+As the example illustrates, it is possible to access the fields of the namedtuple by name using dotted notation (obj.attr) as well as by using the positional indexes of standard tuples.
+
+```
+$ python3 collections_namedtuple_person.py
+
+Representation: Person(name='Bob', age=30)
+
+Field by name: Jane
+
+Fields by index:
+Bob is 30 years old
+Jane is 29 years old
+```
+
+Just like a regular tuple, a namedtuple is immutable. This restriction allows tuple instances to have a consistent hash value, which makes it possible to use them as keys in dictionaries and to be included in sets.
+
+```
+# collections_namedtuple_immutable.py
+import collections
+
+Person = collections.namedtuple('Person', 'name age')
+
+pat = Person(name='Pat', age=12)
+print('\nRepresentation:', pat)
+
+pat.age = 21
+```
+
+Trying to change a value through its named attribute results in an AttributeError.
+
+```
+$ python3 collections_namedtuple_immutable.py
+
+Representation: Person(name='Pat', age=12)
+Traceback (most recent call last):
+  File "collections_namedtuple_immutable.py", line 9, in <module>
+    pat.age = 21
+AttributeError: can't set attribute
+```
