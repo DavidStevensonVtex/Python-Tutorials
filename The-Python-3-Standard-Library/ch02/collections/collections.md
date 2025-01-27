@@ -640,3 +640,8 @@ n = 32
 D1: deque([97, 8, 32], maxlen=3)
 D2: deque([32, 8, 97], maxlen=3)
 ```
+
+#### See also
+
+* [Wikipedia: Deque](https://en.wikipedia.org/wiki/Double-ended_queue) – A discussion of the deque data structure.
+* [Deque Recipes](https://docs.python.org/3/library/collections.html#deque-recipes) – Examples of using deques in algorithms from the standard library documentation.
