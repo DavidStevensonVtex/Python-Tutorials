@@ -738,3 +738,55 @@ Traceback (most recent call last):
     pat.age = 21
 AttributeError: can't set attribute
 ```
+
+#### 2.2.5.2 Invalid Field Names
+
+Field names are invalid if they are repeated or conflict with Python keywords.
+
+```
+# collections_namedtuple_bad_fields.py
+import collections
+
+try:
+    collections.namedtuple('Person', 'name class age')
+except ValueError as err:
+    print(err)
+
+try:
+    collections.namedtuple('Person', 'name age age')
+except ValueError as err:
+    print(err)
+```
+
+As the field names are parsed, invalid values cause ValueError exceptions.
+
+```
+$ python3 collections_namedtuple_bad_fields.py
+Type names and field names cannot be a keyword: 'class'
+Encountered duplicate field name: 'age'
+```
+
+In situations where a namedtuple is created based on values outside the control of the program (such as to represent the rows returned by a database query, where the schema is not known in advance), the rename option should be set to True so the invalid fields are renamed.
+
+```
+# collections_namedtuple_rename.py
+import collections
+
+with_class = collections.namedtuple(
+    'Person', 'name class age',
+    rename=True)
+print(with_class._fields)
+
+two_ages = collections.namedtuple(
+    'Person', 'name age age',
+    rename=True)
+print(two_ages._fields)
+```
+
+The new names for renamed fields depend on their index in the tuple, so the field with name class becomes _1 and the duplicate age field is changed to _2.
+
+```
+$ python3 collections_namedtuple_rename.py
+('name', '_1', 'age')
+('name', 'age', '_2')
+```
