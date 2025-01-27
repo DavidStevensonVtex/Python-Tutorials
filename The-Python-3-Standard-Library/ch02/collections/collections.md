@@ -445,3 +445,36 @@ Left end: a
 Right end: g
 remove(c): deque(['a', 'b', 'd', 'e', 'f', 'g'])
 ```
+
+#### 2.2.4.1 Populating
+
+A deque can be populated from either end, termed “left” and “right” in the Python implementation.
+
+```
+# collections_deque_populating.py
+import collections
+
+# Add to the right
+d1 = collections.deque()
+d1.extend('abcdefg')
+print('extend    :', d1)
+d1.append('h')
+print('append    :', d1)
+
+# Add to the left
+d2 = collections.deque()
+d2.extendleft(range(6))
+print('extendleft:', d2)
+d2.appendleft(6)
+print('appendleft:', d2)
+```
+
+The extendleft() function iterates over its input and performs the equivalent of an appendleft() for each item. The end result is that the deque contains the input sequence in reverse order.
+
+```
+$ python3 collections_deque_populating.py 
+extend    : deque(['a', 'b', 'c', 'd', 'e', 'f', 'g'])
+append    : deque(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'])
+extendleft: deque([5, 4, 3, 2, 1, 0])
+appendleft: deque([6, 5, 4, 3, 2, 1, 0])
+```
