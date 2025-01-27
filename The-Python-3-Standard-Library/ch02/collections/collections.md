@@ -478,3 +478,90 @@ append    : deque(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'])
 extendleft: deque([5, 4, 3, 2, 1, 0])
 appendleft: deque([6, 5, 4, 3, 2, 1, 0])
 ```
+
+#### 2.2.4.2 Consuming
+
+Similarly, the elements of the deque can be consumed from both ends or either end, depending on the algorithm being applied.
+
+```
+# collections_deque_consuming.py
+import collections
+
+print('From the right:')
+d = collections.deque('abcdefg')
+while True:
+    try:
+        print(d.pop(), end='')
+    except IndexError:
+        break
+print()
+
+print('\nFrom the left:')
+d = collections.deque(range(6))
+while True:
+    try:
+        print(d.popleft(), end='')
+    except IndexError:
+        break
+print()
+```
+
+Use pop() to remove an item from the “right” end of the deque and popleft() to take an item from the “left” end.
+
+```
+$ python3 collections_deque_consuming.py 
+From the right:
+gfedcba
+
+From the left:
+012345
+```
+
+Since deques are thread-safe, the contents can even be consumed from both ends at the same time from separate threads.
+
+```
+# collections_deque_both_ends.py
+import collections
+import threading
+import time
+
+candle = collections.deque(range(5))
+
+
+def burn(direction, nextSource):
+    while True:
+        try:
+            next = nextSource()
+        except IndexError:
+            break
+        else:
+            print('{:>8}: {}'.format(direction, next))
+            time.sleep(0.1)
+    print('{:>8} done'.format(direction))
+    return
+
+
+left = threading.Thread(target=burn,
+                        args=('Left', candle.popleft))
+right = threading.Thread(target=burn,
+                         args=('Right', candle.pop))
+
+left.start()
+right.start()
+
+left.join()
+right.join()
+```
+
+The threads in this example alternate between each end, removing items until the deque is empty.
+
+```
+$ python3 collections_deque_both_ends.py 
+    Left: 0
+   Right: 4
+    Left: 1
+   Right: 3
+    Left: 2
+   Right done
+    Left done
+```
