@@ -645,3 +645,35 @@ D2: deque([32, 8, 97], maxlen=3)
 
 * [Wikipedia: Deque](https://en.wikipedia.org/wiki/Double-ended_queue) – A discussion of the deque data structure.
 * [Deque Recipes](https://docs.python.org/3/library/collections.html#deque-recipes) – Examples of using deques in algorithms from the standard library documentation.
+
+### 2.2.5 namedtuple — Tuple Subclass with Named Fields
+
+The standard tuple uses numerical indexes to access its members.
+
+```
+# collections_tuple.py
+bob = ('Bob', 30, 'male')
+print('Representation:', bob)
+
+jane = ('Jane', 29, 'female')
+print('\nField by index:', jane[0])
+
+print('\nFields by index:')
+for p in [bob, jane]:
+    print('{} is a {} year old {}'.format(*p))
+```
+
+This makes tuples convenient containers for simple uses.
+
+```
+$ python3 collections_tuple.py
+Representation: ('Bob', 30, 'male')
+
+Field by index: Jane
+
+Fields by index:
+Bob is a 30 year old male
+Jane is a 29 year old female
+```
+
+In contrast, remembering which index should be used for each value can lead to errors, especially if the tuple has a lot of fields and is constructed far from where it is used. A namedtuple assigns names, as well as the numerical index, to each member.
