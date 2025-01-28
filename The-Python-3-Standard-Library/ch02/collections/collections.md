@@ -1024,3 +1024,5 @@ Purpose:	[Abstract base classes](https://docs.python.org/3/library/collections.a
 The collections.abc module contains abstract base classes that define the APIs for container data structures built into Python and provided by the collections module. Refer to the table below for a list of the classes and their purposes.
 
 In addition to clearly defining the APIs for containers with different semantics, these abstract base classes can be used to test whether an object supports an API before invoking it using isinstance(). Some of the classes also provide implementations of methods, and they can be used as mix-ins to build up custom container types without implementing every method from scratch.
+
+[Implementing an Interface in Python](https://realpython.com/python-interface/)
