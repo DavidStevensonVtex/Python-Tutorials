@@ -963,3 +963,56 @@ $ python3 collections_ordereddict_equality.py
 dict       : True
 OrderedDict: False
 ```
+
+#### 2.2.6.2 Reordering
+
+It is possible to change the order of the keys in an OrderedDict by moving them to either the beginning or the end of the sequence using move_to_end().
+
+```
+# collections_ordereddict_move_to_end.py
+import collections
+
+d = collections.OrderedDict(
+    [('a', 'A'), ('b', 'B'), ('c', 'C')]
+)
+
+print('Before:')
+for k, v in d.items():
+    print(k, v)
+
+d.move_to_end('b')
+
+print('\nmove_to_end():')
+for k, v in d.items():
+    print(k, v)
+
+d.move_to_end('b', last=False)
+
+print('\nmove_to_end(last=False):')
+for k, v in d.items():
+    print(k, v)
+```
+
+The last argument tells move_to_end() whether to move the item to be the last item in the key sequence (when True) or the first (when False).
+
+```
+$ python3 collections_ordereddict_move_to_end.py
+Before:
+a A
+b B
+c C
+
+move_to_end():
+a A
+c C
+b B
+
+move_to_end(last=False):
+b B
+a A
+c C
+```
+
+#### See also
+
+[PYTHONHASHSEED](https://docs.python.org/3/using/cmdline.html#envvar-PYTHONHASHSEED) – Environment variable to control the random seed value added to the hash algorithm for key locations in the dictionary.
