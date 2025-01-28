@@ -1016,3 +1016,11 @@ c C
 #### See also
 
 [PYTHONHASHSEED](https://docs.python.org/3/using/cmdline.html#envvar-PYTHONHASHSEED) – Environment variable to control the random seed value added to the hash algorithm for key locations in the dictionary.
+
+### [2.2.7 collections.abc — Abstract Base Classes for Containers](https://pymotw.com/3/collections/abc.html)
+
+Purpose:	[Abstract base classes](https://docs.python.org/3/library/collections.abc.html) for container data types.
+
+The collections.abc module contains abstract base classes that define the APIs for container data structures built into Python and provided by the collections module. Refer to the table below for a list of the classes and their purposes.
+
+In addition to clearly defining the APIs for containers with different semantics, these abstract base classes can be used to test whether an object supports an API before invoking it using isinstance(). Some of the classes also provide implementations of methods, and they can be used as mix-ins to build up custom container types without implementing every method from scratch.
