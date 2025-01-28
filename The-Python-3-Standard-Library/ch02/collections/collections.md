@@ -861,3 +861,61 @@ Before: Person(name='Bob', age=30)
 After: Person(name='Robert', age=30)
 Same?: False
 ```
+
+### 2.2.6 OrderedDict — Remember the Order Keys are Added to a Dictionary
+
+An OrderedDict is a dictionary subclass that remembers the order in which its contents are added.
+
+```
+# collections_ordereddict_iter.py
+import collections
+
+print('Regular dictionary:')
+d = {}
+d['a'] = 'A'
+d['b'] = 'B'
+d['c'] = 'C'
+
+for k, v in d.items():
+    print(k, v)
+
+print('\nOrderedDict:')
+d = collections.OrderedDict()
+d['a'] = 'A'
+d['b'] = 'B'
+d['c'] = 'C'
+
+for k, v in d.items():
+    print(k, v)
+```
+
+Before Python 3.6 a regular dict did not track the insertion order, and iterating over it produced the values in order based on how the keys are stored in the hash table, which is in turn influenced by a random value to reduce collisions. In an OrderedDict, by contrast, the order in which the items are inserted is remembered and used when creating an iterator.
+
+```
+$ python3.5 collections_ordereddict_iter.py
+
+Regular dictionary:
+c C
+b B
+a A
+
+OrderedDict:
+a A
+b B
+c C
+```
+
+```
+$ python3 --version
+Python 3.8.10
+$ python3 collections_ordereddict_iter.py
+Regular dictionary:
+a A
+b B
+c C
+
+OrderedDict:
+a A
+b B
+c C
+```
