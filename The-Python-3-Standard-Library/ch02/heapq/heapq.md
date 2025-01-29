@@ -131,3 +131,96 @@ heapified :
     10       11   
 ------------------------------------
 ```
+
+### 2.4.3 Accessing the Contents of a Heap
+
+Once the heap is organized correctly, use heappop() to remove the element with the lowest value.
+
+```
+# heapq_heappop.py
+import heapq
+from heapq_showtree import show_tree
+from heapq_heapdata import data
+
+print('random    :', data)
+heapq.heapify(data)
+print('heapified :')
+show_tree(data)
+print()
+
+for i in range(2):
+    smallest = heapq.heappop(data)
+    print('pop    {:>3}:'.format(smallest))
+    show_tree(data)
+```
+
+In this example, adapted from the stdlib documentation, heapify() and heappop() are used to sort a list of numbers.
+
+```
+$ python3 heapq_heappop.py
+random    : [19, 9, 4, 10, 11]
+heapified :
+
+                 4                  
+        9                 19        
+    10       11   
+------------------------------------
+
+
+pop      4:
+
+                 9                  
+        10                19        
+    11   
+------------------------------------
+
+pop      9:
+
+                 10                 
+        11                19        
+------------------------------------
+```
+
+To remove existing elements and replace them with new values in a single operation, use heapreplace().
+
+```
+# heapq_heapreplace.py
+import heapq
+from heapq_showtree import show_tree
+from heapq_heapdata import data
+
+heapq.heapify(data)
+print('start:')
+show_tree(data)
+
+for n in [0, 13]:
+    smallest = heapq.heapreplace(data, n)
+    print('replace {:>2} with {:>2}:'.format(smallest, n))
+    show_tree(data)
+```
+
+Replacing elements in place makes it possible to maintain a fixed-size heap, such as a queue of jobs ordered by priority.
+
+```
+$ python3 heapq_heapreplace.py
+start:
+
+                 4                  
+        9                 19        
+    10       11   
+------------------------------------
+
+replace  4 with  0:
+
+                 0                  
+        9                 19        
+    10       11   
+------------------------------------
+
+replace  0 with 13:
+
+                 9                  
+        10                19        
+    13       11   
+------------------------------------
+```
