@@ -224,3 +224,30 @@ replace  0 with 13:
     13       11   
 ------------------------------------
 ```
+
+### 2.4.4 Data Extremes from a Heap
+
+heapq also includes two functions to examine an iterable and find a range of the largest or smallest values it contains.
+
+```
+# heapq_extremes.py
+import heapq
+from heapq_heapdata import data
+
+print('all       :', data)
+print('3 largest :', heapq.nlargest(3, data))
+print('from sort :', list(reversed(sorted(data)[-3:])))
+print('3 smallest:', heapq.nsmallest(3, data))
+print('from sort :', sorted(data)[:3])
+```
+
+Using nlargest() and nsmallest() is efficient only for relatively small values of n > 1, but can still come in handy in a few cases.
+
+```
+$ python3 heapq_extremes.py
+all       : [19, 9, 4, 10, 11]
+3 largest : [19, 11, 10]
+from sort : [19, 11, 10]
+3 smallest: [4, 9, 10]
+from sort : [4, 9, 10]
+```
