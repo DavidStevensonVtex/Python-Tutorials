@@ -46,3 +46,88 @@ def show_tree(tree, total_width=36, fill=' '):
     print('-' * total_width)
     print()
 ```
+
+### 2.4.2 Creating a Heap
+
+There are two basic ways to create a heap: heappush() and heapify().
+
+```
+# heapq_heappush.py
+import heapq
+from heapq_showtree import show_tree
+from heapq_heapdata import data
+
+heap = []
+print('random :', data)
+print()
+
+for n in data:
+    print('add {:>3}:'.format(n))
+    heapq.heappush(heap, n)
+    show_tree(heap)
+```
+
+When heappush() is used, the heap sort order of the elements is maintained as new items are added from a data source.
+
+```
+$ python3 heapq_heappush.py
+random : [19, 9, 4, 10, 11]
+
+add  19:
+
+                 19                 
+------------------------------------
+
+add   9:
+
+                 9                  
+        19        
+------------------------------------
+
+add   4:
+
+                 4                  
+        19                9         
+------------------------------------
+
+add  10:
+
+                 4                  
+        10                9         
+    19   
+------------------------------------
+
+add  11:
+
+                 4                  
+        10                9         
+    19       11   
+------------------------------------
+```
+
+If the data is already in memory, it is more efficient to use heapify() to rearrange the items of the list in place.
+
+```
+# heapq_heapify.py
+import heapq
+from heapq_showtree import show_tree
+from heapq_heapdata import data
+
+print('random    :', data)
+heapq.heapify(data)
+print('heapified :')
+show_tree(data)
+```
+
+The result of building a list in heap order one item at a time is the same as building an unordered list and then calling heapify().
+
+```
+$ python3 heapq_heapify.py
+random    : [19, 9, 4, 10, 11]
+heapified :
+
+                 4                  
+        9                 19        
+    10       11   
+------------------------------------
+```
