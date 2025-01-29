@@ -147,3 +147,57 @@ A1: array('i', [0, 1, 2, 3, 4])
 Bytes: b'0000000001000000020000000300000004000000'
 A2: array('i', [0, 1, 2, 3, 4])
 ```
+
+### 2.3.4 Alternative Byte Ordering
+
+If the data in the array is not in the native byte order, or if the data needs to be swapped before being sent to a system with a different byte order (or over the network), it is possible to convert the entire array without iterating over the elements from Python.
+
+```
+# array_byteswap.py
+import array
+import binascii
+
+
+def to_hex(a):
+    chars_per_item = a.itemsize * 2  # 2 hex digits
+    hex_version = binascii.hexlify(a)
+    num_chunks = len(hex_version) // chars_per_item
+    for i in range(num_chunks):
+        start = i * chars_per_item
+        end = start + chars_per_item
+        yield hex_version[start:end]
+
+
+start = int('0x12345678', 16)
+end = start + 5
+a1 = array.array('i', range(start, end))
+a2 = array.array('i', range(start, end))
+a2.byteswap()
+
+fmt = '{:>12} {:>12} {:>12} {:>12}'
+print(fmt.format('A1 hex', 'A1', 'A2 hex', 'A2'))
+print(fmt.format('-' * 12, '-' * 12, '-' * 12, '-' * 12))
+fmt = '{!r:>12} {:12} {!r:>12} {:12}'
+for values in zip(to_hex(a1), a1, to_hex(a2), a2):
+    print(fmt.format(*values))
+```
+
+The byteswap() method switches the byte order of the items in the array from within C, so it is much more efficient than looping over the data in Python.
+
+```
+$ python3 array_byteswap.py
+      A1 hex           A1       A2 hex           A2
+------------ ------------ ------------ ------------
+ b'78563412'    305419896  b'12345678'   2018915346
+ b'79563412'    305419897  b'12345679'   2035692562
+ b'7a563412'    305419898  b'1234567a'   2052469778
+ b'7b563412'    305419899  b'1234567b'   2069246994
+ b'7c563412'    305419900  b'1234567c'   2086024210
+```
+
+### See also
+
+[Standard library documentation for array](https://docs.python.org/3/library/array.html)
+[struct](https://pymotw.com/3/struct/index.html#module-struct) – The struct module.
+[Numerical Python](https://scipy.org/) – [NumPy](https://numpy.org/) is a Python library for working with large data sets efficiently. [SciPy](https://scipy.org/)
+[Python 2 to 3 porting notes for array](https://pymotw.com/3/porting_notes.html#porting-array)
