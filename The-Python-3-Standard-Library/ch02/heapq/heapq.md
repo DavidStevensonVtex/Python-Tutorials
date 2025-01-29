@@ -251,3 +251,53 @@ from sort : [19, 11, 10]
 3 smallest: [4, 9, 10]
 from sort : [4, 9, 10]
 ```
+
+### 2.4.5 Efficiently Merging Sorted Sequences
+
+Combining several sorted sequences into one new sequence is easy for small data sets.
+
+`list(sorted(itertools.chain(*data)))`
+
+For larger data sets, this technique can use a considerable amount of memory. Instead of sorting the entire combined sequence, merge() uses a heap to generate a new sequence one item at a time, determining the next item using a fixed amount of memory.
+
+```
+# heapq_merge.py
+import heapq
+import random
+
+
+random.seed(2016)
+
+data = []
+for i in range(4):
+    new_data = list(random.sample(range(1, 101), 5))
+    new_data.sort()
+    data.append(new_data)
+
+for i, d in enumerate(data):
+    print('{}: {}'.format(i, d))
+
+print('\nMerged:')
+for i in heapq.merge(*data):
+    print(i, end=' ')
+print()
+```
+
+Because the implementation of merge() uses a heap, it consumes memory based on the number of sequences being merged, rather than the number of items in those sequences.
+
+```
+$ python3 heapq_merge.py
+0: [33, 58, 71, 88, 95]
+1: [10, 11, 17, 38, 91]
+2: [13, 18, 39, 61, 63]
+3: [20, 27, 31, 42, 45]
+
+Merged:
+10 11 13 17 18 20 27 31 33 38 39 42 45 58 61 63 71 88 91 95 
+```
+
+### See also
+
+* [Standard library documentation for heapq](https://docs.python.org/3/library/heapq.html)
+* [Wikipedia: Heap (data structure)](https://en.wikipedia.org/wiki/Heap_(data_structure)) – A general description of heap data structures.
+* [Priority Queue](https://pymotw.com/3/queue/index.html#queue-priorityqueue) – A priority queue implementation from Queue in the standard library.
