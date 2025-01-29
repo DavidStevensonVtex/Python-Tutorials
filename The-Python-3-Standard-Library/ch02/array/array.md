@@ -82,3 +82,68 @@ Slice   : array('i', [2, 0, 1])
 Iterator:
 [(0, 0), (1, 1), (2, 2), (3, 0), (4, 1), (5, 2)]
 ```
+
+### 2.3.3 Arrays and Files
+
+The contents of an array can be written to and read from files using built-in methods coded efficiently for that purpose.
+
+```
+# array_file.py
+import array
+import binascii
+import tempfile
+
+a = array.array('i', range(5))
+print('A1:', a)
+
+# Write the array of numbers to a temporary file
+output = tempfile.NamedTemporaryFile()
+a.tofile(output.file)  # must pass an *actual* file
+output.flush()
+
+# Read the raw data
+with open(output.name, 'rb') as input:
+    raw_data = input.read()
+    print('Raw Contents:', binascii.hexlify(raw_data))
+
+    # Read the data into an array
+    input.seek(0)
+    a2 = array.array('i')
+    a2.fromfile(input, len(a))
+    print('A2:', a2)
+```
+
+This example illustrates reading the data “raw,” meaning directly from the binary file, versus reading it into a new array and converting the bytes to the appropriate types.
+
+```
+$ python3 array_file.py
+A1: array('i', [0, 1, 2, 3, 4])
+Raw Contents: b'0000000001000000020000000300000004000000'
+A2: array('i', [0, 1, 2, 3, 4])
+```
+
+tofile() uses tobytes() to format the data, and fromfile() uses frombytes() to convert it back to an array instance.
+
+```
+# array_tobytes.py
+import array
+import binascii
+
+a = array.array('i', range(5))
+print('A1:', a)
+
+as_bytes = a.tobytes()
+print('Bytes:', binascii.hexlify(as_bytes))
+
+a2 = array.array('i')
+a2.frombytes(as_bytes)
+print('A2:', a2)
+```
+
+Both tobytes() and frombytes() work on byte strings, not Unicode strings.
+
+```
+A1: array('i', [0, 1, 2, 3, 4])
+Bytes: b'0000000001000000020000000300000004000000'
+A2: array('i', [0, 1, 2, 3, 4])
+```
