@@ -50,3 +50,35 @@ As byte string: b'This is the array.'
 As array      : array('b', [84, 104, 105, 115, 32, 105, 115, 32, 116, 104, 101, 32, 97, 114, 114, 97, 121, 46])
 As hex        : b'54686973206973207468652061727261792e'
 ```
+
+### 2.3.2 Manipulating Arrays
+
+An array can be extended and otherwise manipulated in the same ways as other Python sequences.
+
+```
+# array_sequence.py
+import array
+import pprint
+
+a = array.array('i', range(3))
+print('Initial :', a)
+
+a.extend(range(3))
+print('Extended:', a)
+
+print('Slice   :', a[2:5])
+
+print('Iterator:')
+print(list(enumerate(a)))
+```
+
+The supported operations include slicing, iterating, and adding elements to the end.
+
+```
+$ python3 array_sequence.py
+Initial : array('i', [0, 1, 2])
+Extended: array('i', [0, 1, 2, 0, 1, 2])
+Slice   : array('i', [2, 0, 1])
+Iterator:
+[(0, 0), (1, 1), (2, 2), (3, 0), (4, 1), (5, 2)]
+```
