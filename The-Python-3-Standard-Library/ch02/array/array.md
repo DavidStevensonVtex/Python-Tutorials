@@ -24,3 +24,29 @@ Code	Type	Minimum size (bytes)
 * Q	unsigned long long	8
 * f	float	4
 * d	double float	8
+
+### 2.3.1 Initialization
+
+An array is instantiated with an argument describing the type of data to be allowed, and possibly an initial sequence of data to store in the array.
+
+```
+# array_string.py
+import array
+import binascii
+
+s = b'This is the array.'
+a = array.array('b', s)
+
+print('As byte string:', s)
+print('As array      :', a)
+print('As hex        :', binascii.hexlify(a))
+```
+
+In this example, the array is configured to hold a sequence of bytes and is initialized with a simple byte string.
+
+```
+$ python3 array_string.py
+As byte string: b'This is the array.'
+As array      : array('b', [84, 104, 105, 115, 32, 105, 115, 32, 116, 104, 101, 32, 97, 114, 114, 97, 121, 46])
+As hex        : b'54686973206973207468652061727261792e'
+```
