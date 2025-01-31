@@ -61,3 +61,91 @@ Passing the packed value to unpack(), gives basically the same values back (note
 $ python3 struct_unpack.py
 Unpacked Values: (1, b'ab', 2.700000047683716)
 ```
+
+### 2.7.3 Endianness
+
+By default, values are encoded using the native C library notion of endianness. It is easy to override that choice by providing an explicit endianness directive in the format string.
+
+```
+# struct_endianness.py
+import struct
+import binascii
+
+values = (1, 'ab'.encode('utf-8'), 2.7)
+print('Original values:', values)
+
+endianness = [
+    ('@', 'native, native'),
+    ('=', 'native, standard'),
+    ('<', 'little-endian'),
+    ('>', 'big-endian'),
+    ('!', 'network'),
+]
+
+for code, name in endianness:
+    s = struct.Struct(code + ' I 2s f')
+    packed_data = s.pack(*values)
+    print()
+    print('Format string  :', s.format, 'for', name)
+    print('Uses           :', s.size, 'bytes')
+    print('Packed Value   :', binascii.hexlify(packed_data))
+    print('Unpacked Value :', s.unpack(packed_data))
+```
+
+the table below lists the byte order specifiers used by Struct.
+
+Byte Order Specifiers for struct
+
+Code	Meaning
+
+* \@	Native order
+* \=	Native standard
+* \<	little-endian
+* \>	big-endian
+* \!	Network order
+
+```
+$ python3 struct_endianness.py
+Original values: (1, b'ab', 2.7)
+
+Format string  : @ I 2s f for native, native
+Uses           : 12 bytes
+Packed Value   : b'0100000061620000cdcc2c40'
+Unpacked Value : (1, b'ab', 2.700000047683716)
+
+Format string  : = I 2s f for native, standard
+Uses           : 10 bytes
+Packed Value   : b'010000006162cdcc2c40'
+Unpacked Value : (1, b'ab', 2.700000047683716)
+
+Format string  : < I 2s f for little-endian
+Uses           : 10 bytes
+Packed Value   : b'010000006162cdcc2c40'
+Unpacked Value : (1, b'ab', 2.700000047683716)
+
+Format string  : > I 2s f for big-endian
+Uses           : 10 bytes
+Packed Value   : b'000000016162402ccccd'
+Unpacked Value : (1, b'ab', 2.700000047683716)
+
+Format string  : ! I 2s f for network
+Uses           : 10 bytes
+Packed Value   : b'000000016162402ccccd'
+Unpacked Value : (1, b'ab', 2.700000047683716)
+```
+
+Big endian and little endian are two ways of ordering bytes in computer memory. The order determines how multi-byte data types are represented. 
+
+Big endian 
+
+The most significant byte is stored at the lowest memory address
+
+Commonly used in networking protocols and architectures
+
+Similar to writing numbers left-to-right in English
+
+Little endian 
+
+The least significant byte is stored at the lowest memory address
+
+Commonly used in processor architectures like x86 and ARM
