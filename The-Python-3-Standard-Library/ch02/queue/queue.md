@@ -34,4 +34,27 @@ $ python3 queue_fifo.py
 0 1 2 3 4 
 ```
 
+### 2.6.2 LIFO Queue
 
+In contrast to the standard FIFO implementation of Queue, the LifoQueue uses last-in, first-out ordering (normally associated with a stack data structure).
+
+```
+# queue_lifo.py
+import queue
+
+q = queue.LifoQueue()
+
+for i in range(5):
+    q.put(i)
+
+while not q.empty():
+    print(q.get(), end=' ')
+print()
+```
+
+The item most recently put into the queue is removed by get.
+
+```
+$ python3 queue_lifo.py
+4 3 2 1 0
+```
