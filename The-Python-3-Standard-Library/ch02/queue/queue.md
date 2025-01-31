@@ -130,3 +130,137 @@ Processing job: Important job
 Processing job: Mid-level job
 Processing job: Low-level job
 ```
+
+### 2.6.4 Building a Threaded Podcast Client
+
+The source code for the podcasting client in this section demonstrates how to use the Queue class with multiple threads. The program reads one or more RSS feeds, queues up the enclosures for the five most recent episodes from each feed to be downloaded, and processes several downloads in parallel using threads. It does not have enough error handling for production use, but the skeleton implementation illustrates the use of the queue module.
+
+First, some operating parameters are established. Usually, these would come from user inputs (e.g., preferences or a database). The example uses hard-coded values for the number of threads and list of URLs to fetch.
+
+```
+# fetch_podcasts.py
+from queue import Queue
+import threading
+import time
+import urllib
+from urllib.parse import urlparse
+
+# pip install feedparser
+import feedparser
+
+# Set up some global variables
+num_fetch_threads = 2
+enclosure_queue = Queue()
+
+# A real app wouldn't use hard-coded data...
+feed_urls = [
+    'http://talkpython.fm/episodes/rss',
+]
+
+
+def message(s):
+    print('{}: {}'.format(threading.current_thread().name, s))
+```
+
+The function download_enclosures() runs in the worker thread and processes the downloads using urllib.
+
+```
+def download_enclosures(q):
+    """This is the worker thread function.
+    It processes items in the queue one after
+    another.  These daemon threads go into an
+    infinite loop, and exit only when
+    the main thread ends.
+    """
+    while True:
+        message('looking for the next enclosure')
+        url = q.get()
+        filename = url.rpartition('/')[-1]
+        message('downloading {}'.format(filename))
+        response = urllib.request.urlopen(url)
+        data = response.read()
+        # Save the downloaded file to the current directory
+        message('writing to {}'.format(filename))
+        with open(filename, 'wb') as outfile:
+            outfile.write(data)
+        q.task_done()
+```
+
+Once the target function for the threads is defined, the worker threads can be started. When download_enclosures() processes the statement url = q.get(), it blocks and waits until the queue has something to return. That means it is safe to start the threads before there is anything in the queue.
+
+```
+# Set up some threads to fetch the enclosures
+for i in range(num_fetch_threads):
+    worker = threading.Thread(
+        target=download_enclosures,
+        args=(enclosure_queue,),
+        name='worker-{}'.format(i),
+    )
+    worker.setDaemon(True)
+    worker.start()
+```
+
+The next step is to retrieve the feed contents using the feedparser module and enqueue the URLs of the enclosures. As soon as the first URL is added to the queue, one of the worker threads picks it up and starts downloading it. The loop continues to add items until the feed is exhausted, and the worker threads take turns dequeuing URLs to download them.
+
+```
+# Download the feed(s) and put the enclosure URLs into
+# the queue.
+for url in feed_urls:
+    response = feedparser.parse(url, agent='fetch_podcasts.py')
+    for entry in response['entries'][:5]:
+        for enclosure in entry.get('enclosures', []):
+            parsed_url = urlparse(enclosure['url'])
+            message('queuing {}'.format(
+                parsed_url.path.rpartition('/')[-1]))
+            enclosure_queue.put(enclosure['url'])
+```
+
+The only thing left to do is wait for the queue to empty out again, using join().
+
+```
+# Now wait for the queue to be empty, indicating that we have
+# processed all of the downloads.
+message('*** main thread waiting')
+enclosure_queue.join()
+message('*** done')
+```
+
+Running the sample script produces output similar to the following.
+
+```
+$ python3 fetch_podcasts.py
+worker-0: looking for the next enclosure
+worker-1: looking for the next enclosure
+MainThread: queuing great-tables.mp3
+MainThread: queuing duckdb-and-python-ducks-and-snakes-living-together.mp3
+worker-0: downloading great-tables.mp3
+MainThread: queuing django-ninja.mp3
+worker-1: downloading duckdb-and-python-ducks-and-snakes-living-together.mp3
+MainThread: queuing anaconda-toolbox-for-excel-and-more-with-peter-wang.mp3
+MainThread: queuing multimodal-data-with-lancedb.mp3
+MainThread: *** main thread waiting
+worker-1: writing to duckdb-and-python-ducks-and-snakes-living-together.mp3
+worker-1: looking for the next enclosure
+worker-1: downloading django-ninja.mp3
+worker-0: writing to great-tables.mp3
+worker-0: looking for the next enclosure
+worker-0: downloading anaconda-toolbox-for-excel-and-more-with-peter-wang.mp3
+worker-1: writing to django-ninja.mp3
+worker-1: looking for the next enclosure
+worker-1: downloading multimodal-data-with-lancedb.mp3
+worker-0: writing to anaconda-toolbox-for-excel-and-more-with-peter-wang.mp3
+worker-0: looking for the next enclosure
+worker-1: writing to multimodal-data-with-lancedb.mp3
+worker-1: looking for the next enclosure
+MainThread: *** done
+```
+
+The actual output will depend on the contents of the RSS feed used.
+
+### See also
+
+* [Standard library documentation for queue](https://docs.python.org/3/library/queue.html)
+* [deque — Double-Ended Queue](https://pymotw.com/3/collections/deque.html#deque) from [collections](https://pymotw.com/3/collections/index.html#module-collections)
+* [Queue data structures](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)) – Wikipedia article explaining queues.
+* [FIFO](https://en.wikipedia.org/wiki/FIFO) – Wikipedia article explaining first-in, first-out, data structures.
+* [feedparser module](https://pypi.org/project/feedparser/) – A module for parsing RSS and Atom feeds, created by Mark Pilgrim and maintained by Kurt McKee.
