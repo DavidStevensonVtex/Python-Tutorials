@@ -123,3 +123,113 @@ $ python3 weakref_finalize.py
 (Deleting <__main__.ExpensiveObject object at 0x7f79f699b040>)
 on_finalize(('extra argument',))
 ```
+
+The finalize instance has a writable propertly atexit to control whether the callback is invoked as a program is exiting, if it hasn’t already been called.
+
+```
+# weakref_finalize_atexit.py
+import sys
+import weakref
+
+
+class ExpensiveObject:
+
+    def __del__(self):
+        print('(Deleting {})'.format(self))
+
+
+def on_finalize(*args):
+    print('on_finalize({!r})'.format(args))
+
+
+obj = ExpensiveObject()
+f = weakref.finalize(obj, on_finalize, 'extra argument')
+f.atexit = bool(int(sys.argv[1]))
+```
+
+The default is to invoke the callback. Setting atexit to false disables that behavior.
+
+```
+$ python3 weakref_finalize_atexit.py 1
+on_finalize(('extra argument',))
+(Deleting <__main__.ExpensiveObject object at 0x7f572df45040>)
+$ python3 weakref_finalize_atexit.py 0
+(Deleting <__main__.ExpensiveObject object at 0x7f65b270f040>)
+```
+
+Giving the finalize instance a reference to the object it tracks causes a reference to be retained, so the object is never garbage collected.
+
+```
+# weakref_finalize_reference.py
+import gc
+import weakref
+
+
+class ExpensiveObject:
+
+    def __del__(self):
+        print('(Deleting {})'.format(self))
+
+
+def on_finalize(*args):
+    print('on_finalize({!r})'.format(args))
+
+
+obj = ExpensiveObject()
+obj_id = id(obj)
+
+f = weakref.finalize(obj, on_finalize, obj)
+f.atexit = False
+
+del obj
+
+for o in gc.get_objects():
+    if id(o) == obj_id:
+        print('found uncollected object in gc')
+```
+
+As this example shows, even though the explicit reference to obj is deleted, the object is retained and visible to the garbage collector through f.
+
+```
+$ python3 weakref_finalize_reference.py
+found uncollected object in gc
+(Deleting <__main__.ExpensiveObject object at 0x7f3dea3f0040>)
+```
+
+Using a bound method of a tracked object as the callable can also prevent an object from being finalized properly.
+
+```
+# weakref_finalize_reference_method.py
+import gc
+import weakref
+
+
+class ExpensiveObject:
+
+    def __del__(self):
+        print('(Deleting {})'.format(self))
+
+    def do_finalize(self):
+        print('do_finalize')
+
+
+obj = ExpensiveObject()
+obj_id = id(obj)
+
+f = weakref.finalize(obj, obj.do_finalize)
+f.atexit = False
+
+del obj
+
+for o in gc.get_objects():
+    if id(o) == obj_id:
+        print('found uncollected object in gc')
+```
+
+Because the callable given to finalize is a bound method of the instance obj, the finalize object holds a reference to obj, which cannot be deleted and garbage collected.
+
+```
+$ python3 weakref_finalize_reference_method.py
+found uncollected object in gc
+(Deleting <__main__.ExpensiveObject object at 0x7f8271b20040>)
+```
