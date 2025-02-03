@@ -90,3 +90,36 @@ deleting obj
 callback(<weakref at 0x7f97f7ab4860; dead>)
 r(): None
 ```
+
+### 2.8.3 Finalizing Objects
+
+For more robust management of resources when weak references are cleaned up, use finalize to associate callbacks with objects. A finalize instance is retained until the attached object is deleted, even if the application does not retain a reference to the finalizer.
+
+```
+# weakref_finalize.py
+import weakref
+
+
+class ExpensiveObject:
+
+    def __del__(self):
+        print('(Deleting {})'.format(self))
+
+
+def on_finalize(*args):
+    print('on_finalize({!r})'.format(args))
+
+
+obj = ExpensiveObject()
+weakref.finalize(obj, on_finalize, 'extra argument')
+
+del obj
+```
+
+The arguments to finalize are the object to track, a callable to invoke when the object is garbage collected, and any positional or named arguments to pass to the callable.
+
+```
+$ python3 weakref_finalize.py
+(Deleting <__main__.ExpensiveObject object at 0x7f79f699b040>)
+on_finalize(('extra argument',))
+```
