@@ -277,3 +277,127 @@ Traceback (most recent call last):
 ReferenceError: weakly-referenced object no longer exists
 ```
 
+### 2.8.5 Caching Objects
+
+The ref and proxy classes are considered “low level.” While they are useful for maintaining weak references to individual objects and allowing cycles to be garbage collected, the WeakKeyDictionary and WeakValueDictionary classes provide a more appropriate API for creating a cache of several objects.
+
+The WeakValueDictionary class uses weak references to the values it holds, allowing them to be garbage collected when other code is not actually using them. Using explicit calls to the garbage collector illustrates the difference between memory handling with a regular dictionary and WeakValueDictionary:
+
+
+```
+# weakref_valuedict.py
+import gc
+from pprint import pprint
+import weakref
+
+gc.set_debug(gc.DEBUG_UNCOLLECTABLE)
+
+
+class ExpensiveObject:
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return 'ExpensiveObject({})'.format(self.name)
+
+    def __del__(self):
+        print('    (Deleting {})'.format(self))
+
+
+def demo(cache_factory):
+    # hold objects so any weak references
+    # are not removed immediately
+    all_refs = {}
+    # create the cache using the factory
+    print('CACHE TYPE:', cache_factory)
+    cache = cache_factory()
+    for name in ['one', 'two', 'three']:
+        o = ExpensiveObject(name)
+        cache[name] = o
+        all_refs[name] = o
+        del o  # decref
+
+    print('  all_refs =', end=' ')
+    pprint(all_refs)
+    print('\n  Before, cache contains:', list(cache.keys()))
+    for name, value in cache.items():
+        print('    {} = {}'.format(name, value))
+        del value  # decref
+
+    # remove all references to the objects except the cache
+    print('\n  Cleanup:')
+    del all_refs
+    gc.collect()
+
+    print('\n  After, cache contains:', list(cache.keys()))
+    for name, value in cache.items():
+        print('    {} = {}'.format(name, value))
+    print('  demo returning')
+    return
+
+
+demo(dict)
+print()
+
+demo(weakref.WeakValueDictionary)
+```
+
+Any loop variables that refer to the values being cached must be cleared explicitly so the reference count of the object is decremented. Otherwise, the garbage collector will not remove the objects and they will remain in the cache. Similarly, the all_refs variable is used to hold references to prevent them from being garbage collected prematurely.
+
+```
+$ python3 weakref_valuedict.py
+CACHE TYPE: <class 'dict'>
+  all_refs = {'one': ExpensiveObject(one),
+ 'three': ExpensiveObject(three),
+ 'two': ExpensiveObject(two)}
+
+  Before, cache contains: ['one', 'two', 'three']
+    one = ExpensiveObject(one)
+    two = ExpensiveObject(two)
+    three = ExpensiveObject(three)
+
+  Cleanup:
+
+  After, cache contains: ['one', 'two', 'three']
+    one = ExpensiveObject(one)
+    two = ExpensiveObject(two)
+    three = ExpensiveObject(three)
+  demo returning
+    (Deleting ExpensiveObject(one))
+    (Deleting ExpensiveObject(two))
+    (Deleting ExpensiveObject(three))
+
+CACHE TYPE: <class 'weakref.WeakValueDictionary'>
+  all_refs = {'one': ExpensiveObject(one),
+ 'three': ExpensiveObject(three),
+ 'two': ExpensiveObject(two)}
+
+  Before, cache contains: ['one', 'two', 'three']
+    one = ExpensiveObject(one)
+    two = ExpensiveObject(two)
+    three = ExpensiveObject(three)
+
+  Cleanup:
+    (Deleting ExpensiveObject(one))
+    (Deleting ExpensiveObject(two))
+    (Deleting ExpensiveObject(three))
+
+  After, cache contains: []
+  demo returning
+
+```
+
+The WeakKeyDictionary works similarly but uses weak references for the keys instead of the values in the dictionary.
+
+Warning
+
+The library documentation for weakref contains this warning:
+
+Caution: Because a WeakValueDictionary is built on top of a Python dictionary, it must not change size when iterating over it. This can be difficult to ensure for a WeakValueDictionary because actions performed by the program during iteration may cause items in the dictionary to vanish “by magic” (as a side effect of garbage collection).
+
+### See also
+
+* [Standard library documentation for weakref](https://docs.python.org/3/library/weakref.html)
+* [gc](https://pymotw.com/3/gc/index.html#module-gc) – The gc module is the interface to the interpreter’s garbage collector.
+* [PEP 205](https://peps.python.org/pep-0205/) – “Weak References” enhancement proposal.
