@@ -233,3 +233,47 @@ $ python3 weakref_finalize_reference_method.py
 found uncollected object in gc
 (Deleting <__main__.ExpensiveObject object at 0x7f8271b20040>)
 ```
+
+### 2.8.4 Proxies
+
+It is sometimes more convenient to use a proxy, rather than a weak reference. Proxies can be used as though they were the original object, and do not need to be called before the object is accessible. As a consequence, they can be passed to a library that does not know it is receiving a reference instead of the real object.
+
+```
+# weakref_proxy.py
+import weakref
+
+
+class ExpensiveObject:
+
+    def __init__(self, name):
+        self.name = name
+
+    def __del__(self):
+        print('(Deleting {})'.format(self))
+
+
+obj = ExpensiveObject('My Object')
+r = weakref.ref(obj)
+p = weakref.proxy(obj)
+
+print('via obj:', obj.name)
+print('via ref:', r().name)
+print('via proxy:', p.name)
+del obj
+print('via proxy:', p.name)
+```
+
+If the proxy is accessed after the referent object is removed, a ReferenceError exception is raised.
+
+```
+$ python3 weakref_proxy.py
+via obj: My Object
+via ref: My Object
+via proxy: My Object
+(Deleting <__main__.ExpensiveObject object at 0x7f37be820df0>)
+Traceback (most recent call last):
+  File "weakref_proxy.py", line 22, in <module>
+    print('via proxy:', p.name)
+ReferenceError: weakly-referenced object no longer exists
+```
+
