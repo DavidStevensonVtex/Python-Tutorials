@@ -59,3 +59,44 @@ PPRINT:
  (4, ['o', 'p', 'q']),
  (5, ['r', 's', 'tu', 'v', 'x', 'y', 'z'])]
 ```
+
+### 2.10.2 Formatting
+
+To format a data structure without writing it directly to a stream (for example, for logging), use pformat() to build a string representation.
+
+```
+# pprint_pformat.py
+import logging
+from pprint import pformat
+from pprint_data import data
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(levelname)-8s %(message)s',
+)
+
+logging.debug('Logging pformatted data')
+formatted = pformat(data)
+for line in formatted.splitlines():
+    logging.debug(line.rstrip())
+```
+
+The formatted string can then be printed or logged independently.
+
+```
+$ python3 pprint_pformat.py
+DEBUG    Logging pformatted data
+DEBUG    [(1, {'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D'}),
+DEBUG     (2,
+DEBUG      {'e': 'E',
+DEBUG       'f': 'F',
+DEBUG       'g': 'G',
+DEBUG       'h': 'H',
+DEBUG       'i': 'I',
+DEBUG       'j': 'J',
+DEBUG       'k': 'K',
+DEBUG       'l': 'L'}),
+DEBUG     (3, ['m', 'n']),
+DEBUG     (4, ['o', 'p', 'q']),
+DEBUG     (5, ['r', 's', 'tu', 'v', 'x', 'y', 'z'])]
+```
