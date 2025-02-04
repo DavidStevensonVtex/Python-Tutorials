@@ -184,3 +184,123 @@ $ python3 pprint_depth.py
 [(...), (...), (...), (...), (...)]
 [(1, {...}), (2, {...}), (3, [...]), (4, [...]), (5, [...])]
 ```
+
+### 2.10.6 Controlling Output Width
+
+The default output width for the formatted text is 80 columns. To adjust that width, use the width argument to pprint().
+
+```
+# pprint_width.py
+from pprint import pprint
+
+from pprint_data import data
+
+for width in [80, 5]:
+    print('WIDTH =', width)
+    pprint(data, width=width)
+    print()
+```
+
+When the width is too small to accommodate the formatted data structure, the lines are not truncated or wrapped if doing so would introduce invalid syntax.
+
+```
+$ python3 pprint_width.py
+WIDTH = 80
+[(1, {'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D'}),
+ (2,
+  {'e': 'E',
+   'f': 'F',
+   'g': 'G',
+   'h': 'H',
+   'i': 'I',
+   'j': 'J',
+   'k': 'K',
+   'l': 'L'}),
+ (3, ['m', 'n']),
+ (4, ['o', 'p', 'q']),
+ (5, ['r', 's', 'tu', 'v', 'x', 'y', 'z'])]
+
+WIDTH = 5
+[(1,
+  {'a': 'A',
+   'b': 'B',
+   'c': 'C',
+   'd': 'D'}),
+ (2,
+  {'e': 'E',
+   'f': 'F',
+   'g': 'G',
+   'h': 'H',
+   'i': 'I',
+   'j': 'J',
+   'k': 'K',
+   'l': 'L'}),
+ (3,
+  ['m',
+   'n']),
+ (4,
+  ['o',
+   'p',
+   'q']),
+ (5,
+  ['r',
+   's',
+   'tu',
+   'v',
+   'x',
+   'y',
+   'z'])]
+
+```
+
+The compact flag tells pprint() to try to fit more data on each individual line, rather than spreading complex data structures across lines.
+
+```
+# pprint_compact.py
+from pprint import pprint
+
+from pprint_data import data
+
+print('DEFAULT:')
+pprint(data, compact=False)
+print('\nCOMPACT:')
+pprint(data, compact=True)
+```
+
+This example shows that when a data structure does not fit on a line, it is split up (as with the second item in the data list). When multiple elements can fit on a line, as with the third and fourth members, they are placed that way.
+
+```
+$ python3 pprint_compact.py
+DEFAULT:
+[(1, {'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D'}),
+ (2,
+  {'e': 'E',
+   'f': 'F',
+   'g': 'G',
+   'h': 'H',
+   'i': 'I',
+   'j': 'J',
+   'k': 'K',
+   'l': 'L'}),
+ (3, ['m', 'n']),
+ (4, ['o', 'p', 'q']),
+ (5, ['r', 's', 'tu', 'v', 'x', 'y', 'z'])]
+
+COMPACT:
+[(1, {'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D'}),
+ (2,
+  {'e': 'E',
+   'f': 'F',
+   'g': 'G',
+   'h': 'H',
+   'i': 'I',
+   'j': 'J',
+   'k': 'K',
+   'l': 'L'}),
+ (3, ['m', 'n']), (4, ['o', 'p', 'q']),
+ (5, ['r', 's', 'tu', 'v', 'x', 'y', 'z'])]
+```
+
+### See also
+
+* [Standard library documentation for pprint](https://docs.python.org/3/library/pprint.html)
