@@ -162,3 +162,25 @@ $ python3 pprint_recursion.py
 id(local_data) => 139745615266944
 ['a', 'b', 1, 2, <Recursion on list with id=139745615266944>]
 ```
+
+### 2.10.5 Limiting Nested Output
+
+For very deep data structures, it may not be desirable for the output to include all of the details. The data may not be formatted properly, the formatted text might be too large to manage, or some of the data may be extraneous.
+
+```
+# pprint_depth.py
+from pprint import pprint
+
+from pprint_data import data
+
+pprint(data, depth=1)
+pprint(data, depth=2)
+```
+
+Use the depth argument to control how far down into the nested data structure the pretty printer recurses. Levels not included in the output are represented by ellipsis.
+
+```
+$ python3 pprint_depth.py
+[(...), (...), (...), (...), (...)]
+[(1, {...}), (2, {...}), (3, [...]), (4, [...]), (5, [...])]
+```
