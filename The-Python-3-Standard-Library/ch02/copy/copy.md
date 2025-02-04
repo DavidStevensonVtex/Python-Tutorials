@@ -101,3 +101,53 @@ $ python3 copy_deep.py
 dup[0] is my_list[0]: False
 dup[0] == my_list[0]: True
 ```
+
+### 2.9.3 Customizing Copy Behavior
+
+It is possible to control how copies are made using the `__copy__()` and `__deepcopy__()` special methods.
+
+* `__copy__()` is called without any arguments and should return a shallow copy of the object.
+* `__deepcopy__()` is called with a memo dictionary and should return a deep copy of the object. Any member attributes that need to be deep-copied should be passed to copy.deepcopy(), along with the memo dictionary, to control for recursion. (The memo dictionary is explained in more detail later.)
+
+The following example illustrates how the methods are called.
+
+```
+# copy_hooks.py
+import copy
+import functools
+
+
+@functools.total_ordering
+class MyClass:
+
+    def __init__(self, name):
+        self.name = name
+
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __gt__(self, other):
+        return self.name > other.name
+
+    def __copy__(self):
+        print('__copy__()')
+        return MyClass(self.name)
+
+    def __deepcopy__(self, memo):
+        print('__deepcopy__({})'.format(memo))
+        return MyClass(copy.deepcopy(self.name, memo))
+
+
+a = MyClass('a')
+
+sc = copy.copy(a)
+dc = copy.deepcopy(a)
+```
+
+The memo dictionary is used to keep track of the values that have been copied already, so as to avoid infinite recursion.
+
+```
+$ python3 copy_hooks.py
+__copy__()
+__deepcopy__({})
+```
