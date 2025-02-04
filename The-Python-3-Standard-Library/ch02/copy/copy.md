@@ -151,3 +151,96 @@ $ python3 copy_hooks.py
 __copy__()
 __deepcopy__({})
 ```
+
+### 2.9.4 Recursion in Deep Copy
+
+To avoid problems with duplicating recursive data structures, deepcopy() uses a dictionary to track objects that have already been copied. This dictionary is passed to the `__deepcopy__()` method so it can be examined there as well.
+
+The next example shows how an interconnected data structure such as a directed graph can help protect against recursion by implementing a `__deepcopy__()` method.
+
+```
+# copy_recursion.py
+import copy
+
+
+class Graph:
+
+    def __init__(self, name, connections):
+        self.name = name
+        self.connections = connections
+
+    def add_connection(self, other):
+        self.connections.append(other)
+
+    def __repr__(self):
+        return 'Graph(name={}, id={})'.format(
+            self.name, id(self))
+
+    def __deepcopy__(self, memo):
+        print('\nCalling __deepcopy__ for {!r}'.format(self))
+        if self in memo:
+            existing = memo.get(self)
+            print('  Already copied to {!r}'.format(existing))
+            return existing
+        print('  Memo dictionary:')
+        if memo:
+            for k, v in memo.items():
+                print('    {}: {}'.format(k, v))
+        else:
+            print('    (empty)')
+        dup = Graph(copy.deepcopy(self.name, memo), [])
+        print('  Copying to new object {}'.format(dup))
+        memo[self] = dup
+        for c in self.connections:
+            dup.add_connection(copy.deepcopy(c, memo))
+        return dup
+
+
+root = Graph('root', [])
+a = Graph('a', [root])
+b = Graph('b', [a, root])
+root.add_connection(a)
+root.add_connection(b)
+
+dup = copy.deepcopy(root)
+```
+
+The Graph class includes a few basic directed graph methods. An instance can be initialized with a name and a list of existing nodes to which it is connected. The add_connection() method is used to set up bidirectional connections. It is also used by the deep copy operator.
+
+The `__deepcopy__()` method prints messages to show how it is called, and manages the memo dictionary contents as needed. Instead of copying the entire connection list wholesale, it creates a new list and appends copies of the individual connections to it. That ensures that the memo dictionary is updated as each new node is duplicated, and it avoids recursion issues or extra copies of nodes. As before, the method returns the copied object when it is done.
+
+![image](https://pymotw.com/3/_images/graphviz-e1d2b289f2182fb32e7d25ab5da793d9fe0c8bec.png)
+
+The graph shown in the figure includes several cycles, but handling the recursion with the memo dictionary prevents the traversal from causing a stack overflow error. When the root node is copied, it produces the following output.
+
+```
+$ python3 copy_recursion.py
+
+Calling __deepcopy__ for Graph(name=root, id=139873854529600)
+  Memo dictionary:
+    (empty)
+  Copying to new object Graph(name=root, id=139873853224896)
+
+Calling __deepcopy__ for Graph(name=a, id=139873853546352)
+  Memo dictionary:
+    Graph(name=root, id=139873854529600): Graph(name=root, id=139873853224896)
+  Copying to new object Graph(name=a, id=139873853225088)
+
+Calling __deepcopy__ for Graph(name=root, id=139873854529600)
+  Already copied to Graph(name=root, id=139873853224896)
+
+Calling __deepcopy__ for Graph(name=b, id=139873853880976)
+  Memo dictionary:
+    Graph(name=root, id=139873854529600): Graph(name=root, id=139873853224896)
+    Graph(name=a, id=139873853546352): Graph(name=a, id=139873853225088)
+    139873854529600: Graph(name=root, id=139873853224896)
+    139873853368640: [Graph(name=root, id=139873854529600), Graph(name=a, id=139873853546352)]
+    139873853546352: Graph(name=a, id=139873853225088)
+  Copying to new object Graph(name=b, id=139873853372112)
+```
+
+The second time the root node is encountered, while the a node is being copied, `__deepcopy__()` detects the recursion and reuses the existing value from the memo dictionary instead of creating a new object.
+
+### See also
+
+* [Standard library documentation for copy](https://docs.python.org/3/library/copy.html)
