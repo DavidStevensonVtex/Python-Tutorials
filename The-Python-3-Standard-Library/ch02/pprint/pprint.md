@@ -100,3 +100,42 @@ DEBUG     (3, ['m', 'n']),
 DEBUG     (4, ['o', 'p', 'q']),
 DEBUG     (5, ['r', 's', 'tu', 'v', 'x', 'y', 'z'])]
 ```
+
+### 2.10.3 Arbitrary Classes
+
+The PrettyPrinter class used by pprint() can also work with custom classes, if they define a` __repr__()` method.
+
+```
+# pprint_arbitrary_object.py
+from pprint import pprint
+
+
+class node:
+
+    def __init__(self, name, contents=[]):
+        self.name = name
+        self.contents = contents[:]
+
+    def __repr__(self):
+        return (
+            'node(' + repr(self.name) + ', ' +
+            repr(self.contents) + ')'
+        )
+
+
+trees = [
+    node('node-1'),
+    node('node-2', [node('node-2-1')]),
+    node('node-3', [node('node-3-1')]),
+]
+pprint(trees)
+```
+
+The representations of the nested objects are combined by the PrettyPrinter to return the full string representation.
+
+```
+$ python3 pprint_arbitrary_object.py
+[node('node-1', []),
+ node('node-2', [node('node-2-1', [])]),
+ node('node-3', [node('node-3-1', [])])]
+```
