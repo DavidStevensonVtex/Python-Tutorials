@@ -139,3 +139,26 @@ $ python3 pprint_arbitrary_object.py
  node('node-2', [node('node-2-1', [])]),
  node('node-3', [node('node-3-1', [])])]
 ```
+
+### 2.10.4 Recursion
+
+Recursive data structures are represented with a reference to the original source of the data, given in the format `<Recursion on typename with id=number>`.
+
+```
+# pprint_recursion.py
+from pprint import pprint
+
+local_data = ['a', 'b', 1, 2]
+local_data.append(local_data)
+
+print('id(local_data) =>', id(local_data))
+pprint(local_data)
+```
+
+In this example, the list local\_data is added to itself, creating a recursive reference.
+
+```
+$ python3 pprint_recursion.py
+id(local_data) => 139745615266944
+['a', 'b', 1, 2, <Recursion on list with id=139745615266944>]
+```
