@@ -452,3 +452,70 @@ a > b :
   testing __gt__(1, 2)
   result of a > b: False
 ```
+
+#### 4.1.2.2 Collation Order
+
+Since old-style comparison functions are deprecated in Python 3, the cmp argument to functions like sort() are also no longer supported. Older programs that use comparison functions can use cmp_to_key() to convert them to a function that returns a collation key, which is used to determine the position in the final sequence.
+
+```
+# functools_cmp_to_key.py
+import functools
+
+
+class MyObject:
+
+    def __init__(self, val):
+        self.val = val
+
+    def __str__(self):
+        return "MyObject({})".format(self.val)
+
+
+def compare_obj(a, b):
+    """Old-style comparison function."""
+    print("comparing {} and {}".format(a, b))
+    if a.val < b.val:
+        return -1
+    elif a.val > b.val:
+        return 1
+    return 0
+
+
+# Make a key function using cmp_to_key()
+get_key = functools.cmp_to_key(compare_obj)
+
+
+def get_key_wrapper(o):
+    "Wrapper function for get_key to allow for print statements."
+    new_key = get_key(o)
+    print("key_wrapper({}) -> {!r}".format(o, new_key))
+    return new_key
+
+
+objs = [MyObject(x) for x in range(5, 0, -1)]
+
+for o in sorted(objs, key=get_key_wrapper):
+    print(o)
+```
+
+Normally cmp_to_key() would be used directly, but in this example an extra wrapper function is introduced to print out more information as the key function is being called.
+
+The output shows that sorted() starts by calling get_key_wrapper() for each item in the sequence to produce a key. The keys returned by cmp_to_key() are instances of a class defined in functools that implements the rich comparison API using the old-style comparison function passed in. After all of the keys are created, the sequence is sorted by comparing the keys.
+
+```
+$ python3 functools_cmp_to_key.py
+key_wrapper(MyObject(5)) -> <functools.KeyWrapper object at 0x7ffb8477df10>
+key_wrapper(MyObject(4)) -> <functools.KeyWrapper object at 0x7ffb8477dfb0>
+key_wrapper(MyObject(3)) -> <functools.KeyWrapper object at 0x7ffb8477df90>
+key_wrapper(MyObject(2)) -> <functools.KeyWrapper object at 0x7ffb8477df70>
+key_wrapper(MyObject(1)) -> <functools.KeyWrapper object at 0x7ffb847e88f0>
+comparing MyObject(4) and MyObject(5)
+comparing MyObject(3) and MyObject(4)
+comparing MyObject(2) and MyObject(3)
+comparing MyObject(1) and MyObject(2)
+MyObject(1)
+MyObject(2)
+MyObject(3)
+MyObject(4)
+MyObject(5)
+```
