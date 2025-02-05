@@ -91,3 +91,69 @@ Traceback (most recent call last):
     p1()
 TypeError: myfunc() missing 1 required positional argument: 'a'
 ```
+
+#### 3.1.1.2 Acquiring Function Properties
+
+The partial object does not have `__name__` or `__doc_`_ attributes by default, and without those attributes, decorated functions are more difficult to debug. Using update_wrapper(), copies or adds attributes from the original function to the partial object.
+
+```
+# functools_update_wrapper.py
+import functools
+
+
+def myfunc(a, b=2):
+    "Docstring for myfunc()."
+    print("  called myfunc with:", (a, b))
+
+
+def show_details(name, f):
+    "Show details of a callable object."
+    print("{}:".format(name))
+    print("  object:", f)
+    print("  __name__:", end=" ")
+    try:
+        print(f.__name__)
+    except AttributeError:
+        print("(no __name__)")
+    print("  __doc__", repr(f.__doc__))
+    print()
+
+
+show_details("myfunc", myfunc)
+
+p1 = functools.partial(myfunc, b=4)
+show_details("raw wrapper", p1)
+
+print("Updating wrapper:")
+print("  assign:", functools.WRAPPER_ASSIGNMENTS)
+print("  update:", functools.WRAPPER_UPDATES)
+print()
+
+functools.update_wrapper(p1, myfunc)
+show_details("updated wrapper", p1)
+```
+
+The attributes added to the wrapper are defined in WRAPPER_ASSIGNMENTS, while WRAPPER_UPDATES lists values to be modified.
+
+```
+$ python3 functools_update_wrapper.py
+myfunc:
+  object: <function myfunc at 0x7fd222982ee0>
+  __name__: myfunc
+  __doc__ 'Docstring for myfunc().'
+
+raw wrapper:
+  object: functools.partial(<function myfunc at 0x7fd222982ee0>, b=4)
+  __name__: (no __name__)
+  __doc__ 'partial(func, *args, **keywords) - new function with partial application\n    of the given arguments and keywords.\n'
+
+Updating wrapper:
+  assign: ('__module__', '__name__', '__qualname__', '__doc__', '__annotations__')
+  update: ('__dict__',)
+
+updated wrapper:
+  object: functools.partial(<function myfunc at 0x7fd222982ee0>, b=4)
+  __name__: myfunc
+  __doc__ 'Docstring for myfunc().'
+
+```
