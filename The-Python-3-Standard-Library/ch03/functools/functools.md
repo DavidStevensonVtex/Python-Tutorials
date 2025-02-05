@@ -696,3 +696,98 @@ $ python3 functools_lru_cache_arguments.py
 ([1], 2) ERROR: unhashable type: 'list'
 (1, {'2': 'two'}) ERROR: unhashable type: 'dict'
 ```
+
+### 3.1.4 Reducing a Data Set
+
+The reduce() function takes a callable and a sequence of data as input and produces a single value as output based on invoking the callable with the values from the sequence and accumulating the resulting output.
+
+```
+# functools_reduce.py
+import functools
+
+
+def do_reduce(a, b):
+    print("do_reduce({}, {})".format(a, b))
+    return a + b
+
+
+data = range(1, 5)
+print(data)
+result = functools.reduce(do_reduce, data)
+print("result: {}".format(result))
+```
+
+This example adds up the numbers in the input sequence.
+
+```
+range(1, 5)
+do_reduce(1, 2)
+do_reduce(3, 3)
+do_reduce(6, 4)
+result: 10
+```
+
+The optional initializer argument is placed at the front of the sequence and processed along with the other items. This can be used to update a previously computed value with new inputs.
+
+```
+# functools_reduce_initializer.py
+import functools
+
+
+def do_reduce(a, b):
+    print("do_reduce({}, {})".format(a, b))
+    return a + b
+
+
+data = range(1, 5)
+print(data)
+result = functools.reduce(do_reduce, data, 99)
+print("result: {}".format(result))
+```
+
+In this example a previous sum of 99 is used to initialize the value computed by reduce().
+
+```
+$ python3 functools_reduce_initializer.py
+range(1, 5)
+do_reduce(99, 1)
+do_reduce(100, 2)
+do_reduce(102, 3)
+do_reduce(105, 4)
+result: 109
+```
+
+Sequences with a single item automatically reduce to that value when no initializer is present. Empty lists generate an error, unless an initializer is provided.
+
+```
+# functools_reduce_short_sequences.py
+import functools
+
+
+def do_reduce(a, b):
+    print("do_reduce({}, {})".format(a, b))
+    return a + b
+
+
+print("Single item in sequence:", functools.reduce(do_reduce, [1]))
+
+print("Single item in sequence with initializer:", functools.reduce(do_reduce, [1], 99))
+
+print("Empty sequence with initializer:", functools.reduce(do_reduce, [], 99))
+
+try:
+    print("Empty sequence:", functools.reduce(do_reduce, []))
+except TypeError as err:
+    print("ERROR: {}".format(err))
+```
+
+Because the initializer argument serves as a default, but is also combined with the new values if the input sequence is not empty, it is important to consider carefully whether to use it. When it does not make sense to combine the default with new values, it is better to catch the TypeError rather than passing an initializer.
+
+```
+$ python3 functools_reduce_short_sequences.py
+Single item in sequence: 1
+do_reduce(99, 1)
+Single item in sequence with initializer: 100
+Empty sequence with initializer: 99
+ERROR: reduce() of empty sequence with no initial value
+```
