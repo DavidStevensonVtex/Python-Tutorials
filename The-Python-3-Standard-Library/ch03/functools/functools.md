@@ -376,7 +376,7 @@ decorated_myfunc:
 
 Under Python 2, classes could define a `__cmp__()` method that returns -1, 0, or 1 based on whether the object is less than, equal to, or greater than the item being compared. Python 2.1 introduced the rich comparison methods API (`__lt__()`, `__le__()`, `__eq__()`, `__ne__()`, `__gt__()`, and `__ge__()`), which perform a single comparison operation and return a boolean value. Python 3 deprecated `__cmp__()` in favor of these new methods and functools provides tools to make it easier to write classes that comply with the new comparison requirements in Python 3.
 
-Rich Comparison
+#### 3.1.2.1 Rich Comparison
 
 The rich comparison API is designed to allow classes with complex comparisons to implement each test in the most efficient way possible. However, for classes where comparison is relatively simple, there is no point in manually creating each of the rich comparison methods. The total_ordering() class decorator takes a class that provides some of the methods, and adds the rest of them.
 
