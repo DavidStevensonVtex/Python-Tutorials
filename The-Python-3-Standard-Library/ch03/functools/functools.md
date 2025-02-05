@@ -372,3 +372,83 @@ decorated_myfunc:
      myfunc: ('args to decorated', 4)
 ```
 
+### 3.1.2 Comparison
+
+Under Python 2, classes could define a `__cmp__()` method that returns -1, 0, or 1 based on whether the object is less than, equal to, or greater than the item being compared. Python 2.1 introduced the rich comparison methods API (`__lt__()`, `__le__()`, `__eq__()`, `__ne__()`, `__gt__()`, and `__ge__()`), which perform a single comparison operation and return a boolean value. Python 3 deprecated `__cmp__()` in favor of these new methods and functools provides tools to make it easier to write classes that comply with the new comparison requirements in Python 3.
+
+Rich Comparison
+
+The rich comparison API is designed to allow classes with complex comparisons to implement each test in the most efficient way possible. However, for classes where comparison is relatively simple, there is no point in manually creating each of the rich comparison methods. The total_ordering() class decorator takes a class that provides some of the methods, and adds the rest of them.
+
+```
+# functools_total_ordering.py
+import functools
+import inspect
+from pprint import pprint
+
+
+@functools.total_ordering
+class MyObject:
+
+    def __init__(self, val):
+        self.val = val
+
+    def __eq__(self, other):
+        print("  testing __eq__({}, {})".format(self.val, other.val))
+        return self.val == other.val
+
+    def __gt__(self, other):
+        print("  testing __gt__({}, {})".format(self.val, other.val))
+        return self.val > other.val
+
+
+print("Methods:\n")
+pprint(inspect.getmembers(MyObject, inspect.isfunction))
+
+a = MyObject(1)
+b = MyObject(2)
+
+print("\nComparisons:")
+for expr in ["a < b", "a <= b", "a == b", "a >= b", "a > b"]:
+    print("\n{:<6}:".format(expr))
+    result = eval(expr)
+    print("  result of {}: {}".format(expr, result))
+```
+
+The class must provide implementation of `__eq__()` and one other rich comparison method. The decorator adds implementations of the rest of the methods that work by using the comparisons provided. If a comparison cannot be made, the method should return NotImplemented so the comparison can be tried using the reverse comparison operators on the other object, before failing entirely.
+
+```
+$ python3 functools_total_ordering.py
+Methods:
+
+[('__eq__', <function MyObject.__eq__ at 0x7f02402eee50>),
+ ('__ge__', <function _ge_from_gt at 0x7f02403bd310>),
+ ('__gt__', <function MyObject.__gt__ at 0x7f02402eeee0>),
+ ('__init__', <function MyObject.__init__ at 0x7f02402eedc0>),
+ ('__le__', <function _le_from_gt at 0x7f02403bd3a0>),
+ ('__lt__', <function _lt_from_gt at 0x7f02403bd280>)]
+
+Comparisons:
+
+a < b :
+  testing __gt__(1, 2)
+  testing __eq__(1, 2)
+  result of a < b: True
+
+a <= b:
+  testing __gt__(1, 2)
+  result of a <= b: True
+
+a == b:
+  testing __eq__(1, 2)
+  result of a == b: False
+
+a >= b:
+  testing __gt__(1, 2)
+  testing __eq__(1, 2)
+  result of a >= b: False
+
+a > b :
+  testing __gt__(1, 2)
+  result of a > b: False
+```
