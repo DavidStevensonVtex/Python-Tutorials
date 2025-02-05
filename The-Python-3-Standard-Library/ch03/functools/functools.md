@@ -157,3 +157,61 @@ updated wrapper:
   __doc__ 'Docstring for myfunc().'
 
 ```
+
+#### 3.1.1.3 Other Callables
+
+Partials work with any callable object, not just with standalone functions.
+
+```
+# functools_callable.py
+import functools
+
+
+class MyClass:
+    "Demonstration class for functools"
+
+    def __call__(self, e, f=6):
+        "Docstring for MyClass.__call__"
+        print("  called object with:", (self, e, f))
+
+
+def show_details(name, f):
+    "Show details of a callable object."
+    print("{}:".format(name))
+    print("  object:", f)
+    print("  __name__:", end=" ")
+    try:
+        print(f.__name__)
+    except AttributeError:
+        print("(no __name__)")
+    print("  __doc__", repr(f.__doc__))
+    return
+
+
+o = MyClass()
+
+show_details("instance", o)
+o("e goes here")
+print()
+
+p = functools.partial(o, e="default for e", f=8)
+functools.update_wrapper(p, o)
+show_details("instance wrapper", p)
+p()
+```
+This example creates partials from an instance of a class with a `__call__()` method.
+
+```
+$ python3 functools_callable.py
+instance:
+  object: <__main__.MyClass object at 0x7f43d3fa4df0>
+  __name__: (no __name__)
+  __doc__ 'Demonstration class for functools'
+  called object with: (<__main__.MyClass object at 0x7f43d3fa4df0>, 'e goes here', 6)
+
+instance wrapper:
+  object: functools.partial(<__main__.MyClass object at 0x7f43d3fa4df0>, e='default for e', f=8)
+  __name__: (no __name__)
+  __doc__ 'Demonstration class for functools'
+  called object with: (<__main__.MyClass object at 0x7f43d3fa4df0>, 'default for e', 8)
+```
