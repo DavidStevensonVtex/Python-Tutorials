@@ -453,7 +453,7 @@ a > b :
   result of a > b: False
 ```
 
-#### 4.1.2.2 Collation Order
+#### 3.1.2.2 Collation Order
 
 Since old-style comparison functions are deprecated in Python 3, the cmp argument to functions like sort() are also no longer supported. Older programs that use comparison functions can use cmp_to_key() to convert them to a function that returns a collation key, which is used to determine the position in the final sequence.
 
@@ -518,4 +518,181 @@ MyObject(2)
 MyObject(3)
 MyObject(4)
 MyObject(5)
+```
+
+### 3.1.3 Caching
+
+The lru_cache() decorator wraps a function in a least-recently-used cache. Arguments to the function are used to build a hash key, which is then mapped to the result. Subsequent calls with the same arguments will fetch the value from the cache instead of calling the function. The decorator also adds methods to the function to examine the state of the cache (cache_info()) and empty the cache (cache_clear()).
+
+```
+# functools_lru_cache.py
+import functools
+
+
+@functools.lru_cache()
+def expensive(a, b):
+    print("expensive({}, {})".format(a, b))
+    return a * b
+
+
+MAX = 2
+
+print("First set of calls:")
+for i in range(MAX):
+    for j in range(MAX):
+        expensive(i, j)
+print(expensive.cache_info())
+
+print("\nSecond set of calls:")
+for i in range(MAX + 1):
+    for j in range(MAX + 1):
+        expensive(i, j)
+print(expensive.cache_info())
+
+print("\nClearing cache:")
+expensive.cache_clear()
+print(expensive.cache_info())
+
+print("\nThird set of calls:")
+for i in range(MAX):
+    for j in range(MAX):
+        expensive(i, j)
+print(expensive.cache_info())
+````
+
+This example makes several calls to expensive() in a set of nested loops. The second time those calls are made with the same values the results appear in the cache. When the cache is cleared and the loops are run again the values must be recomputed.
+
+```
+$ python3 functools_lru_cache.py
+First set of calls:
+expensive(0, 0)
+expensive(0, 1)
+expensive(1, 0)
+expensive(1, 1)
+CacheInfo(hits=0, misses=4, maxsize=128, currsize=4)
+
+Second set of calls:
+expensive(0, 2)
+expensive(1, 2)
+expensive(2, 0)
+expensive(2, 1)
+expensive(2, 2)
+CacheInfo(hits=4, misses=9, maxsize=128, currsize=9)
+
+Clearing cache:
+CacheInfo(hits=0, misses=0, maxsize=128, currsize=0)
+
+Third set of calls:
+expensive(0, 0)
+expensive(0, 1)
+expensive(1, 0)
+expensive(1, 1)
+CacheInfo(hits=0, misses=4, maxsize=128, currsize=4)
+```
+
+To prevent the cache from growing without bounds in a long-running process, it is given a maximum size. The default is 128 entries, but that can be changed for each cache using the maxsize argument.
+
+```
+# functools_lru_cache_expire.py
+import functools
+
+
+@functools.lru_cache(maxsize=2)
+def expensive(a, b):
+    print("called expensive({}, {})".format(a, b))
+    return a * b
+
+
+def make_call(a, b):
+    print("({}, {})".format(a, b), end=" ")
+    pre_hits = expensive.cache_info().hits
+    expensive(a, b)
+    post_hits = expensive.cache_info().hits
+    if post_hits > pre_hits:
+        print("cache hit")
+
+
+print("Establish the cache")
+make_call(1, 2)
+make_call(2, 3)
+
+print("\nUse cached items")
+make_call(1, 2)
+make_call(2, 3)
+
+print("\nCompute a new value, triggering cache expiration")
+make_call(3, 4)
+
+print("\nCache still contains one old item")
+make_call(2, 3)
+
+print("\nOldest item needs to be recomputed")
+make_call(1, 2)
+```
+
+In this example the cache size is set to 2 entries. When the third set of unique arguments (3, 4) is used the oldest item in the cache is dropped and replaced with the new result.
+
+```
+
+$ python3 functools_lru_cache_expire.py
+Establish the cache
+(1, 2) called expensive(1, 2)
+(2, 3) called expensive(2, 3)
+
+Use cached items
+(1, 2) cache hit
+(2, 3) cache hit
+
+Compute a new value, triggering cache expiration
+(3, 4) called expensive(3, 4)
+
+Cache still contains one old item
+(2, 3) cache hit
+
+Oldest item needs to be recomputed
+(1, 2) called expensive(1, 2)
+```
+
+The keys for the cache managed by lru_cache() must be hashable, so all of the arguments to the function wrapped with the cache lookup must be hashable.
+
+```
+# functools_lru_cache_arguments.py
+import functools
+
+
+@functools.lru_cache(maxsize=2)
+def expensive(a, b):
+    print("called expensive({}, {})".format(a, b))
+    return a * b
+
+
+def make_call(a, b):
+    print("({}, {})".format(a, b), end=" ")
+    pre_hits = expensive.cache_info().hits
+    expensive(a, b)
+    post_hits = expensive.cache_info().hits
+    if post_hits > pre_hits:
+        print("cache hit")
+
+
+make_call(1, 2)
+
+try:
+    make_call([1], 2)
+except TypeError as err:
+    print("ERROR: {}".format(err))
+
+try:
+    make_call(1, {"2": "two"})
+except TypeError as err:
+    print("ERROR: {}".format(err))
+```
+
+If any object that can’t be hashed is passed in to the function, a TypeError is raised.
+
+```
+$ python3 functools_lru_cache_arguments.py
+(1, 2) called expensive(1, 2)
+([1], 2) ERROR: unhashable type: 'list'
+(1, {'2': 'two'}) ERROR: unhashable type: 'dict'
 ```
