@@ -791,3 +791,121 @@ Single item in sequence with initializer: 100
 Empty sequence with initializer: 99
 ERROR: reduce() of empty sequence with no initial value
 ```
+
+### 3.1.5 Generic Functions
+
+In a dynamically typed language like Python it is common to need to perform slightly different operation based on the type of an argument, especially when dealing with the difference between a list of items and a single item. It is simple enough to check the type of an argument directly, but in cases where the behavioral difference can be isolated into separate functions functools provides the singledispatch() decorator to register a set of generic functions for automatic switching based on the type of the first argument to a function.
+
+```
+# functools_singledispatch.py
+import functools
+
+
+@functools.singledispatch
+def myfunc(arg):
+    print("default myfunc({!r})".format(arg))
+
+
+@myfunc.register(int)
+def myfunc_int(arg):
+    print("myfunc_int({})".format(arg))
+
+
+@myfunc.register(list)
+def myfunc_list(arg):
+    print("myfunc_list()")
+    for item in arg:
+        print("  {}".format(item))
+
+
+myfunc("string argument")
+myfunc(1)
+myfunc(2.3)
+myfunc(["a", "b", "c"])
+```
+
+The register() attribute of the new function serves as another decorator for registering alternative implementations. The first function wrapped with singledispatch() is the default implementation if no other type-specific function is found, as with the float case in this example.
+
+```
+$ python3 functools_singledispatch.py
+default myfunc('string argument')
+myfunc_int(1)
+default myfunc(2.3)
+myfunc_list()
+  a
+  b
+  c
+```
+
+When no exact match is found for the type, the inheritance order is evaluated and the closest matching type is used.
+
+```
+# functools_singledispatch_mro.py
+import functools
+
+
+class A:
+    pass
+
+
+class B(A):
+    pass
+
+
+class C(A):
+    pass
+
+
+class D(B):
+    pass
+
+
+class E(C, D):
+    pass
+
+
+@functools.singledispatch
+def myfunc(arg):
+    print("default myfunc({})".format(arg.__class__.__name__))
+
+
+@myfunc.register(A)
+def myfunc_A(arg):
+    print("myfunc_A({})".format(arg.__class__.__name__))
+
+
+@myfunc.register(B)
+def myfunc_B(arg):
+    print("myfunc_B({})".format(arg.__class__.__name__))
+
+
+@myfunc.register(C)
+def myfunc_C(arg):
+    print("myfunc_C({})".format(arg.__class__.__name__))
+
+
+myfunc(A())
+myfunc(B())
+myfunc(C())
+myfunc(D())
+myfunc(E())
+```
+
+In this example, classes D and E do not match exactly with any registered generic functions, and the function selected depends on the class hierarchy.
+
+```
+$ python3 functools_singledispatch_mro.py
+myfunc_A(A)
+myfunc_B(B)
+myfunc_C(C)
+myfunc_B(D)
+myfunc_C(E)
+```
+
+### See also
+
+* [Standard library documentation for functools](https://docs.python.org/3/library/functools.html)
+* [Rich comparison methods](https://docs.python.org/3/reference/datamodel.html#object.__lt__) – Description of the rich comparison methods from the Python Reference Guide.
+* [Isolated @memoize](https://nedbatchelder.com/blog/201601/isolated_memoize.html) – Article on creating memoizing decorators that work well with unit tests, by Ned Batchelder.
+* [PEP 443](https://peps.python.org/pep-0443/) – “Single-dispatch generic functions”
+* [inspect](https://pymotw.com/3/inspect/index.html#module-inspect) – Introspection API for live objects.
