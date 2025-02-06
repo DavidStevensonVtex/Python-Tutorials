@@ -631,3 +631,292 @@ Grouped, sorted:
 1 [(1, 1), (1, 4)]
 2 [(2, 2), (2, 5)]
 ```
+
+### 3.2.6 Combining Inputs
+
+The accumulate() function processes the input iterable, passing the nth and n+1st item to a function and producing the return value instead of either input. The default function used to combine the two values adds them, so accumulate() can be used to produce the cumulative sum of a series of numerical inputs.
+
+```
+# itertools_accumulate.py
+from itertools import *
+
+print(list(accumulate(range(5))))
+print(list(accumulate("abcde")))
+```
+
+When used with a sequence of non-integer values, the results depend on what it means to “add” two items together. The second example in this script shows that when accumulate() receives a string input each response is a progressively longer prefix of that string.
+
+```
+$ python3 itertools_accumulate.py
+[0, 1, 3, 6, 10]
+['a', 'ab', 'abc', 'abcd', 'abcde']
+```
+
+It is possible to combine accumulate() with any other function that takes two input values to achieve different results.
+
+```
+# itertools_accumulate_custom.py
+from itertools import *
+
+
+def f(a, b):
+    print(a, b)
+    return b + a + b
+
+
+print(list(accumulate("abcde", f)))
+```
+
+This example combines the string values in a way that makes a series of (nonsensical) palindromes. Each step of the way when f() is called, it prints the input values passed to it by accumulate().
+
+```
+$ python3 itertools_accumulate_custom.py
+a b
+bab c
+cbabc d
+dcbabcd e
+['a', 'bab', 'cbabc', 'dcbabcd', 'edcbabcde']
+```
+
+Nested for loops that iterate over multiple sequences can often be replaced with product(), which produces a single iterable whose values are the Cartesian product of the set of input values.
+
+```
+# itertools_product.py
+from itertools import *
+import pprint
+
+FACE_CARDS = ("J", "Q", "K", "A")
+SUITS = ("H", "D", "C", "S")
+
+DECK = list(
+    product(
+        chain(range(2, 11), FACE_CARDS),
+        SUITS,
+    )
+)
+
+for card in DECK:
+    print("{:>2}{}".format(*card), end=" ")
+    if card[1] == SUITS[-1]:
+        print()
+```
+
+The values produced by product() are tuples, with the members taken from each of the iterables passed in as arguments in the order they are passed. The first tuple returned includes the first value from each iterable. The last iterable passed to product() is processed first, followed by the next to last, and so on. The result is that the return values are in order based on the first iterable, then the next iterable, etc.
+
+In this example, the cards are ordered by value and then by suit.
+
+```
+$ python3 itertools_product.py
+ 2H  2D  2C  2S 
+ 3H  3D  3C  3S 
+ 4H  4D  4C  4S 
+ 5H  5D  5C  5S 
+ 6H  6D  6C  6S 
+ 7H  7D  7C  7S 
+ 8H  8D  8C  8S 
+ 9H  9D  9C  9S 
+10H 10D 10C 10S 
+ JH  JD  JC  JS 
+ QH  QD  QC  QS 
+ KH  KD  KC  KS 
+ AH  AD  AC  AS 
+```
+
+To change the order of the cards, change the order of the arguments to product().
+
+```
+# itertools_product_ordering.py
+from itertools import *
+import pprint
+
+FACE_CARDS = ("J", "Q", "K", "A")
+SUITS = ("H", "D", "C", "S")
+
+DECK = list(
+    product(
+        SUITS,
+        chain(range(2, 11), FACE_CARDS),
+    )
+)
+
+for card in DECK:
+    print("{:>2}{}".format(card[1], card[0]), end=" ")
+    if card[1] == FACE_CARDS[-1]:
+        print()
+```
+
+The print loop in this example looks for an Ace card, instead of the spade suit, and then adds a newline to break up the output.
+
+```
+$ python3 itertools_product_ordering.py
+ 2H  3H  4H  5H  6H  7H  8H  9H 10H  JH  QH  KH  AH 
+ 2D  3D  4D  5D  6D  7D  8D  9D 10D  JD  QD  KD  AD 
+ 2C  3C  4C  5C  6C  7C  8C  9C 10C  JC  QC  KC  AC 
+ 2S  3S  4S  5S  6S  7S  8S  9S 10S  JS  QS  KS  AS
+```
+
+To compute the product of a sequence with itself, specify how many times the input should be repeated.
+
+```
+# itertools_product_repeat.py
+from itertools import *
+
+
+def show(iterable):
+    for i, item in enumerate(iterable, 1):
+        print(item, end=" ")
+        if (i % 3) == 0:
+            print()
+    print()
+
+
+print("Repeat 2:\n")
+show(list(product(range(3), repeat=2)))
+
+print("Repeat 3:\n")
+show(list(product(range(3), repeat=3)))
+```
+
+Since repeating a single iterable is like passing the same iterable multiple times, each tuple produced by product() will contain a number of items equal to the repeat counter.
+
+```
+$ python3 itertools_product_repeat.py
+Repeat 2:
+
+(0, 0) (0, 1) (0, 2) 
+(1, 0) (1, 1) (1, 2) 
+(2, 0) (2, 1) (2, 2) 
+
+Repeat 3:
+
+(0, 0, 0) (0, 0, 1) (0, 0, 2) 
+(0, 1, 0) (0, 1, 1) (0, 1, 2) 
+(0, 2, 0) (0, 2, 1) (0, 2, 2) 
+(1, 0, 0) (1, 0, 1) (1, 0, 2) 
+(1, 1, 0) (1, 1, 1) (1, 1, 2) 
+(1, 2, 0) (1, 2, 1) (1, 2, 2) 
+(2, 0, 0) (2, 0, 1) (2, 0, 2) 
+(2, 1, 0) (2, 1, 1) (2, 1, 2) 
+(2, 2, 0) (2, 2, 1) (2, 2, 2) 
+```
+
+The permutations() function produces items from the input iterable combined in the possible permutations of the given length. It defaults to producing the full set of all permutations.
+
+```
+# itertools_permutations.py
+from itertools import *
+
+
+def show(iterable):
+    first = None
+    for i, item in enumerate(iterable, 1):
+        if first != item[0]:
+            if first is not None:
+                print()
+            first = item[0]
+        print("".join(item), end=" ")
+    print()
+
+
+print("All permutations:\n")
+show(permutations("abcd"))
+
+print("\nPairs:\n")
+show(permutations("abcd", r=2))
+```
+
+Use the r argument to limit the length and number of the individual permutations returned.
+
+```
+$ python3 itertools_permutations.py
+All permutations:
+
+abcd abdc acbd acdb adbc adcb 
+bacd badc bcad bcda bdac bdca 
+cabd cadb cbad cbda cdab cdba 
+dabc dacb dbac dbca dcab dcba 
+
+Pairs:
+
+ab ac ad 
+ba bc bd 
+ca cb cd 
+da db dc 
+```
+
+To limit the values to unique combinations rather than permutations, use combinations(). As long as the members of the input are unique, the output will not include any repeated values.
+
+```
+# itertools_combinations.py
+from itertools import *
+
+
+def show(iterable):
+    first = None
+    for i, item in enumerate(iterable, 1):
+        if first != item[0]:
+            if first is not None:
+                print()
+            first = item[0]
+        print("".join(item), end=" ")
+    print()
+
+
+print("Unique pairs:\n")
+show(combinations("abcd", r=2))
+```
+
+Unlike with permutations, the r argument to combinations() is required.
+
+```
+$ python3 itertools_combinations.py
+Unique pairs:
+
+ab ac ad 
+bc bd 
+cd 
+```
+
+While combinations() does not repeat individual input elements, sometimes it is useful to consider combinations that do include repeated elements. For those cases, use combinations_with_replacement().
+
+```
+# itertools_combinations_with_replacement.py
+from itertools import *
+
+
+def show(iterable):
+    first = None
+    for i, item in enumerate(iterable, 1):
+        if first != item[0]:
+            if first is not None:
+                print()
+            first = item[0]
+        print("".join(item), end=" ")
+    print()
+
+
+print("Unique pairs:\n")
+show(combinations_with_replacement("abcd", r=2))
+```
+
+In this output, each input item is paired with itself as well as all of the other members of the input sequence.
+
+```
+$ python3 itertools_combinations_with_replacement.py
+Unique pairs:
+
+aa ab ac ad 
+bb bc bd 
+cc cd 
+dd 
+```
+
+### See also
+
+* [Standard library documentation for itertools](https://docs.python.org/3/library/itertools.html)
+* [Python 2 to 3 porting notes for itertools](https://pymotw.com/3/porting_notes.html#porting-itertools)
+* [The Standard ML Basis Library](https://smlfamily.github.io/Basis/) – The library for SML.
+* [Definition of Haskell and the Standard Libraries](https://www.haskell.org/definition/) – Standard library specification for the functional language Haskell.
+* [Clojure](https://clojure.org/) – Clojure is a dynamic functional language that runs on the Java Virtual Machine.
+* [tee](https://man7.org/linux/man-pages/man1/tee.1.html) – Unix command line tool for splitting one input into multiple identical output streams.
+* [Cartesian product](https://en.wikipedia.org/wiki/Cartesian_product) – Mathematical definition of the Cartesian product of two sequences.
