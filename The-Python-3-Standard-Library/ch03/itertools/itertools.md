@@ -192,3 +192,82 @@ r: 0 1 2
 i1: [3, 4]
 i2: [3, 4]
 ```
+
+### 3.2.2 Converting Inputs
+
+The built-in map() function returns an iterator that calls a function on the values in the input iterators, and returns the results. It stops when any input iterator is exhausted.
+
+```
+# itertools_map.py
+
+
+def times_two(x):
+    return 2 * x
+
+
+def multiply(x, y):
+    return (x, y, x * y)
+
+
+print("Doubles:")
+for i in map(times_two, range(5)):
+    print(i)
+
+print("\nMultiples:")
+r1 = range(5)
+r2 = range(5, 10)
+for i in map(multiply, r1, r2):
+    print("{:d} * {:d} = {:d}".format(*i))
+
+print("\nStopping:")
+r1 = range(5)
+r2 = range(2)
+for i in map(multiply, r1, r2):
+    print(i)
+```
+
+In the first example, the lambda function multiplies the input values by 2. In a second example, the lambda function multiplies two arguments, taken from separate iterators, and returns a tuple with the original arguments and the computed value. The third example stops after producing two tuples because the second range is exhausted.
+
+```
+$ python3 itertools_map.py
+Doubles:
+0
+2
+4
+6
+8
+
+Multiples:
+0 * 5 = 0
+1 * 6 = 6
+2 * 7 = 14
+3 * 8 = 24
+4 * 9 = 36
+
+Stopping:
+(0, 0, 0)
+(1, 1, 1)
+```
+
+The starmap() function is similar to map(), but instead of constructing a tuple from multiple iterators, it splits up the items in a single iterator as arguments to the mapping function using the * syntax.
+
+```
+# itertools_starmap.py
+from itertools import *
+
+values = [(0, 5), (1, 6), (2, 7), (3, 8), (4, 9)]
+
+for i in starmap(lambda x, y: (x, y, x * y), values):
+    print("{} * {} = {}".format(*i))
+```
+
+Where the mapping function to map() is called f(i1, i2), the mapping function passed to starmap() is called f(*i).
+
+```
+$ python3 itertools_starmap.py
+0 * 5 = 0
+1 * 6 = 6
+2 * 7 = 14
+3 * 8 = 24
+4 * 9 = 36
+```
