@@ -271,3 +271,133 @@ $ python3 itertools_starmap.py
 3 * 8 = 24
 4 * 9 = 36
 ```
+
+### 3.2.3 Producing New Values
+
+The count() function returns an iterator that produces consecutive integers, indefinitely. The first number can be passed as an argument (the default is zero). There is no upper bound argument (see the built-in range() for more control over the result set).
+
+```
+# itertools_count.py
+from itertools import *
+
+for i in zip(count(1), ["a", "b", "c"]):
+    print(i)
+```
+
+This example stops because the list argument is consumed.
+
+```
+$ python3 itertools_count.py
+(1, 'a')
+(2, 'b')
+(3, 'c')
+```
+
+The start and step arguments to count() can be any numerical values that can be added together.
+
+```
+# itertools_count_step.py
+import fractions
+from itertools import *
+
+start = fractions.Fraction(1, 3)
+step = fractions.Fraction(1, 3)
+
+for i in zip(count(start, step), ["a", "b", "c"]):
+    print("{}: {}".format(*i))
+```
+
+In this example, the start point and steps are Fraction objects from the fraction module.
+
+```
+$ python3 itertools_count_step.py
+1/3: a
+2/3: b
+1: c
+```
+
+The cycle() function returns an iterator that repeats the contents of the arguments it is given indefinitely. Since it has to remember the entire contents of the input iterator, it may consume quite a bit of memory if the iterator is long.
+
+```
+# itertools_cycle.py
+from itertools import *
+
+for i in zip(range(7), cycle(["a", "b", "c"])):
+    print(i)
+```
+
+A counter variable is used to break out of the loop after a few cycles in this example.
+
+```
+$ python3 itertools_cycle.py
+(0, 'a')
+(1, 'b')
+(2, 'c')
+(3, 'a')
+(4, 'b')
+(5, 'c')
+(6, 'a')
+```
+
+The repeat() function returns an iterator that produces the same value each time it is accessed.The repeat() function returns an iterator that produces the same value each time it is accessed.
+
+```
+# itertools_repeat.py
+from itertools import *
+
+for i in repeat("over-and-over", 5):
+    print(i)
+```
+
+The iterator returned by repeat() keeps returning data forever, unless the optional times argument is provided to limit it.
+
+```
+$ python3 itertools_repeat.py
+over-and-over
+over-and-over
+over-and-over
+over-and-over
+over-and-over
+```
+
+It is useful to combine repeat() with zip() or map() when invariant values need to be included with the values from the other iterators.
+
+```
+# itertools_repeat_zip.py
+from itertools import *
+
+for i, s in zip(count(), repeat("over-and-over", 5)):
+    print(i, s)
+```
+
+A counter value is combined with the constant returned by repeat() in this example.
+
+```
+$ python3 itertools_repeat_zip.py
+0 over-and-over
+1 over-and-over
+2 over-and-over
+3 over-and-over
+4 over-and-over
+```
+
+This example uses map() to multiply the numbers in the range 0 through 4 by 2.
+
+```
+# itertools_repeat_map.py
+from itertools import *
+
+for i in map(lambda x, y: (x, y, x * y), repeat(2), range(5)):
+    print("{:d} * {:d} = {:d}".format(*i))
+```
+
+The repeat() iterator does not need to be explicitly limited, since map() stops processing when any of its inputs ends, and the range() returns only five elements.
+
+```
+$ python3 itertools_repeat_map.py
+2 * 0 = 0
+2 * 1 = 2
+2 * 2 = 4
+2 * 3 = 6
+2 * 4 = 8
+```
