@@ -540,3 +540,94 @@ The first argument is the data iterable to process and the second is a selector 
 $ python3 itertools_compress.py
 3 6 9
 ```
+
+### 3.2.5 Grouping Data
+
+The groupby() function returns an iterator that produces sets of values organized by a common key. This example illustrates grouping related values based on an attribute.
+
+```
+# itertools_groupby_seq.py
+import functools
+from itertools import *
+import operator
+import pprint
+
+
+@functools.total_ordering
+class Point:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return "({}, {})".format(self.x, self.y)
+
+    def __eq__(self, other):
+        return (self.x, self.y) == (other.x, other.y)
+
+    def __gt__(self, other):
+        return (self.x, self.y) > (other.x, other.y)
+
+
+# Create a dataset of Point instances
+data = list(map(Point, cycle(islice(count(), 3)), islice(count(), 7)))
+print("Data:")
+pprint.pprint(data, width=35)
+print()
+
+# Try to group the unsorted data based on X values
+print("Grouped, unsorted:")
+for k, g in groupby(data, operator.attrgetter("x")):
+    print(k, list(g))
+print()
+
+# Sort the data
+data.sort()
+print("Sorted:")
+pprint.pprint(data, width=35)
+print()
+
+# Group the sorted data based on X values
+print("Grouped, sorted:")
+for k, g in groupby(data, operator.attrgetter("x")):
+    print(k, list(g))
+print()
+```
+
+The input sequence needs to be sorted on the key value in order for the groupings to work out as expected.
+
+```
+$ python3 itertools_groupby_seq.py
+Data:
+[(0, 0),
+ (1, 1),
+ (2, 2),
+ (0, 3),
+ (1, 4),
+ (2, 5),
+ (0, 6)]
+
+Grouped, unsorted:
+0 [(0, 0)]
+1 [(1, 1)]
+2 [(2, 2)]
+0 [(0, 3)]
+1 [(1, 4)]
+2 [(2, 5)]
+0 [(0, 6)]
+
+Sorted:
+[(0, 0),
+ (0, 3),
+ (0, 6),
+ (1, 1),
+ (1, 4),
+ (2, 2),
+ (2, 5)]
+
+Grouped, sorted:
+0 [(0, 0), (0, 3), (0, 6)]
+1 [(1, 1), (1, 4)]
+2 [(2, 2), (2, 5)]
+```
