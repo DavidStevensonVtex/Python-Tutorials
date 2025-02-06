@@ -401,3 +401,142 @@ $ python3 itertools_repeat_map.py
 2 * 3 = 6
 2 * 4 = 8
 ```
+
+### 3.2.4 Filtering
+
+The dropwhile() function returns an iterator that produces elements of the input iterator after a condition becomes false for the first time.
+
+```
+# itertools_dropwhile.py
+from itertools import *
+
+
+def should_drop(x):
+    print("Testing:", x)
+    return x < 1
+
+
+for i in dropwhile(should_drop, [-1, 0, 1, 2, -2]):
+    print("Yielding:", i)
+```
+
+dropwhile() does not filter every item of the input; after the condition is false the first time, all of the remaining items in the input are returned.
+
+```
+$ python3 itertools_dropwhile.py
+Testing: -1
+Testing: 0
+Testing: 1
+Yielding: 1
+Yielding: 2
+Yielding: -2
+```
+
+The opposite of dropwhile() is takewhile(). It returns an iterator that returns items from the input iterator as long as the test function returns true.
+
+```
+# itertools_takewhile.py
+from itertools import *
+
+
+def should_take(x):
+    print("Testing:", x)
+    return x < 2
+
+
+for i in takewhile(should_take, [-1, 0, 1, 2, -2]):
+    print("Yielding:", i)
+```
+
+As soon as should_take() returns False, takewhile() stops processing the input.
+
+```
+$ python3 itertools_takewhile.py
+Testing: -1
+Yielding: -1
+Testing: 0
+Yielding: 0
+Testing: 1
+Yielding: 1
+Testing: 2
+```
+
+The built-in function filter() returns an iterator that includes only items for which the test function returns true.
+
+```
+# itertools_filter.py
+from itertools import *
+
+
+def check_item(x):
+    print("Testing:", x)
+    return x < 1
+
+
+for i in filter(check_item, [-1, 0, 1, 2, -2]):
+    print("Yielding:", i)
+```
+
+filter() is different from dropwhile() and takewhile() in that every item is tested before it is returned.
+
+```
+$ python3 itertools_filter.py
+Testing: -1
+Yielding: -1
+Testing: 0
+Yielding: 0
+Testing: 1
+Testing: 2
+Testing: -2
+Yielding: -2
+```
+
+filterfalse() returns an iterator that includes only items where the test function returns false.
+
+```
+# itertools_filterfalse.py
+from itertools import *
+
+
+def check_item(x):
+    print("Testing:", x)
+    return x < 1
+
+
+for i in filterfalse(check_item, [-1, 0, 1, 2, -2]):
+    print("Yielding:", i)
+```
+
+The test expression in check_item() is the same, so the results in this example with filterfalse() are the opposite of the results from the previous example.
+
+```
+$ python3 itertools_filterfalse.py
+Testing: -1
+Testing: 0
+Testing: 1
+Yielding: 1
+Testing: 2
+Yielding: 2
+Testing: -2
+```
+
+compress() offers another way to filter the contents of an iterable. Instead of calling a function, it uses the values in another iterable to indicate when to accept a value and when to ignore it.
+
+```
+# itertools_compress.py
+from itertools import *
+
+every_third = cycle([False, False, True])
+data = range(1, 10)
+
+for i in compress(data, every_third):
+    print(i, end=" ")
+print()
+```
+
+The first argument is the data iterable to process and the second is a selector iterable producing Boolean values indicating which elements to take from the data input (a true value causes the value to be produced, a false value causes it to be ignored).
+
+```
+$ python3 itertools_compress.py
+3 6 9
+```
