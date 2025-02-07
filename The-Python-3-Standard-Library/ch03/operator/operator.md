@@ -262,3 +262,87 @@ a = iadd(a, b) => 4.0
 
 c = iconcat(c, d) => [1, 2, 3, 'a', 'b', 'c']
 ```
+
+### 3.3.6 Attribute and Item “Getters”
+
+One of the most unusual features of the operator module is the concept of getters. These are callable objects constructed at runtime to retrieve attributes of objects or contents from sequences. Getters are especially useful when working with iterators or generator sequences, where they are intended to incur less overhead than a lambda or Python function.
+
+```
+# operator_attrgetter.py
+from operator import *
+
+
+class MyObj:
+    """example class for attrgetter"""
+
+    def __init__(self, arg):
+        super().__init__()
+        self.arg = arg
+
+    def __repr__(self):
+        return "MyObj({})".format(self.arg)
+
+
+l = [MyObj(i) for i in range(5)]
+print("objects   :", l)
+
+# Extract the 'arg' value from each object
+g = attrgetter("arg")
+vals = [g(i) for i in l]
+print("arg values:", vals)
+
+# Sort using arg
+l.reverse()
+print("reversed  :", l)
+print("sorted    :", sorted(l, key=g))
+```
+
+Attribute getters work like lambda x, n='attrname': getattr(x, n):
+
+```
+$ python3 operator_attrgetter.py
+objects   : [MyObj(0), MyObj(1), MyObj(2), MyObj(3), MyObj(4)]
+arg values: [0, 1, 2, 3, 4]
+reversed  : [MyObj(4), MyObj(3), MyObj(2), MyObj(1), MyObj(0)]
+sorted    : [MyObj(0), MyObj(1), MyObj(2), MyObj(3), MyObj(4)]
+```
+
+Item getters work like lambda x, y=5: x[y]:
+
+```
+# operator_itemgetter.py
+from operator import *
+
+l = [dict(val=-1 * i) for i in range(4)]
+print("Dictionaries:")
+print(" original:", l)
+g = itemgetter("val")
+vals = [g(i) for i in l]
+print("   values:", vals)
+print("   sorted:", sorted(l, key=g))
+
+print()
+l = [(i, i * -2) for i in range(4)]
+print("\nTuples:")
+print(" original:", l)
+g = itemgetter(1)
+vals = [g(i) for i in l]
+print("   values:", vals)
+print("   sorted:", sorted(l, key=g))
+```
+
+Item getters work with mappings as well as sequences.
+
+```
+$ python3 operator_itemgetter.py
+Dictionaries:
+ original: [{'val': 0}, {'val': -1}, {'val': -2}, {'val': -3}]
+   values: [0, -1, -2, -3]
+   sorted: [{'val': -3}, {'val': -2}, {'val': -1}, {'val': 0}]
+
+
+Tuples:
+ original: [(0, 0), (1, -2), (2, -4), (3, -6)]
+   values: [0, -2, -4, -6]
+   sorted: [(3, -6), (2, -4), (1, -2), (0, 0)]
+```
