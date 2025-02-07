@@ -346,3 +346,64 @@ Tuples:
    values: [0, -2, -4, -6]
    sorted: [(3, -6), (2, -4), (1, -2), (0, 0)]
 ```
+
+### 3.3.7 Combining Operators and Custom Classes
+
+The functions in the operator module work via the standard Python interfaces for their operations, so they work with user-defined classes as well as the built-in types.
+
+```
+# operator_classes.py
+from operator import *
+
+
+class MyObj:
+    """Example for operator overloading"""
+
+    def __init__(self, val):
+        super(MyObj, self).__init__()
+        self.val = val
+
+    def __str__(self):
+        return "MyObj({})".format(self.val)
+
+    def __lt__(self, other):
+        """compare for less-than"""
+        print("Testing {} < {}".format(self, other))
+        return self.val < other.val
+
+    def __add__(self, other):
+        """add values"""
+        print("Adding {} + {}".format(self, other))
+        return MyObj(self.val + other.val)
+
+
+a = MyObj(1)
+b = MyObj(2)
+
+print("Comparison:")
+print(lt(a, b))
+
+print("\nArithmetic:")
+print(add(a, b))
+```
+
+Refer to the Python reference guide for a complete list of the special methods used by each operator.
+
+```
+$ python3 operator_classes.py
+Comparison:
+Testing MyObj(1) < MyObj(2)
+True
+
+Arithmetic:
+Adding MyObj(1) + MyObj(2)
+MyObj(3)
+```
+
+### See also
+
+* [Standard library documentation for operator](https://docs.python.org/3/library/operator.html)
+* [functools](https://pymotw.com/3/functools/index.html#module-functools) – Functional programming tools, including the total_ordering() decorator for adding rich comparison methods to a class.
+* [itertools](https://pymotw.com/3/itertools/index.html#module-itertools) – Iterator operations.
+* [collections](https://pymotw.com/3/collections/index.html#module-collections) – Abstract types for collections.
+* [numbers – Abstract types for numerical values](https://docs.python.org/3/library/numbers.html).
