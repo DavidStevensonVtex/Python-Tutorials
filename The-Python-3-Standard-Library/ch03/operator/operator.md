@@ -222,3 +222,43 @@ Destructive:
   delitem(b, 1)          : ['a', 'c']
   delitem(a, slice(1, 3)): [1]
 ```
+
+### 3.3.5 In-place Operators
+
+In addition to the standard operators, many types of objects support “in-place” modification through special operators such as +=. There are equivalent functions for in-place modifications, too:
+
+```
+# operator_inplace.py
+from operator import *
+
+a = -1
+b = 5.0
+c = [1, 2, 3]
+d = ["a", "b", "c"]
+print("a =", a)
+print("b =", b)
+print("c =", c)
+print("d =", d)
+print()
+
+a = iadd(a, b)
+print("a = iadd(a, b) =>", a)
+print()
+
+c = iconcat(c, d)
+print("c = iconcat(c, d) =>", c)
+```
+
+These examples only demonstrate a few of the functions. Refer to the standard library documentation for complete details.
+
+```
+$ python3 operator_inplace.py
+a = -1
+b = 5.0
+c = [1, 2, 3]
+d = ['a', 'b', 'c']
+
+a = iadd(a, b) => 4.0
+
+c = iconcat(c, d) => [1, 2, 3, 'a', 'b', 'c']
+```
