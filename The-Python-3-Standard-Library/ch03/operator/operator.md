@@ -39,3 +39,34 @@ truth(a)    : True
 is_(a, b)   : False
 is_not(a, b): True
 ```
+
+### 3.3.2 Comparison Operators
+
+All of the rich comparison operators are supported.
+
+```
+# operator_comparisons.py
+from operator import *
+
+a = 1
+b = 5.0
+
+print("a =", a)
+print("b =", b)
+for func in (lt, le, eq, ne, ge, gt):
+    print("{}(a, b): {}".format(func.__name__, func(a, b)))
+```
+
+The functions are equivalent to the expression syntax using <, <=, ==, >=, and >.
+
+```
+$ python3 operator_comparisons.py
+a = 1
+b = 5.0
+lt(a, b): True
+le(a, b): True
+eq(a, b): False
+ne(a, b): True
+ge(a, b): False
+gt(a, b): False
+```
