@@ -752,3 +752,104 @@ within the context
 inline_cleanup()
 local_resource = 'resource created in context'
 ```
+
+#### 3.4.7.3 Partial Stacks
+
+Sometimes when building complex contexts it is useful to be able to abort an operation if the context cannot be completely constructed, but to delay the cleanup of all resources until a later time if they can all be set up properly. For example, if an operation needs several long-lived network connections, it may be best to not start the operation if one connection fails. However, if all of the connections can be opened they need to stay open longer than the duration of a single context manager. The pop_all() method of ExitStack can be used in this scenario.
+
+pop_all() clears all of the context managers and callbacks from the stack on which it is called, and returns a new stack pre-populated with those same context managers and callbacks. The close() method of the new stack can be invoked later, after the original stack is gone, to clean up the resources.
+
+```
+# contextlib_exitstack_pop_all.py
+import contextlib
+
+from contextlib_context_managers import *
+
+
+def variable_stack(contexts):
+    with contextlib.ExitStack() as stack:
+        for c in contexts:
+            stack.enter_context(c)
+        # Return the close() method of a new stack as a clean-up
+        # function.
+        return stack.pop_all().close
+    # Explicitly return None, indicating that the ExitStack could
+    # not be initialized cleanly but that cleanup has already
+    # occurred.
+    return None
+
+
+print("No errors:")
+cleaner = variable_stack(
+    [
+        HandleError(1),
+        HandleError(2),
+    ]
+)
+cleaner()
+
+print("\nHandled error building context manager stack:")
+try:
+    cleaner = variable_stack(
+        [
+            HandleError(1),
+            ErrorOnEnter(2),
+        ]
+    )
+except RuntimeError as err:
+    print("caught error {}".format(err))
+else:
+    if cleaner is not None:
+        cleaner()
+    else:
+        print("no cleaner returned")
+
+print("\nUnhandled error building context manager stack:")
+try:
+    cleaner = variable_stack(
+        [
+            PassError(1),
+            ErrorOnEnter(2),
+        ]
+    )
+except RuntimeError as err:
+    print("caught error {}".format(err))
+else:
+    if cleaner is not None:
+        cleaner()
+    else:
+        print("no cleaner returned")
+```
+
+This example uses the same context manager classes defined earlier, with the difference that ErrorOnEnter produces an error on `__enter__()` instead of `__exit__()`. Inside variable_stack(), if all of the contexts are entered without error then the close() method of a new ExitStack is returned. If a handled error occurs, variable_stack() returns None to indicate that the cleanup work is already done. And if an unhandled error occurs, the partial stack is cleaned up and the error is propagated.
+
+```
+$ python3 contextlib_exitstack_pop_all.py
+No errors:
+  HandleError(1): entering
+  HandleError(2): entering
+  HandleError(2): exiting False
+  HandleError(1): exiting False
+
+Handled error building context manager stack:
+  HandleError(1): entering
+  ErrorOnEnter(2): throwing error on enter
+  HandleError(1): handling exception RuntimeError('from 2')
+  HandleError(1): exiting True
+no cleaner returned
+
+Unhandled error building context manager stack:
+  PassError(1): entering
+  ErrorOnEnter(2): throwing error on enter
+  PassError(1): passing exception RuntimeError('from 2')
+  PassError(1): exiting
+caught error from 2
+```
+
+### See also
+
+* [Standard library documentation for contextlib](https://docs.python.org/3/library/contextlib.html)
+* [PEP 343](https://peps.python.org/pep-0343/) – The with statement.
+* [Context Manager Types](https://docs.python.org/3/library/stdtypes.html#typecontextmanager) – Description of the context manager API from the standard library documentation.
+* [With Statement Context Managers](https://docs.python.org/3/reference/datamodel.html#context-managers) – Description of the context manager API from the Python Reference Guide.
+* [Resource management in Python 3.3, or contextlib.ExitStack FTW!](https://www.wefearchange.org/2013/05/resource-management-in-python-33-or.html) – Description of using ExitStack to deploy safe code from Barry Warsaw.
