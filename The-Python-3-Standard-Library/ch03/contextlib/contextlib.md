@@ -198,3 +198,127 @@ __enter__(as decorator)
 Doing work in the wrapped function
 __exit__(as decorator)
 ```
+
+### 3.4.3 From Generator to Context Manager
+
+Creating context managers the traditional way, by writing a class with __enter__() and __exit__() methods, is not difficult. But sometimes writing everything out fully is extra overhead for a trivial bit of context. In those sorts of situations, use the contextmanager() decorator to convert a generator function into a context manager.
+
+```
+# contextlib_contextmanager.py
+import contextlib
+
+
+@contextlib.contextmanager
+def make_context():
+    print("  entering")
+    try:
+        yield {}
+    except RuntimeError as err:
+        print("  ERROR:", err)
+    finally:
+        print("  exiting")
+
+
+print("Normal:")
+with make_context() as value:
+    print("  inside with statement:", value)
+
+print("\nHandled error:")
+with make_context() as value:
+    raise RuntimeError("showing example of handling an error")
+
+print("\nUnhandled error:")
+with make_context() as value:
+    raise ValueError("this exception is not handled")
+```
+
+The generator should initialize the context, yield exactly one time, then clean up the context. The value yielded, if any, is bound to the variable in the as clause of the with statement. Exceptions from within the with block are re-raised inside the generator, so they can be handled there.
+
+```
+$ python3 contextlib_contextmanager.py
+Normal:
+  entering
+  inside with statement: {}
+  exiting
+
+Handled error:
+  entering
+  ERROR: showing example of handling an error
+  exiting
+
+Unhandled error:
+  entering
+  exiting
+Traceback (most recent call last):
+  File "contextlib_contextmanager.py", line 26, in <module>
+    raise ValueError("this exception is not handled")
+ValueError: this exception is not handled
+```
+
+The context manager returned by contextmanager() is derived from ContextDecorator, so it also works as a function decorator.
+
+```
+# contextlib_contextmanager_decorator.py
+import contextlib
+
+
+@contextlib.contextmanager
+def make_context():
+    print("  entering")
+    try:
+        # Yield control, but not a value, because any value
+        # yielded is not available when the context manager
+        # is used as a decorator.
+        yield
+    except RuntimeError as err:
+        print("  ERROR:", err)
+    finally:
+        print("  exiting")
+
+
+@make_context()
+def normal():
+    print("  inside with statement")
+
+
+@make_context()
+def throw_error(err):
+    raise err
+
+
+print("Normal:")
+normal()
+
+print("\nHandled error:")
+throw_error(RuntimeError("showing example of handling an error"))
+
+print("\nUnhandled error:")
+throw_error(ValueError("this exception is not handled"))
+```
+
+As in the ContextDecorator example above, when the context manager is used as a decorator the value yielded by the generator is not available inside the function being decorated. Arguments passed to the decorated function are still available, as demonstrated by throw_error() in this example.
+
+```
+$ python3 contextlib_contextmanager_decorator.py
+Normal:
+  entering
+  inside with statement
+  exiting
+
+Handled error:
+  entering
+  ERROR: showing example of handling an error
+  exiting
+
+Unhandled error:
+  entering
+  exiting
+Traceback (most recent call last):
+  File "contextlib_contextmanager_decorator.py", line 36, in <module>
+    throw_error(ValueError("this exception is not handled"))
+  File "/usr/lib/python3.8/contextlib.py", line 75, in inner
+    return func(*args, **kwds)
+  File "contextlib_contextmanager_decorator.py", line 26, in throw_error
+    raise err
+ValueError: this exception is not handled
+```
