@@ -480,3 +480,193 @@ Both redirect_stdout() and redirect_stderr() modify global state by replacing ob
 Most context managers operate on one object at a time, such as a single file or database handle. In these cases, the object is known in advance and the code using the context manager can be built around that one object. In other cases, a program may need to create an unknown number of objects in a context, while wanting all of them to be cleaned up when control flow exits the context. ExitStack was created to handle these more dynamic cases.
 
 An ExitStack instance maintains a stack data structure of cleanup callbacks. The callbacks are populated explicitly within the context, and any registered callbacks are called in the reverse order when control flow exits the context. The result is like having multple nested with statements, except they are established dynamically.
+
+#### 3.4.7.1 Stacking Context Managers
+
+There are several ways to populate the ExitStack. This example uses enter_context() to add a new context manager to the stack.
+
+```
+# contextlib_exitstack_enter_context.py
+import contextlib
+
+
+@contextlib.contextmanager
+def make_context(i):
+    print("{} entering".format(i))
+    yield {}
+    print("{} exiting".format(i))
+
+
+def variable_stack(n, msg):
+    with contextlib.ExitStack() as stack:
+        for i in range(n):
+            stack.enter_context(make_context(i))
+        print(msg)
+
+
+variable_stack(2, "inside context")
+```
+
+enter_context() first calls `__enter__()` on the context manager, and then registers its `__exit__() `method as a callback to be invoked as the stack is undone.
+
+```
+$ python3 contextlib_exitstack_enter_context.py
+0 entering
+1 entering
+inside context
+1 exiting
+0 exiting
+```
+
+The context managers given to ExitStack are treated as though they are in a series of nested with statements. Errors that happen anywhere within the context propagate through the normal error handling of the context managers. These context manager classes illustrate the way errors propagate.
+
+```
+# contextlib_context_managers.py
+import contextlib
+
+
+class Tracker:
+    "Base class for noisy context managers."
+
+    def __init__(self, i):
+        self.i = i
+
+    def msg(self, s):
+        print("  {}({}): {}".format(self.__class__.__name__, self.i, s))
+
+    def __enter__(self):
+        self.msg("entering")
+
+
+class HandleError(Tracker):
+    "If an exception is received, treat it as handled."
+
+    def __exit__(self, *exc_details):
+        received_exc = exc_details[1] is not None
+        if received_exc:
+            self.msg("handling exception {!r}".format(exc_details[1]))
+        self.msg("exiting {}".format(received_exc))
+        # Return Boolean value indicating whether the exception
+        # was handled.
+        return received_exc
+
+
+class PassError(Tracker):
+    "If an exception is received, propagate it."
+
+    def __exit__(self, *exc_details):
+        received_exc = exc_details[1] is not None
+        if received_exc:
+            self.msg("passing exception {!r}".format(exc_details[1]))
+        self.msg("exiting")
+        # Return False, indicating any exception was not handled.
+        return False
+
+
+class ErrorOnExit(Tracker):
+    "Cause an exception."
+
+    def __exit__(self, *exc_details):
+        self.msg("throwing error")
+        raise RuntimeError("from {}".format(self.i))
+
+
+class ErrorOnEnter(Tracker):
+    "Cause an exception."
+
+    def __enter__(self):
+        self.msg("throwing error on enter")
+        raise RuntimeError("from {}".format(self.i))
+
+    def __exit__(self, *exc_info):
+        self.msg("exiting")
+```
+
+The examples using these classes are based around variable_stack(), which uses the context managers passed to construct an ExitStack, building up the overall context one by one. The examples below pass different context managers to explore the error handling behavior. First, the normal case of no exceptions.
+
+```
+print('No errors:')
+variable_stack([
+    HandleError(1),
+    PassError(2),
+])
+```
+
+Then, an example of handling exceptions within the context managers at the end of the stack, in which all of the open contexts are closed as the stack is unwound.
+
+```
+print('\nError at the end of the context stack:')
+variable_stack([
+    HandleError(1),
+    HandleError(2),
+    ErrorOnExit(3),
+])
+```
+
+Next, an example of handling exceptions within the context managers in the middle of the stack, in which the error does not occur until some contexts are already closed, so those contexts do not see the error.
+
+```
+print('\nError in the middle of the context stack:')
+variable_stack([
+    HandleError(1),
+    PassError(2),
+    ErrorOnExit(3),
+    HandleError(4),
+])
+```
+
+Finally, an example of the exception remaining unhandled and propagating up to the calling code.
+
+```
+try:
+    print('\nError ignored:')
+    variable_stack([
+        PassError(1),
+        ErrorOnExit(2),
+    ])
+except RuntimeError:
+    print('error handled outside of context')
+```
+
+If any context manager in the stack receives an exception and returns a True value, it prevents that exception from propagating up to any other context managers.
+
+```
+$ python3 contextlib_exitstack_enter_context_errors.py
+No errors:
+  HandleError(1): entering
+  PassError(2): entering
+  PassError(2): exiting
+  HandleError(1): exiting False
+  outside of stack, any errors were handled
+
+Error at the end of the context stack:
+  HandleError(1): entering
+  HandleError(2): entering
+  ErrorOnExit(3): entering
+  ErrorOnExit(3): throwing error
+  HandleError(2): handling exception RuntimeError('from 3')
+  HandleError(2): exiting True
+  HandleError(1): exiting False
+  outside of stack, any errors were handled
+
+Error in the middle of the context stack:
+  HandleError(1): entering
+  PassError(2): entering
+  ErrorOnExit(3): entering
+  HandleError(4): entering
+  HandleError(4): exiting False
+  ErrorOnExit(3): throwing error
+  PassError(2): passing exception RuntimeError('from 3')
+  PassError(2): exiting
+  HandleError(1): handling exception RuntimeError('from 3')
+  HandleError(1): exiting True
+  outside of stack, any errors were handled
+
+Error ignored:
+  PassError(1): entering
+  ErrorOnExit(2): entering
+  ErrorOnExit(2): throwing error
+  PassError(1): passing exception RuntimeError('from 2')
+  PassError(1): exiting
+error handled outside of context
+```
