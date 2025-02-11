@@ -670,3 +670,85 @@ Error ignored:
   PassError(1): exiting
 error handled outside of context
 ```
+
+#### 3.4.7.2 Arbitrary Context Callbacks
+
+ExitStack also supports arbitrary callbacks for closing a context, making it easy to clean up resources that are not controlled via a context manager.
+
+```
+# contextlib_exitstack_callbacks.py
+import contextlib
+
+
+def callback(*args, **kwds):
+    print("closing callback({}, {})".format(args, kwds))
+
+
+with contextlib.ExitStack() as stack:
+    stack.callback(callback, "arg1", "arg2")
+    stack.callback(callback, arg3="val3")
+```
+
+Just as with the `__exit__()` methods of full context managers, the callbacks are invoked in the reverse order that they are registered.
+
+```
+$ python3 contextlib_exitstack_callbacks.py
+closing callback((), {'arg3': 'val3'})
+closing callback(('arg1', 'arg2'), {})
+```
+
+The callbacks are invoked regardless of whether an error occurred, and they are not given any information about whether an error occurred. Their return value is ignored.
+
+```
+# contextlib_exitstack_callbacks_error.py
+import contextlib
+
+
+def callback(*args, **kwds):
+    print("closing callback({}, {})".format(args, kwds))
+
+
+try:
+    with contextlib.ExitStack() as stack:
+        stack.callback(callback, "arg1", "arg2")
+        stack.callback(callback, arg3="val3")
+        raise RuntimeError("thrown error")
+except RuntimeError as err:
+    print("ERROR: {}".format(err))
+```
+
+Because they do not have access to the error, callbacks are unable to suppress exceptions from propagating through the rest of the stack of context managers.
+
+```
+$ python3 contextlib_exitstack_callbacks_error.py
+closing callback((), {'arg3': 'val3'})
+closing callback(('arg1', 'arg2'), {})
+ERROR: thrown error
+```
+
+Callbacks make a convenient way to clearly define cleanup logic without the overhead of creating a new context manager class. To improve code readability, that logic can be encapsulated in an inline function, and callback() can be used as a decorator.
+
+```
+# contextlib_exitstack_callbacks_decorator.py
+import contextlib
+
+
+with contextlib.ExitStack() as stack:
+
+    @stack.callback
+    def inline_cleanup():
+        print("inline_cleanup()")
+        print("local_resource = {!r}".format(local_resource))
+
+    local_resource = "resource created in context"
+    print("within the context")
+```
+
+There is no way to specify the arguments for functions registered using the decorator form of callback(). However, if the cleanup callback is defined inline, scope rules give it access to variables defined in the calling code.
+
+```
+$ python3 contextlib_exitstack_callbacks_decorator.py
+within the context
+inline_cleanup()
+local_resource = 'resource created in context'
+```
