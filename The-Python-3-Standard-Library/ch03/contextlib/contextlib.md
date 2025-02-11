@@ -373,3 +373,69 @@ Error handling example:
   close()
   Had an error: error message
 ```
+
+### 3.4.5 Ignoring Exceptions
+
+It is frequently useful to ignore exceptions raised by libraries, because the error indicates that the desired state has already been achieved, or it can otherwise be ignored. The most common way to ignore exceptions is with a try:except statement with only a pass statement in the except block.
+
+```
+# contextlib_ignore_error.py
+import contextlib
+
+
+class NonFatalError(Exception):
+    pass
+
+
+def non_idempotent_operation():
+    raise NonFatalError("The operation failed because of existing state")
+
+
+try:
+    print("trying non-idempotent operation")
+    non_idempotent_operation()
+    print("succeeded!")
+except NonFatalError:
+    pass
+
+print("done")
+```
+
+In this case, the operation fails and the error is ignored.
+
+```
+$ python3 contextlib_ignore_error.py
+trying non-idempotent operation
+done
+```
+
+The try:except form can be replaced with contextlib.suppress() to more explicitly suppress a class of exceptions happening anywhere in the with block.
+
+```
+# contextlib_suppress.py
+import contextlib
+
+
+class NonFatalError(Exception):
+    pass
+
+
+def non_idempotent_operation():
+    raise NonFatalError("The operation failed because of existing state")
+
+
+with contextlib.suppress(NonFatalError):
+    print("trying non-idempotent operation")
+    non_idempotent_operation()
+    print("succeeded!")
+
+print("done")
+```
+
+In this updated version, the exception is discarded entirely.
+
+```
+$ python3 contextlib_suppress.py
+trying non-idempotent operation
+done
+```
