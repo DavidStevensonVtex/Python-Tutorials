@@ -439,3 +439,38 @@ $ python3 contextlib_suppress.py
 trying non-idempotent operation
 done
 ```
+
+### 3.4.6 Redirecting Output Streams
+
+Poorly designed library code may write directly to sys.stdout or sys.stderr, without providing arguments to configure different output destinations. The redirect_stdout() and redirect_stderr() context managers can be used to capture output from functions like this, for which the source cannot be changed to accept a new output argument.
+
+```
+# contextlib_redirect.py
+from contextlib import redirect_stdout, redirect_stderr
+import io
+import sys
+
+
+def misbehaving_function(a):
+    sys.stdout.write("(stdout) A: {!r}\n".format(a))
+    sys.stderr.write("(stderr) A: {!r}\n".format(a))
+
+
+capture = io.StringIO()
+with redirect_stdout(capture), redirect_stderr(capture):
+    misbehaving_function(5)
+
+print(capture.getvalue())
+```
+
+In this example, misbehaving_function() writes to both stdout and stderr, but the two context managers send that output to the same io.StringIO instance where it is saved to be used later.
+
+```
+$ python3 contextlib_redirect.py
+(stdout) A: 5
+(stderr) A: 5
+```
+
+Note
+
+Both redirect_stdout() and redirect_stderr() modify global state by replacing objects in the sys module, and should be used with care. The functions are not thread-safe, and may interfere with other operations that expect the standard output streams to be attached to terminal devices.
