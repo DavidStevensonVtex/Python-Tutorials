@@ -73,3 +73,41 @@ time:
     resolution    : 1e-09
     current       : 1739390998.1144085
 ```
+
+### 4.1.2 Wall Clock Time
+
+One of the core functions of the time module is time(), which returns the number of seconds since the start of the “epoch” as a floating point value.
+
+```
+# time_time.py
+import time
+
+print("The time is:", time.time())
+```
+
+The epoch is the start of measurement for time, which for Unix systems is 0:00 on January 1, 1970. Although the value is always a float, actual precision is platform-dependent.
+
+```
+$ python3 time_time.py
+The time is: 1739391320.1193054
+```
+
+The float representation is useful when storing or comparing dates, but not as useful for producing human readable representations. For logging or printing time ctime() can be more useful.
+
+```
+# time_ctime.py
+import time
+
+print("The time is      :", time.ctime())
+later = time.time() + 15
+print("15 secs from now :", time.ctime(later))
+```
+
+The second print() call in this example shows how to use ctime() to format a time value other than the current time.
+
+```
+$ python3 time_ctime.py
+The time is      : Wed Feb 12 15:17:37 2025
+15 secs from now : Wed Feb 12 15:17:52 2025
+```
+
