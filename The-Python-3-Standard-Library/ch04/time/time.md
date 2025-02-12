@@ -111,3 +111,27 @@ The time is      : Wed Feb 12 15:17:37 2025
 15 secs from now : Wed Feb 12 15:17:52 2025
 ```
 
+### 4.1.3 Monotonic Clocks
+
+Because time() looks at the system clock, and the system clock can be changed by the user or system services for synchronizing clocks across multiple computers, calling time() repeatedly may produce values that go forwards and backwards. This can result in unexpected behavior when trying to measure durations or otherwise use those times for computation. Avoid those situations by using monotonic(), which always returns values that go forward.
+
+```
+# time_monotonic.py
+import time
+
+start = time.monotonic()
+time.sleep(0.1)
+end = time.monotonic()
+print("start : {:>9.2f}".format(start))
+print("end   : {:>9.2f}".format(end))
+print("span  : {:>9.2f}".format(end - start))
+```
+
+The start point for the monotonic clock is not defined, so return values are only useful for doing calculations with other clock values. In this example the duration of the sleep is measured using monotonic().
+
+```
+$ python3 time_monotonic.py
+start :  27249.98
+end   :  27250.08
+span  :      0.10
+```
