@@ -322,3 +322,43 @@ $ python3 datetime_timedelta_math.py
 1/4 day  : 6:00:00
 meetings per day : 7.0
 ```
+
+### 4.2.5 Comparing Values
+
+Both date and time values can be compared using the standard comparison operators to determine which is earlier or later.
+
+```
+# datetime_comparing.py
+import datetime
+import time
+
+print("Times:")
+t1 = datetime.time(12, 55, 0)
+print("  t1:", t1)
+t2 = datetime.time(13, 5, 0)
+print("  t2:", t2)
+print("  t1 < t2:", t1 < t2)
+
+print()
+print("Dates:")
+d1 = datetime.date.today()
+print("  d1:", d1)
+d2 = datetime.date.today() + datetime.timedelta(days=1)
+print("  d2:", d2)
+print("  d1 > d2:", d1 > d2)
+```
+
+All comparison operators are supported.
+
+```
+$ python3 datetime_comparing.py
+Times:
+  t1: 12:55:00
+  t2: 13:05:00
+  t1 < t2: True
+
+Dates:
+  d1: 2025-02-13
+  d2: 2025-02-14
+  d1 > d2: False
+```
