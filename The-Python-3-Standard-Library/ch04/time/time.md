@@ -240,3 +240,60 @@ Thu Feb 13 14:07:33 2025 : 0.264 0.777
 Thu Feb 13 14:07:33 2025 : 0.260 1.037
 Thu Feb 13 14:07:34 2025 : 0.291 1.329
 ```
+
+### 4.1.6 Time Components
+
+Storing times as elapsed seconds is useful in some situations, but there are times when a program needs to have access to the individual fields of a date (year, month, etc.). The time module defines struct_time for holding date and time values with components broken out so they are easy to access. There are several functions that work with struct_time values instead of floats.
+
+```
+# time_struct.py
+import time
+
+
+def show_struct(s):
+    print("  tm_year :", s.tm_year)
+    print("  tm_mon  :", s.tm_mon)
+    print("  tm_mday :", s.tm_mday)
+    print("  tm_hour :", s.tm_hour)
+    print("  tm_min  :", s.tm_min)
+    print("  tm_sec  :", s.tm_sec)
+    print("  tm_wday :", s.tm_wday)
+    print("  tm_yday :", s.tm_yday)
+    print("  tm_isdst:", s.tm_isdst)
+
+
+print("gmtime:")
+show_struct(time.gmtime())
+print("\nlocaltime:")
+show_struct(time.localtime())
+print("\nmktime:", time.mktime(time.localtime()))
+```
+
+The gmtime() function returns the current time in UTC. localtime() returns the current time with the current time zone applied. mktime() takes a struct_time and converts it to the floating point representation.
+
+```
+$ python3 time_struct.py
+gmtime:
+  tm_year : 2025
+  tm_mon  : 2
+  tm_mday : 13
+  tm_hour : 19
+  tm_min  : 10
+  tm_sec  : 30
+  tm_wday : 3
+  tm_yday : 44
+  tm_isdst: 0
+
+localtime:
+  tm_year : 2025
+  tm_mon  : 2
+  tm_mday : 13
+  tm_hour : 14
+  tm_min  : 10
+  tm_sec  : 30
+  tm_wday : 3
+  tm_yday : 44
+  tm_isdst: 0
+
+mktime: 1739473830.0
+```
