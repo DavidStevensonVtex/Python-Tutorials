@@ -358,3 +358,63 @@ Europe/Amsterdam :
   DST   : 1
   Time  : Thu Feb 13 20:21:31 2025
 ```
+
+### 4.1.8 Parsing and Formatting Times
+
+The two functions strptime() and strftime() convert between struct_time and string representations of time values. There is a long list of formatting instructions available to support input and output in different styles. The complete list is documented in the library documentation for the time module.
+
+This example converts the current time from a string to a struct_time instance and back to a string.
+
+```
+# time_strptime.py
+import time
+
+
+def show_struct(s):
+    print("  tm_year :", s.tm_year)
+    print("  tm_mon  :", s.tm_mon)
+    print("  tm_mday :", s.tm_mday)
+    print("  tm_hour :", s.tm_hour)
+    print("  tm_min  :", s.tm_min)
+    print("  tm_sec  :", s.tm_sec)
+    print("  tm_wday :", s.tm_wday)
+    print("  tm_yday :", s.tm_yday)
+    print("  tm_isdst:", s.tm_isdst)
+
+
+now = time.ctime(1483391847.433716)
+print("Now:", now)
+
+parsed = time.strptime(now)
+print("\nParsed:")
+show_struct(parsed)
+
+print("\nFormatted:", time.strftime("%a %b %d %H:%M:%S %Y", parsed))
+```
+
+The output string is not exactly like the input, since the day of the month is prefixed with a zero.
+
+```
+$ python3 time_strptime.py
+Now: Mon Jan  2 16:17:27 2017
+
+Parsed:
+  tm_year : 2017
+  tm_mon  : 1
+  tm_mday : 2
+  tm_hour : 16
+  tm_min  : 17
+  tm_sec  : 27
+  tm_wday : 0
+  tm_yday : 2
+  tm_isdst: -1
+
+Formatted: Mon Jan 02 16:17:27 2017
+```
+
+### See also
+
+* [Standard library documentation for time](https://docs.python.org/3/library/time.html)
+* [Python 2 to 3 porting notes for time](https://pymotw.com/3/porting_notes.html#porting-time)
+* [datetime](https://pymotw.com/3/datetime/index.html#module-datetime) – The datetime module includes other classes for doing calculations with dates and times.
+* [calendar](https://pymotw.com/3/calendar/index.html#module-calendar) – Work with higher-level date functions to produce calendars or calculate recurring events.
