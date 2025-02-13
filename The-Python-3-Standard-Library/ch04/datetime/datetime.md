@@ -255,3 +255,70 @@ $ python3 datetime_timedelta_total_seconds.py
 1 day, 0:00:00  =  86400.0 seconds
 7 days, 0:00:00 = 604800.0 seconds
 ```
+
+### 4.2.4 Date Arithmetic
+
+Date math uses the standard arithmetic operators.
+
+```
+# datetime_date_math.py
+import datetime
+
+today = datetime.date.today()
+print("Today    :", today)
+
+one_day = datetime.timedelta(days=1)
+print("One day  :", one_day)
+
+yesterday = today - one_day
+print("Yesterday:", yesterday)
+
+tomorrow = today + one_day
+print("Tomorrow :", tomorrow)
+
+print()
+print("tomorrow - yesterday:", tomorrow - yesterday)
+print("yesterday - tomorrow:", yesterday - tomorrow)
+```
+
+This example with date objects illustrates using timedelta objects to compute new dates, and subtracting date instances to produce timedeltas (including a negative delta value).
+
+```
+$ python3 datetime_date_math.py
+Today    : 2025-02-13
+One day  : 1 day, 0:00:00
+Yesterday: 2025-02-12
+Tomorrow : 2025-02-14
+
+tomorrow - yesterday: 2 days, 0:00:00
+yesterday - tomorrow: -2 days, 0:00:00
+```
+
+A timedelta object also supports arithmetic with integers, floats, and other timedelta instances.
+
+```
+# datetime_timedelta_math.py
+import datetime
+
+one_day = datetime.timedelta(days=1)
+print("1 day    :", one_day)
+print("5 days   :", one_day * 5)
+print("1.5 days :", one_day * 1.5)
+print("1/4 day  :", one_day / 4)
+
+# assume an hour for lunch
+work_day = datetime.timedelta(hours=7)
+meeting_length = datetime.timedelta(hours=1)
+print("meetings per day :", work_day / meeting_length)
+```
+
+In this example, several multiples of a single day are computed, with the resulting timedelta holding the appropriate number of days or hours. The final example demonstrates how to compute values by combining two timedelta objects. In this case, the result is a floating point number.
+
+```
+$ python3 datetime_timedelta_math.py
+1 day    : 1 day, 0:00:00
+5 days   : 5 days, 0:00:00
+1.5 days : 1 day, 12:00:00
+1/4 day  : 6:00:00
+meetings per day : 7.0
+```
