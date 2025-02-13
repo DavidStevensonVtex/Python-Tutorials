@@ -432,3 +432,81 @@ t : 01:02:03
 d : 2025-02-13
 dt: 2025-02-13 01:02:03
 ```
+
+### 4.2.7 Formatting and Parsing
+
+The default string representation of a datetime object uses the ISO-8601 format (YYYY-MM-DDTHH:MM:SS.mmmmmm). Alternate formats can be generated using strftime().
+
+```
+# datetime_datetime_strptime.py
+import datetime
+
+format = "%a %b %d %H:%M:%S %Y"
+
+today = datetime.datetime.today()
+print("ISO     :", today)
+
+s = today.strftime(format)
+print("strftime:", s)
+
+d = datetime.datetime.strptime(s, format)
+print("strptime:", d.strftime(format))
+```
+
+Use datetime.strptime() to convert formatted strings to datetime instances.
+
+```
+$ python3 datetime_datetime_strptime.py
+ISO     : 2025-02-13 15:30:03.819105
+strftime: Thu Feb 13 15:30:03 2025
+strptime: Thu Feb 13 15:30:03 2025
+```
+
+The same formatting codes can be used with Python’s [string formatting mini-language](https://docs.python.org/3.5/library/string.html#formatspec) by placing them after the : in the field specification of the format string.
+
+```
+# datetime_format.py
+import datetime
+
+today = datetime.datetime.today()
+print("ISO     :", today)
+print("format(): {:%a %b %d %H:%M:%S %Y}".format(today))
+```
+
+Each datetime format code must still be prefixed with \%, and subsequent colons are treated as literal characters to include in the output.
+
+```
+$ python3 datetime_format.py
+ISO     : 2025-02-13 15:33:37.044782
+format(): Thu Feb 13 15:33:37 2025
+```
+
+The following table demonstrates all of the formatting codes for 5:00 PM January 13, 2016 in the US/Eastern time zone.
+
+strptime/strftime format codes
+
+Symbol	Meaning	Example
+
+* \%a	Abbreviated weekday name	'Wed'
+* \%A	Full weekday name	'Wednesday'
+* \%w	Weekday number – 0 (Sunday) through 6 (Saturday)	'3'
+* \%d	Day of the month (zero padded)	'13'
+* \%b	Abbreviated month name	'Jan'
+* \%B	Full month name	'January'
+* \%m	Month of the year	'01'
+* \%y	Year without century	'16'
+* \%Y	Year with century	'2016'
+* \%H	Hour from 24-hour clock	'17'
+* \%I	Hour from 12-hour clock	'05'
+* \%p	AM/PM	'PM'
+* \%M	Minutes	'00'
+* \%S	Seconds	'00'
+* \%f	Microseconds	'000000'
+* \%z	UTC offset for time zone-aware objects	'-0500'
+* \%Z	Time Zone name	'EST'
+* \%j	Day of the year	'013'
+* \%W	Week of the year	'02'
+* \%c	Date and time representation for the current locale	'Wed Jan 13 17:00:00 2016'
+* \%x	Date representation for the current locale	'01/13/16'
+* \%X	Time representation for the current locale	'17:00:00'
+* \%\%	A literal % character	'%'
