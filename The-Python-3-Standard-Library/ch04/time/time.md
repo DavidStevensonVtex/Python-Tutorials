@@ -203,3 +203,40 @@ Thu Feb 13 14:03:33 2025 - 1739473413.07 - 0.03
 ```
 
 Calling sleep() yields control from the current thread and asks it to wait for the system to wake it back up. If a program has only one thread, this effectively blocks the app and it does no work.
+
+### 4.1.5 Performance Counter
+
+It is important to have a high-resolution monotonic clock for measuring performance. Determining the best clock data source requires platform-specific knowledge, which Python provides in perf_counter().
+
+```
+# time_perf_counter.py
+import hashlib
+import time
+
+# Data to use to calculate md5 checksums
+data = open(__file__, "rb").read()
+
+loop_start = time.perf_counter()
+
+for i in range(5):
+    iter_start = time.perf_counter()
+    h = hashlib.sha1()
+    for i in range(300000):
+        h.update(data)
+    cksum = h.digest()
+    now = time.perf_counter()
+    loop_elapsed = now - loop_start
+    iter_elapsed = now - iter_start
+    print(time.ctime(), ": {:0.3f} {:0.3f}".format(iter_elapsed, loop_elapsed))
+```
+
+As with monotonic(), the epoch for perf_counter() is undefined, and the values are meant to be used for comparing and computing values, not as absolute times.
+
+```
+$ python3 time_perf_counter.py
+Thu Feb 13 14:07:33 2025 : 0.257 0.257
+Thu Feb 13 14:07:33 2025 : 0.256 0.513
+Thu Feb 13 14:07:33 2025 : 0.264 0.777
+Thu Feb 13 14:07:33 2025 : 0.260 1.037
+Thu Feb 13 14:07:34 2025 : 0.291 1.329
+```
