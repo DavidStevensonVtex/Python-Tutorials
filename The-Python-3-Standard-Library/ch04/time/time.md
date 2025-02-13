@@ -297,3 +297,64 @@ localtime:
 
 mktime: 1739473830.0
 ```
+
+### 4.1.7 Working with Time Zones
+
+The functions for determining the current time depend on having the time zone set, either by the program or by using a default time zone set for the system. Changing the time zone does not change the actual time, just the way it is represented.
+
+To change the time zone, set the environment variable TZ, then call tzset(). The time zone can be specified with a lot of detail, right down to the start and stop times for daylight savings time. It is usually easier to use the time zone name and let the underlying libraries derive the other information, though.
+
+This example program changes the time zone to a few different values and shows how the changes affect other settings in the time module.
+
+```
+# time_timezone.py
+import time
+import os
+
+
+def show_zone_info():
+    print("  TZ    :", os.environ.get("TZ", "(not set)"))
+    print("  tzname:", time.tzname)
+    print("  Zone  : {} ({})".format(time.timezone, (time.timezone / 3600)))
+    print("  DST   :", time.daylight)
+    print("  Time  :", time.ctime())
+    print()
+
+
+print("Default :")
+show_zone_info()
+
+ZONES = ["GMT", "Europe/Amsterdam"]
+
+for zone in ZONES:
+    os.environ["TZ"] = zone
+    time.tzset()
+    print(zone, ":")
+    show_zone_info()
+```
+
+The default time zone on the system used to prepare the examples is US/Eastern. The other zones in the example change the tzname, daylight flag, and timezone offset value.
+
+```
+$ python3 time_timezone.py
+Default :
+  TZ    : (not set)
+  tzname: ('EST', 'EDT')
+  Zone  : 18000 (5.0)
+  DST   : 1
+  Time  : Thu Feb 13 14:21:31 2025
+
+GMT :
+  TZ    : GMT
+  tzname: ('GMT', 'GMT')
+  Zone  : 0 (0.0)
+  DST   : 0
+  Time  : Thu Feb 13 19:21:31 2025
+
+Europe/Amsterdam :
+  TZ    : Europe/Amsterdam
+  tzname: ('CET', 'CEST')
+  Zone  : -3600 (-1.0)
+  DST   : 1
+  Time  : Thu Feb 13 20:21:31 2025
+```
