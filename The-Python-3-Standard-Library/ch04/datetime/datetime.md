@@ -509,4 +509,52 @@ Symbol	Meaning	Example
 * \%c	Date and time representation for the current locale	'Wed Jan 13 17:00:00 2016'
 * \%x	Date representation for the current locale	'01/13/16'
 * \%X	Time representation for the current locale	'17:00:00'
-* \%\%	A literal % character	'%'
+* \%\%	A literal % character	'\%'
+
+### 4.2.8 Time Zones
+
+Within datetime, time zones are represented by subclasses of tzinfo. Since tzinfo is an abstract base class, applications need to define a subclass and provide appropriate implementations for a few methods to make it useful.
+
+datetime does include a somewhat naive implementation in the class timezone that uses a fixed offset from UTC, and does not support different offset values on different days of the year, such as where daylight savings time applies, or where the offset from UTC has changed over time.
+
+```
+# datetime_timezone.py
+import datetime
+
+min6 = datetime.timezone(datetime.timedelta(hours=-6))
+plus6 = datetime.timezone(datetime.timedelta(hours=6))
+d = datetime.datetime.now(min6)
+
+print(min6, ":", d)
+print(datetime.timezone.utc, ":", d.astimezone(datetime.timezone.utc))
+print(plus6, ":", d.astimezone(plus6))
+
+# convert to the current system timezone
+d_system = d.astimezone()
+print(d_system.tzinfo, "      :", d_system)
+```
+
+To convert a datetime value from one time zone to another, use astimezone(). In the example above, two separate time zones 6 hours on either side of UTC are shown, and the utc instance from datetime.timezone is also used for reference. The final output line shows the value in the system timezone, acquired by calling astimezone() with no argument.
+
+```
+$ python3 datetime_timezone.py
+UTC-06:00 : 2025-02-13 14:38:51.413288-06:00
+UTC : 2025-02-13 20:38:51.413288+00:00
+UTC+06:00 : 2025-02-14 02:38:51.413288+06:00
+EST       : 2025-02-13 15:38:51.413288-05:00
+```
+
+Note
+
+The third party module [pytz](https://pypi.org/project/pytz/) is a better implementation for time zones. It supports named time zones, and the offset database is kept up to date as changes are made by political bodies around the world.
+
+### See also
+
+* [Standard library documentation for datetime](https://docs.python.org/3/library/datetime.html)
+* [Python 2 to 3 porting notes for datetime](https://pymotw.com/3/porting_notes.html#porting-datetime)
+* [calendar](https://pymotw.com/3/calendar/index.html#module-calendar) – The calendar module.
+* [time](https://pymotw.com/3/time/index.html#module-time) – The time module.
+* [dateutil](https://labix.org/python-dateutil) – dateutil from Labix extends the datetime module with additional features.
+* [pytz](https://pypi.org/project/pytz/) – World Time Zone database and classes for making datetime objects time zone-aware.
+* [WikiPedia: Proleptic Gregorian calendar](https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar) – A description of the Gregorian calendar system.
+* [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) – The standard for numeric representation of Dates and Time
