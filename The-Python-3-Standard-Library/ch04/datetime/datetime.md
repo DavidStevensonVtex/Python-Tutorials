@@ -362,3 +362,73 @@ Dates:
   d2: 2025-02-14
   d1 > d2: False
 ```
+
+### 4.2.6 Combining Dates and Times
+
+Use the datetime class to hold values consisting of both date and time components. As with date, there are several convenient class methods to make creating datetime instances from other common values.
+
+```
+# datetime_datetime.py
+import datetime
+
+print("Now    :", datetime.datetime.now())
+print("Today  :", datetime.datetime.today())
+print("UTC Now:", datetime.datetime.utcnow())
+print()
+
+FIELDS = [
+    "year",
+    "month",
+    "day",
+    "hour",
+    "minute",
+    "second",
+    "microsecond",
+]
+
+d = datetime.datetime.now()
+for attr in FIELDS:
+    print("{:15}: {}".format(attr, getattr(d, attr)))
+```
+
+As might be expected, the datetime instance has all of the attributes of both a date and a time object.
+
+```
+$ python3 datetime_datetime.py
+Now    : 2025-02-13 15:22:52.411374
+Today  : 2025-02-13 15:22:52.411441
+UTC Now: 2025-02-13 20:22:52.411463
+
+year           : 2025
+month          : 2
+day            : 13
+hour           : 15
+minute         : 22
+second         : 52
+microsecond    : 411489
+```
+
+Just as with date, datetime provides convenient class methods for creating new instances. It also includes fromordinal() and fromtimestamp().
+
+```
+# datetime_datetime_combine.py
+import datetime
+
+t = datetime.time(1, 2, 3)
+print("t :", t)
+
+d = datetime.date.today()
+print("d :", d)
+
+dt = datetime.datetime.combine(d, t)
+print("dt:", dt)
+```
+
+combine() creates datetime instances from one date and one time instance.
+
+```
+$ python3 datetime_datetime_combine.py
+t : 01:02:03
+d : 2025-02-13
+dt: 2025-02-13 01:02:03
+```
