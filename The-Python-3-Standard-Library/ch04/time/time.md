@@ -135,3 +135,71 @@ start :  27249.98
 end   :  27250.08
 span  :      0.10
 ```
+
+### 4.1.4 Processor Clock Time
+
+While time() returns a wall clock time, process_time() returns processor clock time. The values returned from process_time() reflect the actual time used by the program as it runs.
+
+```
+# time_process_time.py
+import hashlib
+import time
+
+# Data to use to calculate md5 checksums
+print(__file__)
+data = open(__file__, "rb").read()
+
+for i in range(5):
+    h = hashlib.sha1()
+    print(time.ctime(), ": {:0.3f} {:0.3f}".format(time.time(), time.process_time()))
+    for i in range(300000):
+        h.update(data)
+    cksum = h.digest()
+```
+
+In this example, the formatted ctime() is printed along with the floating point values from time(), and clock() for each iteration through the loop.
+
+Note
+
+If you want to run the example on your system, you may have to add more cycles to the inner loop or work with a larger amount of data to actually see a difference in the times.
+
+```
+$ python3 time_process_time.py
+time_process_time.py
+Thu Feb 13 14:00:00 2025 : 1739473200.238 0.032
+Thu Feb 13 14:00:00 2025 : 1739473200.501 0.295
+Thu Feb 13 14:00:00 2025 : 1739473200.702 0.496
+Thu Feb 13 14:00:00 2025 : 1739473200.894 0.688
+Thu Feb 13 14:00:01 2025 : 1739473201.087 0.882
+```
+
+Typically, the processor clock does not tick if a program is not doing anything.
+
+```
+# time_clock_sleep.py
+import time
+
+template = "{} - {:0.2f} - {:0.2f}"
+
+print(template.format(time.ctime(), time.time(), time.process_time()))
+
+for i in range(3, 0, -1):
+    print("Sleeping", i)
+    time.sleep(i)
+    print(template.format(time.ctime(), time.time(), time.process_time()))
+```
+
+In this example, the loop does very little work by going to sleep after each iteration. The time() value increases even while the application is asleep, but the process_time() value does not.
+
+```
+$ python3 -u time_clock_sleep.py
+Thu Feb 13 14:03:27 2025 - 1739473407.07 - 0.03
+Sleeping 3
+Thu Feb 13 14:03:30 2025 - 1739473410.07 - 0.03
+Sleeping 2
+Thu Feb 13 14:03:32 2025 - 1739473412.07 - 0.03
+Sleeping 1
+Thu Feb 13 14:03:33 2025 - 1739473413.07 - 0.03
+```
+
+Calling sleep() yields control from the current thread and asks it to wait for the system to wake it back up. If a program has only one thread, this effectively blocks the app and it does no work.
