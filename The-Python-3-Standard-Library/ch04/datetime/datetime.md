@@ -77,3 +77,120 @@ $ python3 datetime_time_resolution.py
 ERROR: integer argument expected, got float
 ERROR: integer argument expected, got float
 ```
+
+### 4.2.2 Dates
+
+Calendar date values are represented with the date class. Instances have attributes for year, month, and day. It is easy to create a date representing the current date using the `today()` class method.
+
+```
+# datetime_date.py
+import datetime
+
+today = datetime.date.today()
+print(today)
+print("ctime  :", today.ctime())
+tt = today.timetuple()
+print(tt)
+print("tuple  : tm_year  =", tt.tm_year)
+print("         tm_mon   =", tt.tm_mon)
+print("         tm_mday  =", tt.tm_mday)
+print("         tm_hour  =", tt.tm_hour)
+print("         tm_min   =", tt.tm_min)
+print("         tm_sec   =", tt.tm_sec)
+print("         tm_wday  =", tt.tm_wday)
+print("         tm_yday  =", tt.tm_yday)
+print("         tm_isdst =", tt.tm_isdst)
+print("ordinal:", today.toordinal())
+print("Year   :", today.year)
+print("Mon    :", today.month)
+print("Day    :", today.day)
+```
+
+This example prints the current date in several formats:
+
+```
+$ python3 datetime_date.py
+2025-02-13
+ctime  : Thu Feb 13 00:00:00 2025
+time.struct_time(tm_year=2025, tm_mon=2, tm_mday=13, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=3, tm_yday=44, tm_isdst=-1)
+tuple  : tm_year  = 2025
+         tm_mon   = 2
+         tm_mday  = 13
+         tm_hour  = 0
+         tm_min   = 0
+         tm_sec   = 0
+         tm_wday  = 3
+         tm_yday  = 44
+         tm_isdst = -1
+ordinal: 739295
+Year   : 2025
+Mon    : 2
+Day    : 13
+```
+
+There are also class methods for creating instances from POSIX timestamps or integers representing date values from the Gregorian calendar, where January 1 of the year 1 is 1 and each subsequent day increments the value by 1.
+
+```
+# datetime_date_fromordinal.py
+import datetime
+import time
+
+o = 733114
+print("o               :", o)
+print("fromordinal(o)  :", datetime.date.fromordinal(o))
+
+t = time.time()
+print("t               :", t)
+print("fromtimestamp(t):", datetime.date.fromtimestamp(t))
+```
+
+This example illustrates the different value types used by fromordinal() and fromtimestamp().
+
+```
+$ python3 datetime_date_fromordinal.py
+o               : 733114
+fromordinal(o)  : 2008-03-13
+t               : 1739476601.2556498
+fromtimestamp(t): 2025-02-13
+```
+
+As with time, the range of date values supported can be determined using the min and max attributes.
+
+```
+# datetime_date_minmax.py
+import datetime
+
+print("Earliest  :", datetime.date.min)
+print("Latest    :", datetime.date.max)
+print("Resolution:", datetime.date.resolution)
+```
+
+The resolution for dates is whole days.
+
+```
+$ python3 datetime_date_minmax.py
+Earliest  : 0001-01-01
+Latest    : 9999-12-31
+Resolution: 1 day, 0:00:00
+```
+
+Another way to create new date instances uses the replace() method of an existing date.
+
+```
+# datetime_date_replace.py
+import datetime
+
+d1 = datetime.date(2008, 3, 29)
+print("d1:", d1.ctime())
+
+d2 = d1.replace(year=2009)
+print("d2:", d2.ctime())
+```
+
+This example changes the year, leaving the day and month unmodified.
+
+```
+$ python3 datetime_date_replace.py
+d1: Sat Mar 29 00:00:00 2008
+d2: Sun Mar 29 00:00:00 2009
+```
