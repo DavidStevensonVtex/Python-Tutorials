@@ -194,3 +194,64 @@ $ python3 datetime_date_replace.py
 d1: Sat Mar 29 00:00:00 2008
 d2: Sun Mar 29 00:00:00 2009
 ```
+
+### 4.2.3 timedeltas
+
+Future and past dates can be calculated using basic arithmetic on two datetime objects, or by combining a datetime with a timedelta. Subtracting dates produces a timedelta, and a timedelta can be added or subtracted from a date to produce another date. The internal values for a timedelta are stored in days, seconds, and microseconds.
+
+```
+# datetime_timedelta.py
+import datetime
+
+print("microseconds:", datetime.timedelta(microseconds=1))
+print("milliseconds:", datetime.timedelta(milliseconds=1))
+print("seconds     :", datetime.timedelta(seconds=1))
+print("minutes     :", datetime.timedelta(minutes=1))
+print("hours       :", datetime.timedelta(hours=1))
+print("days        :", datetime.timedelta(days=1))
+print("weeks       :", datetime.timedelta(weeks=1))
+```
+
+Intermediate level values passed to the constructor are converted into days, seconds, and microseconds.
+
+```
+$ python3 datetime_timedelta.py
+microseconds: 0:00:00.000001
+milliseconds: 0:00:00.001000
+seconds     : 0:00:01
+minutes     : 0:01:00
+hours       : 1:00:00
+days        : 1 day, 0:00:00
+weeks       : 7 days, 0:00:00
+```
+
+The full duration of a timedelta can be retrieved as a number of seconds using total_seconds().
+
+```
+# datetime_timedelta_total_seconds.py
+import datetime
+
+for delta in [
+    datetime.timedelta(microseconds=1),
+    datetime.timedelta(milliseconds=1),
+    datetime.timedelta(seconds=1),
+    datetime.timedelta(minutes=1),
+    datetime.timedelta(hours=1),
+    datetime.timedelta(days=1),
+    datetime.timedelta(weeks=1),
+]:
+    print("{:15} = {:8} seconds".format(str(delta), delta.total_seconds()))
+```
+
+The return value is a floating point number, to accommodate sub-second durations.
+
+```
+$ python3 datetime_timedelta_total_seconds.py
+0:00:00.000001  =    1e-06 seconds
+0:00:00.001000  =    0.001 seconds
+0:00:01         =      1.0 seconds
+0:01:00         =     60.0 seconds
+1:00:00         =   3600.0 seconds
+1 day, 0:00:00  =  86400.0 seconds
+7 days, 0:00:00 = 604800.0 seconds
+```
