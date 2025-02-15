@@ -152,6 +152,8 @@ The first day of the week is not part of the locale settings, and the value is t
 sudo dpkg-reconfigure locales
 ```
 
+Configure LC_ALL environment variable in .bashrc.
+
 ```
 $ python3 calendar_locale.py 
      July 2017
@@ -172,3 +174,84 @@ lu ma me je ve sa di
 24 25 26 27 28 29 30
 31
 ```
+
+### 4.3.3 Calculating Dates
+
+Although the calendar module focuses mostly on printing full calendars in various formats, it also provides functions useful for working with dates in other ways, such as calculating dates for a recurring event. For example, the Python Atlanta User’s Group meets on the second Thursday of every month. To calculate the dates for the meetings for a year, use the return value of monthcalendar().
+
+```
+# calendar_monthcalendar.py
+import calendar
+import pprint
+
+pprint.pprint(calendar.monthcalendar(2017, 7))
+```
+
+Some days have a 0 value. Those are days of the week that overlap with the given month, but that are part of another month.
+
+```
+$ python3 calendar_monthcalendar.py
+[[0, 0, 0, 0, 0, 1, 2],
+ [3, 4, 5, 6, 7, 8, 9],
+ [10, 11, 12, 13, 14, 15, 16],
+ [17, 18, 19, 20, 21, 22, 23],
+ [24, 25, 26, 27, 28, 29, 30],
+ [31, 0, 0, 0, 0, 0, 0]]
+```
+
+The first day of the week defaults to Monday. It is possible to change that by calling setfirstweekday(), but since the calendar module includes constants for indexing into the date ranges returned by monthcalendar(), it is more convenient to skip that step in this case.
+
+To calculate the group meeting dates for a year, assuming they are always on the second Thursday of every month, look at the output of monthcalendar() to find the dates on which Thursdays fall. The first and last week of the month are padded with 0 values as placeholders for the days falling in the preceding or subsequent month. For example, if a month starts on a Friday, the value in the first week in the Thursday position will be 0.
+
+```
+# calendar_secondthursday.py
+import calendar
+import sys
+
+year = int(sys.argv[1])
+
+# Show every month
+for month in range(1, 13):
+
+    # Compute the dates for each week that overlaps the month
+    c = calendar.monthcalendar(year, month)
+    first_week = c[0]
+    second_week = c[1]
+    third_week = c[2]
+
+    # If there is a Thursday in the first week,
+    # the second Thursday is # in the second week.
+    # Otherwise, the second Thursday must be in
+    # the third week.
+    if first_week[calendar.THURSDAY]:
+        meeting_date = second_week[calendar.THURSDAY]
+    else:
+        meeting_date = third_week[calendar.THURSDAY]
+
+    print("{:>3}: {:>2}".format(calendar.month_abbr[month], meeting_date))
+```
+
+So the meeting schedule for the year is:
+
+```
+$ python3 calendar_secondthursday.py 2017
+Jan: 12
+Feb:  9
+Mar:  9
+Apr: 13
+May: 11
+Jun:  8
+Jul: 13
+Aug: 10
+Sep: 14
+Oct: 12
+Nov:  9
+Dec: 14
+```
+
+### See also
+
+* [Standard library documentation for calendar](https://docs.python.org/3/library/calendar.html)
+* [time](https://pymotw.com/3/time/index.html#module-time) – Lower-level time functions.
+* [datetime](https://pymotw.com/3/datetime/index.html#module-datetime) – Manipulate date values, including timestamps and time zones.
+* [locale](https://pymotw.com/3/locale/index.html#module-locale) – Locale settings.
