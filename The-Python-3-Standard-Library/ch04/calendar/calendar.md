@@ -128,3 +128,47 @@ Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa
 ```
 
 The day_name, day_abbr, month_name, and month_abbr module attributes useful for producing custom formatted output (i.e., to include links in the HTML output). They are automatically configured correctly for the current locale.
+
+### 4.3.2 Locales
+
+To produce a calendar formatted for a locale other than the current default, use LocaleTextCalendar or LocaleHTMLCalendar.
+
+```
+# calendar_locale.py
+import calendar
+
+c = calendar.LocaleTextCalendar(locale="en_US")
+c.prmonth(2017, 7)
+
+print()
+
+c = calendar.LocaleTextCalendar(locale="fr_FR")
+c.prmonth(2017, 7)
+```
+
+The first day of the week is not part of the locale settings, and the value is taken from the argument to the calendar class just as with the regular TextCalendar.
+
+```
+sudo dpkg-reconfigure locales
+```
+
+```
+$ python3 calendar_locale.py 
+     July 2017
+Mo Tu We Th Fr Sa Su
+                1  2
+ 3  4  5  6  7  8  9
+10 11 12 13 14 15 16
+17 18 19 20 21 22 23
+24 25 26 27 28 29 30
+31
+
+    juillet 2017
+lu ma me je ve sa di
+                1  2
+ 3  4  5  6  7  8  9
+10 11 12 13 14 15 16
+17 18 19 20 21 22 23
+24 25 26 27 28 29 30
+31
+```
