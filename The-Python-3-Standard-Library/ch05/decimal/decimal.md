@@ -210,3 +210,57 @@ True
 ### 5.1.5 Context
 
 So far, all of the examples have used the default behaviors of the decimal module. It is possible to override settings such as the precision maintained, how rounding is performed, error handling, etc. by using a context. Contexts can be applied for all Decimal instances in a thread or locally within a small code region.
+
+#### 5.1.5.1 Current Context
+
+To retrieve the current global context, use getcontext.
+
+```
+# decimal_getcontext.py
+import decimal
+
+context = decimal.getcontext()
+
+print("Emax     =", context.Emax)
+print("Emin     =", context.Emin)
+print("capitals =", context.capitals)
+print("prec     =", context.prec)
+print("rounding =", context.rounding)
+print("flags    =")
+for f, v in context.flags.items():
+    print("  {}: {}".format(f, v))
+print("traps    =")
+for t, v in context.traps.items():
+    print("  {}: {}".format(t, v))
+```
+
+This example script shows the public properties of a Context.
+
+```
+$ python3 decimal_getcontext.py
+Emax     = 999999
+Emin     = -999999
+capitals = 1
+prec     = 28
+rounding = ROUND_HALF_EVEN
+flags    =
+  <class 'decimal.InvalidOperation'>: False
+  <class 'decimal.FloatOperation'>: False
+  <class 'decimal.DivisionByZero'>: False
+  <class 'decimal.Overflow'>: False
+  <class 'decimal.Underflow'>: False
+  <class 'decimal.Subnormal'>: False
+  <class 'decimal.Inexact'>: False
+  <class 'decimal.Rounded'>: False
+  <class 'decimal.Clamped'>: False
+traps    =
+  <class 'decimal.InvalidOperation'>: True
+  <class 'decimal.FloatOperation'>: False
+  <class 'decimal.DivisionByZero'>: True
+  <class 'decimal.Overflow'>: True
+  <class 'decimal.Underflow'>: False
+  <class 'decimal.Subnormal'>: False
+  <class 'decimal.Inexact'>: False
+  <class 'decimal.Rounded'>: False
+  <class 'decimal.Clamped'>: False
+```
