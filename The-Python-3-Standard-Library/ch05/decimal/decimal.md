@@ -289,3 +289,73 @@ $ python3 decimal_precision.py
 3 : 0.123456 0.123
 4 : 0.123456 0.1235
 ```
+
+#### 5.1.5.3 Rounding
+
+There are several options for rounding to keep values within the desired precision.
+
+* ROUND_CEILING Always round upwards towards infinity.
+* ROUND_DOWN Always round toward zero.
+* ROUND_FLOOR Always round down towards negative infinity.
+* ROUND_HALF_DOWN Rounds away from zero if the last significant digit is greater than or equal to 5, otherwise toward zero.
+* ROUND_HALF_EVEN Like ROUND_HALF_DOWN except that if the value is 5 then the preceding digit is examined. Even values cause the result to be rounded down and odd digits cause the result to be rounded up.
+* ROUND_HALF_UP Like ROUND_HALF_DOWN except if the last significant digit is 5 the value is rounded away from zero.
+* ROUND_UP Round away from zero.
+* ROUND_05UP Round away from zero if the last digit is 0 or 5, otherwise towards zero.
+
+```
+# decimal_rounding.py
+import decimal
+
+context = decimal.getcontext()
+
+ROUNDING_MODES = [
+    "ROUND_CEILING",
+    "ROUND_DOWN",
+    "ROUND_FLOOR",
+    "ROUND_HALF_DOWN",
+    "ROUND_HALF_EVEN",
+    "ROUND_HALF_UP",
+    "ROUND_UP",
+    "ROUND_05UP",
+]
+
+header_fmt = "{:10} " + " ".join(["{:^8}"] * 6)
+
+print(
+    header_fmt.format(
+        " ",
+        "1/8 (1)",
+        "-1/8 (1)",
+        "1/8 (2)",
+        "-1/8 (2)",
+        "1/8 (3)",
+        "-1/8 (3)",
+    )
+)
+for rounding_mode in ROUNDING_MODES:
+    print("{0:10}".format(rounding_mode.partition("_")[-1]), end=" ")
+    for precision in [1, 2, 3]:
+        context.prec = precision
+        context.rounding = getattr(decimal, rounding_mode)
+        value = decimal.Decimal(1) / decimal.Decimal(8)
+        print("{0:^8}".format(value), end=" ")
+        value = decimal.Decimal(-1) / decimal.Decimal(8)
+        print("{0:^8}".format(value), end=" ")
+    print()
+```
+
+This program shows the effect of rounding the same value to different levels of precision using the different algorithms.
+
+```
+$ python3 decimal_rounding.py
+           1/8 (1)  -1/8 (1) 1/8 (2)  -1/8 (2) 1/8 (3)  -1/8 (3)
+CEILING      0.2      -0.1     0.13    -0.12    0.125    -0.125  
+DOWN         0.1      -0.1     0.12    -0.12    0.125    -0.125  
+FLOOR        0.1      -0.2     0.12    -0.13    0.125    -0.125  
+HALF_DOWN    0.1      -0.1     0.12    -0.12    0.125    -0.125  
+HALF_EVEN    0.1      -0.1     0.12    -0.12    0.125    -0.125  
+HALF_UP      0.1      -0.1     0.13    -0.13    0.125    -0.125  
+UP           0.2      -0.2     0.13    -0.13    0.125    -0.125  
+05UP         0.1      -0.1     0.12    -0.12    0.125    -0.125  
+```
