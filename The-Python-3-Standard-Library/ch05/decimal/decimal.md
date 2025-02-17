@@ -388,3 +388,33 @@ Local precision: 2
 Default precision: 28
 3.14 / 3 = 1.046666666666666666666666667
 ```
+
+#### 5.1.5.5 Per-Instance Context
+
+Contexts also can be used to construct Decimal instances, which then inherit the precision and rounding arguments to the conversion from the context.
+
+```
+# decimal_instance_context.py
+import decimal
+
+# Set up a context with limited precision
+c = decimal.getcontext().copy()
+c.prec = 3
+
+# Create our constant
+pi = c.create_decimal("3.1415")
+
+# The constant value is rounded off
+print("PI    :", pi)
+
+# The result of using the constant uses the global context
+print("RESULT:", decimal.Decimal("2.01") * pi)
+```
+
+This lets an application select the precision of constant values separately from the precision of user data, for example.
+
+```
+$ python3 decimal_instance_context.py
+PI    : 3.14
+RESULT: 6.3114
+```
