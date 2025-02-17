@@ -62,3 +62,50 @@ $ python3 decimal_tuple.py
 Input  : (1, (1, 1), -2)
 Decimal: -0.11
 ```
+
+### 5.1.2 Formatting
+
+Decimal responds to Python’s [string formatting protocol](https://docs.python.org/3.5/library/string.html#formatspec), using the same syntax and options as other numerical types.
+
+```
+# decimal_format.py
+import decimal
+
+d = decimal.Decimal(1.1)
+print("Precision:")
+print("{:.1}".format(d))
+print("{:.2}".format(d))
+print("{:.3}".format(d))
+print("{:.18}".format(d))
+
+print("\nWidth and precision combined:")
+print("{:5.1f} {:5.1g}".format(d, d))
+print("{:5.2f} {:5.2g}".format(d, d))
+print("{:5.2f} {:5.2g}".format(d, d))
+
+print("\nZero padding:")
+print("{:05.1}".format(d))
+print("{:05.2}".format(d))
+print("{:05.3}".format(d))
+```
+
+The format strings can control the width of the output, the precision (number of significant digits), and how to pad the value to fill the width.
+
+```
+$ python3 decimal_format.py
+Precision:
+1
+1.1
+1.10
+1.10000000000000009
+
+Width and precision combined:
+  1.1     1
+ 1.10   1.1
+ 1.10   1.1
+
+Zero padding:
+00001
+001.1
+01.10
+```
