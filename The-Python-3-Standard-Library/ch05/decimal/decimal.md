@@ -359,3 +359,32 @@ HALF_UP      0.1      -0.1     0.13    -0.13    0.125    -0.125
 UP           0.2      -0.2     0.13    -0.13    0.125    -0.125  
 05UP         0.1      -0.1     0.12    -0.12    0.125    -0.125  
 ```
+
+#### 5.1.5.4 Local Context
+
+The context can be applied to a block of code using the with statement.
+
+```
+# decimal_context_manager.py
+import decimal
+
+with decimal.localcontext() as c:
+    c.prec = 2
+    print("Local precision:", c.prec)
+    print("3.14 / 3 =", (decimal.Decimal("3.14") / 3))
+
+print()
+print("Default precision:", decimal.getcontext().prec)
+print("3.14 / 3 =", (decimal.Decimal("3.14") / 3))
+```
+
+The Context supports the context manager API used by with, so the settings only apply within the block.
+
+```
+$ python3 decimal_context_manager.py
+Local precision: 2
+3.14 / 3 = 1.0
+
+Default precision: 28
+3.14 / 3 = 1.046666666666666666666666667
+```
