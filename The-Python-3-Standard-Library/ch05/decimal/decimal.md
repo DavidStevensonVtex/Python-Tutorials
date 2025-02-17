@@ -109,3 +109,65 @@ Zero padding:
 001.1
 01.10
 ```
+
+### 5.1.3 Arithmetic
+
+Decimal overloads the simple arithmetic operators so instances can be manipulated in much the same way as the built-in numeric types.
+
+```
+# decimal_operators.py
+import decimal
+
+a = decimal.Decimal("5.1")
+b = decimal.Decimal("3.14")
+c = 4
+d = 3.14
+
+print("a     =", repr(a))
+print("b     =", repr(b))
+print("c     =", repr(c))
+print("d     =", repr(d))
+print()
+
+print("a + b =", a + b)
+print("a - b =", a - b)
+print("a * b =", a * b)
+print("a / b =", a / b)
+print()
+
+print("a + c =", a + c)
+print("a - c =", a - c)
+print("a * c =", a * c)
+print("a / c =", a / c)
+print()
+
+print("a + d =", end=" ")
+try:
+    print(a + d)
+except TypeError as e:
+    print(e)
+```
+
+Decimal operators also accept integer arguments, but floating point values must be converted to Decimal instances.
+
+```
+$ python3 decimal_operators.py
+a     = Decimal('5.1')
+b     = Decimal('3.14')
+c     = 4
+d     = 3.14
+
+a + b = 8.24
+a - b = 1.96
+a * b = 16.014
+a / b = 1.624203821656050955414012739
+
+a + c = 9.1
+a - c = 1.1
+a * c = 20.4
+a / c = 1.275
+
+a + d = unsupported operand type(s) for +: 'decimal.Decimal' and 'float'
+```
+
+Beyond basic arithmetic, Decimal includes the methods to find the base 10 and natural logarithms. The return values from log10() and ln() are Decimal instances, so they can be used directly in formulas with other values.
