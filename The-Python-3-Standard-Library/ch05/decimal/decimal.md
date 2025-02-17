@@ -206,3 +206,7 @@ Infinity + 1: Infinity
 False
 True
 ```
+
+### 5.1.5 Context
+
+So far, all of the examples have used the default behaviors of the decimal module. It is possible to override settings such as the precision maintained, how rounding is performed, error handling, etc. by using a context. Contexts can be applied for all Decimal instances in a thread or locally within a small code region.
