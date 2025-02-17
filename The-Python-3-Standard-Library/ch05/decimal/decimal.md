@@ -171,3 +171,38 @@ a + d = unsupported operand type(s) for +: 'decimal.Decimal' and 'float'
 ```
 
 Beyond basic arithmetic, Decimal includes the methods to find the base 10 and natural logarithms. The return values from log10() and ln() are Decimal instances, so they can be used directly in formulas with other values.
+
+### 5.1.4 Special Values
+
+In addition to the expected numerical values, Decimal can represent several special values, including positive and negative values for infinity, “not a number”, and zero.
+
+```
+# decimal_special.py
+import decimal
+
+for value in ["Infinity", "NaN", "0"]:
+    print(decimal.Decimal(value), decimal.Decimal("-" + value))
+print()
+
+# Math with infinity
+print("Infinity + 1:", (decimal.Decimal("Infinity") + 1))
+print("-Infinity + 1:", (decimal.Decimal("-Infinity") + 1))
+
+# Print comparing NaN
+print(decimal.Decimal("NaN") == decimal.Decimal("Infinity"))
+print(decimal.Decimal("NaN") != decimal.Decimal(1))
+```
+
+Adding to infinite values returns another infinite value. Comparing for equality with NaN always returns false and comparing for inequality always returns true. Comparing for sort order against NaN is undefined and results in an error.
+
+```
+$ python3 decimal_special.py
+Infinity -Infinity
+NaN -NaN
+0 -0
+
+Infinity + 1: Infinity
+-Infinity + 1: -Infinity
+False
+True
+```
