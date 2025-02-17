@@ -418,3 +418,64 @@ $ python3 decimal_instance_context.py
 PI    : 3.14
 RESULT: 6.3114
 ```
+
+#### 5.1.5.6 Threads
+
+The “global” context is actually thread-local, so each thread can potentially be configured using different values.
+
+```
+# decimal_thread_context.py
+import decimal
+import threading
+from queue import PriorityQueue
+
+
+class Multiplier(threading.Thread):
+    def __init__(self, a, b, prec, q):
+        self.a = a
+        self.b = b
+        self.prec = prec
+        self.q = q
+        threading.Thread.__init__(self)
+
+    def run(self):
+        c = decimal.getcontext().copy()
+        c.prec = self.prec
+        decimal.setcontext(c)
+        self.q.put((self.prec, a * b))
+
+
+a = decimal.Decimal("3.14")
+b = decimal.Decimal("1.234")
+# A PriorityQueue will return values sorted by precision,
+# no matter what order the threads finish.
+q = PriorityQueue()
+threads = [Multiplier(a, b, i, q) for i in range(1, 6)]
+for t in threads:
+    t.start()
+
+for t in threads:
+    t.join()
+
+for i in range(5):
+    prec, value = q.get()
+    print("{}  {}".format(prec, value))
+```
+
+This example creates a new context using the specified, then installs it within each thread.
+
+```
+$ python3 decimal_thread_context.py
+1  4
+2  3.9
+3  3.87
+4  3.875
+5  3.8748
+```
+
+### See also
+
+* [Standard library documentation for decimal](https://docs.python.org/3/library/decimal.html)
+* [Python 2 to 3 porting notes for decimal](https://pymotw.com/3/porting_notes.html#porting-decimal)
+* [Wikipedia: Floating Point](https://en.wikipedia.org/wiki/Floating-point_arithmetic) – Article on floating point representations and arithmetic.
+* [Floating Point Arithmetic: Issues and Limitations](https://docs.python.org/3/tutorial/floatingpoint.html) – Article from the Python tutorial describing floating point math representation issues.
