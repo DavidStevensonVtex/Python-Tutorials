@@ -264,3 +264,28 @@ traps    =
   <class 'decimal.Rounded'>: False
   <class 'decimal.Clamped'>: False
 ```
+
+#### 5.1.5.2 Precision
+
+The prec attribute of the context controls the precision maintained for new values created as a result of arithmetic. Literal values are maintained as described.
+
+```
+# decimal_precision.py
+import decimal
+
+d = decimal.Decimal("0.123456")
+
+for i in range(1, 5):
+    decimal.getcontext().prec = i
+    print(i, ":", d, d * 1)
+```
+
+To change the precision, assign a new value between 1 and decimal.MAX_PREC directly to the attribute.
+
+```
+$ python3 decimal_precision.py
+1 : 0.123456 0.1
+2 : 0.123456 0.12
+3 : 0.123456 0.123
+4 : 0.123456 0.1235
+```
