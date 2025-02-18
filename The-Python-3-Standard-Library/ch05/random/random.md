@@ -428,3 +428,11 @@ The Pareto, or power law, distribution matches many observable phenomena and was
 #### 5.3.10.4 Angular
 
 The von Mises, or circular normal, distribution (produced by `vonmisesvariate()`) is used for computing probabilities of cyclic values such as angles, calendar days, and times.
+
+#### 5.3.10.5 Sizes
+
+`betavariate()` generates values with the Beta distribution, which is commonly used in Bayesian statistics and applications such as task duration modeling.
+
+The Gamma distribution produced by `gammavariate()` is used for modeling the sizes of things such as waiting times, rainfall, and computational errors.
+
+The Weibull distribution computed by `weibullvariate()` is used in failure analysis, industrial engineering, and weather forecasting. It describes the distribution of sizes of particles or other discrete objects.
