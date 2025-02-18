@@ -360,3 +360,47 @@ Same seed:
 0.135  0.135
 0.550  0.550
 ```
+
+### 5.3.9 SystemRandom
+
+Some operating systems provide a random number generator that has access to more sources of entropy that can be introduced into the generator. random exposes this feature through the SystemRandom class, which has the same API as Random but uses os.urandom() to generate the values that form the basis of all of the other algorithms.
+
+```
+# random_system_random.py
+import random
+import time
+
+print("Default initializiation:\n")
+
+r1 = random.SystemRandom()
+r2 = random.SystemRandom()
+
+for i in range(3):
+    print("{:04.3f}  {:04.3f}".format(r1.random(), r2.random()))
+
+print("\nSame seed:\n")
+
+seed = time.time()
+r1 = random.SystemRandom(seed)
+r2 = random.SystemRandom(seed)
+
+for i in range(3):
+    print("{:04.3f}  {:04.3f}".format(r1.random(), r2.random()))
+```
+
+Sequences produced by SystemRandom are not reproducible because the randomness is coming from the system, rather than software state (in fact, seed() and setstate() have no effect at all).
+
+```
+$ python3 random_system_random.py
+Default initializiation:
+
+0.265  0.042
+0.501  0.404
+0.379  0.092
+
+Same seed:
+
+0.163  0.371
+0.965  0.428
+0.461  0.586
+```
