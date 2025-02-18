@@ -316,3 +316,47 @@ Koran's
 save
 energy's
 ```
+
+### 5.3.8 Multiple Simultaneous Generators
+
+In addition to module-level functions, random includes a Random class to manage the internal state for several random number generators. All of the functions described earlier are available as methods of the Random instances, and each instance can be initialized and used separately, without interfering with the values returned by other instances.
+
+```
+# random_random_class.py
+import random
+import time
+
+print("Default initializiation:\n")
+
+r1 = random.Random()
+r2 = random.Random()
+
+for i in range(3):
+    print("{:04.3f}  {:04.3f}".format(r1.random(), r2.random()))
+
+print("\nSame seed:\n")
+
+seed = time.time()
+r1 = random.Random(seed)
+r2 = random.Random(seed)
+
+for i in range(3):
+    print("{:04.3f}  {:04.3f}".format(r1.random(), r2.random()))
+```
+
+On a system with good native random value seeding, the instances start out in unique states. However, if there is no good platform random value generator, the instances are likely to have been seeded with the current time, and therefore produce the same values.
+
+```
+$ python3 random_random_class.py
+Default initializiation:
+
+0.719  0.534
+0.251  0.518
+0.719  0.463
+
+Same seed:
+
+0.484  0.484
+0.135  0.135
+0.550  0.550
+```
