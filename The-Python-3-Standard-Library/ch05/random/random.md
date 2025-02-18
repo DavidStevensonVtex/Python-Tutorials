@@ -424,3 +424,7 @@ The _triangular_ distribution is used as an approximate distribution for small s
 `expovariate()` produces an exponential distribution useful for simulating arrival or interval time values for in homogeneous Poisson processes such as the rate of radioactive decay or requests coming into a web server.
 
 The Pareto, or power law, distribution matches many observable phenomena and was popularized by The Long Tail, by Chris Anderson. The `paretovariate()` function is useful for simulating allocation of resources to individuals (wealth to people, demand for musicians, attention to blogs, etc.).
+
+#### 5.3.10.4 Angular
+
+The von Mises, or circular normal, distribution (produced by `vonmisesvariate()`) is used for computing probabilities of cyclic values such as angles, calendar days, and times.
