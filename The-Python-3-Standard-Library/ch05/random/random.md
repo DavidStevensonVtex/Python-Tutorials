@@ -67,3 +67,51 @@ $ python3 random_seed.py
 $ python3 random_seed.py
 0.134 0.847 0.764 0.255 0.495
 ```
+
+### 5.3.3 Saving State
+
+The internal state of the pseudorandom algorithm used by random() can be saved and used to control the numbers produced in subsequent runs. Restoring the previous state before continuing reduces the likelihood of repeating values or sequences of values from the earlier input. The getstate() function returns data that can be used to re-initialize the random number generator later with setstate().
+
+```
+# random_state.py
+import random
+import os
+import pickle
+
+if os.path.exists("state.dat"):
+    # Restore the previously saved state
+    print("Found state.dat, initializing random module")
+    with open("state.dat", "rb") as f:
+        state = pickle.load(f)
+    random.setstate(state)
+else:
+    # Use a well-known start state
+    print("No state.dat, seeding")
+    random.seed(1)
+
+# Produce random values
+for i in range(3):
+    print("{:04.3f}".format(random.random()), end=" ")
+print()
+
+# Save state for next time
+with open("state.dat", "wb") as f:
+    pickle.dump(random.getstate(), f)
+
+# Produce more random values
+print("\nAfter saving state:")
+for i in range(3):
+    print("{:04.3f}".format(random.random()), end=" ")
+print()
+```
+
+The data returned by getstate() is an implementation detail, so this example saves the data to a file with pickle but otherwise treats it as a black box. If the file exists when the program starts, it loads the old state and continues. Each run produces a few numbers before and after saving the state, to show that restoring the state causes the generator to produce the same values again.
+
+```
+$ python3 random_state.py
+No state.dat, seeding
+0.134 0.847 0.764 
+
+After saving state:
+0.255 0.495 0.449 
+```
