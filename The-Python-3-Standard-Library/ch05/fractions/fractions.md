@@ -116,3 +116,30 @@ $ python3 fractions_from_decimal.py
 1.5 = 3/2
 2.0 = 2
 ```
+
+### 5.2.2 Arithmetic
+
+Once the fractions are instantiated, they can be used in mathematical expressions.
+
+```
+# fractions_arithmetic.py
+import fractions
+
+f1 = fractions.Fraction(1, 2)
+f2 = fractions.Fraction(3, 4)
+
+print("{} + {} = {}".format(f1, f2, f1 + f2))
+print("{} - {} = {}".format(f1, f2, f1 - f2))
+print("{} * {} = {}".format(f1, f2, f1 * f2))
+print("{} / {} = {}".format(f1, f2, f1 / f2))
+```
+
+All of the standard operators are supported.
+
+```
+$ python3 fractions_arithmetic.py
+1/2 + 3/4 = 5/4
+1/2 - 3/4 = -1/4
+1/2 * 3/4 = 3/8
+1/2 / 3/4 = 2/3
+```
