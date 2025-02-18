@@ -411,6 +411,10 @@ While the uniform distribution of the values produced by random() is useful for 
 
 #### 5.3.10.1 Normal
 
-The normal distribution is commonly used for non-uniform continuous values such as grades, heights, weights, etc. The curve produced by the distribution has a distinctive shape which has lead to it being nicknamed a “bell curve.” random includes two functions for generating values with a normal distribution, normalvariate() and the slightly faster gauss() (the normal distribution is also called the Gaussian distribution).
+The _normal_ distribution is commonly used for non-uniform continuous values such as grades, heights, weights, etc. The curve produced by the distribution has a distinctive shape which has lead to it being nicknamed a “bell curve.” random includes two functions for generating values with a normal distribution, `normalvariate()` and the slightly faster `gauss()` (the normal distribution is also called the Gaussian distribution).
 
 The related function, lognormvariate() produces pseudorandom values where the logarithm of the values is distributed normally. Log-normal distributions are useful for values that are the product of several random variables which do not interact.
+
+#### 5.3.10.2 Approximation
+
+The _triangular_ distribution is used as an approximate distribution for small sample sizes. The “curve” of a triangular distribution has low points at known minimum and maximum values, and a high point at the mode, which is estimated based on a “most likely” outcome (reflected by the mode argument to `triangular()`).
