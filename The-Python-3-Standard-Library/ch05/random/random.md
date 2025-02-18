@@ -115,3 +115,48 @@ No state.dat, seeding
 After saving state:
 0.255 0.495 0.449 
 ```
+
+### 5.3.4 Random Integers
+
+random() generates floating point numbers. It is possible to convert the results to integers, but using randint() to generate integers directly is more convenient.
+
+```
+# random_randint.py
+import random
+
+print("[1, 100]:", end=" ")
+
+for i in range(3):
+    print(random.randint(1, 100), end=" ")
+
+print("\n[-5, 5]:", end=" ")
+for i in range(3):
+    print(random.randint(-5, 5), end=" ")
+print()
+```
+
+The arguments to randint() are the ends of the inclusive range for the values. The numbers can be positive or negative, but the first value should be less than the second.
+
+```
+$ python3 random_randint.py
+[1, 100]: 54 81 95 
+[-5, 5]: -4 3 -4 
+```
+
+randrange() is a more general form of selecting values from a range.
+
+```
+# random_randrange.py
+import random
+
+for i in range(3):
+    print(random.randrange(0, 101, 5), end=" ")
+print()
+```
+
+randrange() supports a step argument, in addition to start and stop values, so it is fully equivalent to selecting a random value from range(start, stop, step). It is more efficient, because the range is not actually constructed.
+
+```
+$ python3 random_randrange.py
+100 60 60 
+```
