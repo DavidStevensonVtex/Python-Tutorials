@@ -143,3 +143,44 @@ $ python3 fractions_arithmetic.py
 1/2 * 3/4 = 3/8
 1/2 / 3/4 = 2/3
 ```
+
+### 5.2.3 Approximating Values
+
+A useful feature of Fraction is the ability to convert a floating point number to an approximate rational value.
+
+```
+# fractions_limit_denominator.py
+import fractions
+import math
+
+print("PI       =", math.pi)
+
+f_pi = fractions.Fraction(str(math.pi))
+print("No limit =", f_pi)
+
+for i in [1, 6, 11, 60, 70, 90, 100]:
+    limited = f_pi.limit_denominator(i)
+    print("{0:8} = {1}".format(i, limited))
+```
+
+The value of the fraction can be controlled by limiting the size of the denominator.
+
+```
+$ python3 fractions_limit_denominator.py
+PI       = 3.141592653589793
+No limit = 3141592653589793/1000000000000000
+       1 = 3
+       6 = 19/6
+      11 = 22/7
+      60 = 179/57
+      70 = 201/64
+      90 = 267/85
+     100 = 311/99
+```
+
+### See also
+
+* [Standard library documentation for fractions](https://docs.python.org/3/library/fractions.html)
+* [decimal](https://pymotw.com/3/decimal/index.html#module-decimal) – The decimal module provides an API for fixed and floating point math.
+* [numbers](https://docs.python.org/3/library/numbers.html) – Numeric abstract base classes.
+* [Python 2 to 3 porting notes for fractions](https://pymotw.com/3/porting_notes.html#porting-fractions)
