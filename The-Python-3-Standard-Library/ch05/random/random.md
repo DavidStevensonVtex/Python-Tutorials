@@ -283,3 +283,36 @@ Remaining deck:
  5S 10C  4S  JS  2S  AC  8H  QH  AS  3H  4D  9H  5C 
  2C  3D  KD  6S  4C 10S 
 ```
+
+### 5.3.7 Sampling
+
+Many simulations need random samples from a population of input values. The sample() function generates samples without repeating values and without modifying the input sequence. This example prints a random sample of words from the system dictionary.
+
+```
+# random_sample.py
+import random
+
+with open("/usr/share/dict/words", "rt") as f:
+    words = f.readlines()
+words = [w.rstrip() for w in words]
+
+for w in random.sample(words, 5):
+    print(w)
+```
+
+The algorithm for producing the result set takes into account the sizes of the input and the sample requested to produce the result as efficiently as possible.
+
+```
+$ python3 random_sample.py
+stockroom
+Chesterfield's
+widescreen
+apprehensiveness
+Surya's
+$ python3 random_sample.py
+Epicurus's
+patiently
+Koran's
+save
+energy's
+```
