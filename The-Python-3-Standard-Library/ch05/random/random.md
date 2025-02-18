@@ -404,3 +404,7 @@ Same seed:
 0.965  0.428
 0.461  0.586
 ```
+
+### 5.3.10 Non-uniform Distributions
+
+While the uniform distribution of the values produced by random() is useful for a lot of purposes, other distributions more accurately model specific situations. The random module includes functions to produce values in those distributions, too. They are listed here, but not covered in detail because their uses tend to be specialized and require more complex examples.
