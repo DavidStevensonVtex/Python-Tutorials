@@ -190,3 +190,96 @@ $ python3 random_choice.py
 Heads: 4986
 Tails: 5014
 ```
+
+### 5.3.6 Permutations
+
+A simulation of a card game needs to mix up the deck of cards and then deal them to the players, without using the same card more than once. Using choice() could result in the same card being dealt twice, so instead, the deck can be mixed up with shuffle() and then individual cards removed as they are dealt.
+
+```
+# random_shuffle.py
+import random
+import itertools
+
+FACE_CARDS = ("J", "Q", "K", "A")
+SUITS = ("H", "D", "C", "S")
+
+
+def new_deck():
+    return [
+        # Always use 2 places for the value, so the strings
+        # are a consistent width.
+        "{:>2}{}".format(*c)
+        for c in itertools.product(
+            itertools.chain(range(2, 11), FACE_CARDS),
+            SUITS,
+        )
+    ]
+
+
+def show_deck(deck):
+    p_deck = deck[:]
+    while p_deck:
+        row = p_deck[:13]
+        p_deck = p_deck[13:]
+        for j in row:
+            print(j, end=" ")
+        print()
+
+
+# Make a new deck, with the cards in order
+deck = new_deck()
+print("Initial deck:")
+show_deck(deck)
+
+# Shuffle the deck to randomize the order
+random.shuffle(deck)
+print("\nShuffled deck:")
+show_deck(deck)
+
+# Deal 4 hands of 5 cards each
+hands = [[], [], [], []]
+
+for i in range(5):
+    for h in hands:
+        h.append(deck.pop())
+
+# Show the hands
+print("\nHands:")
+for n, h in enumerate(hands):
+    print("{}:".format(n + 1), end=" ")
+    for c in h:
+        print(c, end=" ")
+    print()
+
+# Show the remaining deck
+print("\nRemaining deck:")
+show_deck(deck)
+```
+
+The cards are represented as strings with the face value and a letter indicating the suit. The dealt “hands” are created by adding one card at a time to each of four lists, and removing it from the deck so it cannot be dealt again.
+
+```
+$ python3 random_shuffle.py
+Initial deck:
+ 2H  2D  2C  2S  3H  3D  3C  3S  4H  4D  4C  4S  5H 
+ 5D  5C  5S  6H  6D  6C  6S  7H  7D  7C  7S  8H  8D 
+ 8C  8S  9H  9D  9C  9S 10H 10D 10C 10S  JH  JD  JC 
+ JS  QH  QD  QC  QS  KH  KD  KC  KS  AH  AD  AC  AS 
+
+Shuffled deck:
+ 2H  QC  QD  5H  6C  KH 10H  8D 10D  3C  KC  AH  7H 
+ 5S 10C  4S  JS  2S  AC  8H  QH  AS  3H  4D  9H  5C 
+ 2C  3D  KD  6S  4C 10S  JD  AD  5D  7D  3S  9S  JH 
+ 6D  9D  KS  4H  6H  2D  8S  7S  7C  8C  9C  QS  JC 
+
+Hands:
+1:  JC  7C  6H  6D  7D 
+2:  QS  7S  4H  JH  5D 
+3:  9C  8S  KS  9S  AD 
+4:  8C  2D  9D  3S  JD 
+
+Remaining deck:
+ 2H  QC  QD  5H  6C  KH 10H  8D 10D  3C  KC  AH  7H 
+ 5S 10C  4S  JS  2S  AC  8H  QH  AS  3H  4D  9H  5C 
+ 2C  3D  KD  6S  4C 10S 
+```
