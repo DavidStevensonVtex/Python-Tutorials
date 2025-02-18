@@ -408,3 +408,9 @@ Same seed:
 ### 5.3.10 Non-uniform Distributions
 
 While the uniform distribution of the values produced by random() is useful for a lot of purposes, other distributions more accurately model specific situations. The random module includes functions to produce values in those distributions, too. They are listed here, but not covered in detail because their uses tend to be specialized and require more complex examples.
+
+#### 5.3.10.1 Normal
+
+The normal distribution is commonly used for non-uniform continuous values such as grades, heights, weights, etc. The curve produced by the distribution has a distinctive shape which has lead to it being nicknamed a “bell curve.” random includes two functions for generating values with a normal distribution, normalvariate() and the slightly faster gauss() (the normal distribution is also called the Gaussian distribution).
+
+The related function, lognormvariate() produces pseudorandom values where the logarithm of the values is distributed normally. Log-normal distributions are useful for values that are the product of several random variables which do not interact.
