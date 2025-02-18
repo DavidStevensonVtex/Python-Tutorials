@@ -436,3 +436,10 @@ The von Mises, or circular normal, distribution (produced by `vonmisesvariate()`
 The Gamma distribution produced by `gammavariate()` is used for modeling the sizes of things such as waiting times, rainfall, and computational errors.
 
 The Weibull distribution computed by `weibullvariate()` is used in failure analysis, industrial engineering, and weather forecasting. It describes the distribution of sizes of particles or other discrete objects.
+
+### See also
+
+* [Standard library documentation for random](https://docs.python.org/3/library/random.html)
+* “Mersenne Twister: A 623-dimensionally equidistributed uniform pseudorandom number generator” – Article by M. Matsumoto and T. Nishimura from _ACM Transactions on Modeling and Computer Simulation_ Vol. 8, No. 1, January pp.3-30 1998.
+* [Wikipedia: Mersenne Twister](https://en.wikipedia.org/wiki/Mersenne_Twister) – Article about the pseudorandom generator algorithm used by Python.
+* [Wikipedia: Uniform distribution](https://en.wikipedia.org/wiki/Continuous_uniform_distribution) – Article about continuous uniform distributions in statistics.
