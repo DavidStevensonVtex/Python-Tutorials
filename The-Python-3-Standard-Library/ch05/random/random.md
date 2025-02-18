@@ -160,3 +160,33 @@ randrange() supports a step argument, in addition to start and stop values, so i
 $ python3 random_randrange.py
 100 60 60 
 ```
+
+### 5.3.5 Picking Random Items
+
+One common use for random number generators is to select a random item from a sequence of enumerated values, even if those values are not numbers. random includes the choice() function for making a random selection from a sequence. This example simulates flipping a coin 10,000 times to count how many times it comes up heads and how many times tails.
+
+```
+# random_choice.py
+import random
+import itertools
+
+outcomes = {
+    "heads": 0,
+    "tails": 0,
+}
+sides = list(outcomes.keys())
+
+for i in range(10000):
+    outcomes[random.choice(sides)] += 1
+
+print("Heads:", outcomes["heads"])
+print("Tails:", outcomes["tails"])
+```
+
+There are only two outcomes allowed, so rather than use numbers and convert them the words “heads” and “tails” are used with choice(). The results are tabulated in a dictionary using the outcome names as keys.
+
+```
+$ python3 random_choice.py
+Heads: 4986
+Tails: 5014
+```
