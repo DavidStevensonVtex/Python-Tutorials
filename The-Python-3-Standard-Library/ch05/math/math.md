@@ -334,3 +334,83 @@ $ python3 math_integers.py
   0.8   0.0   0.0   0.0   1.0
   1.0   1.0   1.0   1.0   1.0
 ```
+
+### 5.4.5 Alternate Representations of Floating Point Values
+
+modf() takes a single floating point number and returns a tuple containing the fractional and whole number parts of the input value.
+
+```
+# math_modf.py
+import math
+
+for i in range(6):
+    print("{}/2 = {}".format(i, math.modf(i / 2.0)))
+```
+
+Both numbers in the return value are floats.
+
+```
+$ python3 math_modf.py
+0/2 = (0.0, 0.0)
+1/2 = (0.5, 0.0)
+2/2 = (0.0, 1.0)
+3/2 = (0.5, 1.0)
+4/2 = (0.0, 2.0)
+5/2 = (0.5, 2.0)
+```
+
+frexp() returns the mantissa and exponent of a floating point number, and can be used to create a more portable representation of the value.
+
+```
+# math_frexp.py
+import math
+
+print("{:^7} {:^7} {:^7}".format("x", "m", "e"))
+print("{:-^7} {:-^7} {:-^7}".format("", "", ""))
+
+for x in [0.1, 0.5, 4.0]:
+    m, e = math.frexp(x)
+    print("{:7.2f} {:7.2f} {:7d}".format(x, m, e))
+```
+
+frexp() uses the formula x = m * 2**e, and returns the values m and e.
+
+```
+$ python3 math_frexp.py
+   x       m       e   
+------- ------- -------
+   0.10    0.80      -3
+   0.50    0.50       0
+   4.00    0.50       3
+```
+
+ldexp() is the inverse of frexp().
+
+```
+# math_ldexp.py
+import math
+
+print("{:^7} {:^7} {:^7}".format("m", "e", "x"))
+print("{:-^7} {:-^7} {:-^7}".format("", "", ""))
+
+INPUTS = [
+    (0.8, -3),
+    (0.5, 0),
+    (0.5, 3),
+]
+
+for m, e in INPUTS:
+    x = math.ldexp(m, e)
+    print("{:7.2f} {:7d} {:7.2f}".format(m, e, x))
+```
+
+Using the same formula as frexp(), ldexp() takes the mantissa and exponent values as arguments and returns a floating point number.
+
+```
+$ python3 math_ldexp.py
+   m       e       x   
+------- ------- -------
+   0.80      -3    0.10
+   0.50       0    0.50
+   0.50       3    4.00
+```
