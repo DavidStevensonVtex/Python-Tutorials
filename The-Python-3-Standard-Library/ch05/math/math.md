@@ -269,3 +269,68 @@ nan, 1.0: False
 inf, inf: True
 inf, 1.0: False
 ```
+
+### 5.4.4 Converting Floating Point Values to Integers
+
+The math module includes three functions for converting floating point values to whole numbers. Each takes a different approach, and will be useful in different circumstances.
+
+The simplest is trunc(), which truncates the digits following the decimal, leaving only the significant digits making up the whole number portion of the value. floor() converts its input to the largest preceding integer, and ceil() (ceiling) produces the largest integer following sequentially after the input value.
+
+```
+# math_integers.py
+import math
+
+HEADINGS = ("i", "int", "trunk", "floor", "ceil")
+print("{:^5} {:^5} {:^5} {:^5} {:^5}".format(*HEADINGS))
+print(
+    "{:-^5} {:-^5} {:-^5} {:-^5} {:-^5}".format(
+        "",
+        "",
+        "",
+        "",
+        "",
+    )
+)
+
+fmt = "{:5.1f} {:5.1f} {:5.1f} {:5.1f} {:5.1f}"
+
+TEST_VALUES = [
+    -1.5,
+    -0.8,
+    -0.5,
+    -0.2,
+    0,
+    0.2,
+    0.5,
+    0.8,
+    1,
+]
+
+for i in TEST_VALUES:
+    print(
+        fmt.format(
+            i,
+            int(i),
+            math.trunc(i),
+            math.floor(i),
+            math.ceil(i),
+        )
+    )
+```
+
+trunc() is equivalent to converting to int directly.
+
+```
+$ python3 math_integers.py
+  i    int  trunk floor ceil 
+----- ----- ----- ----- -----
+ -1.5  -1.0  -1.0  -2.0  -1.0
+ -0.8   0.0   0.0  -1.0   0.0
+ -0.5   0.0   0.0  -1.0   0.0
+ -0.2   0.0   0.0  -1.0   0.0
+  0.0   0.0   0.0   0.0   0.0
+  0.2   0.0   0.0   0.0   1.0
+  0.5   0.0   0.0   0.0   1.0
+  0.8   0.0   0.0   0.0   1.0
+  1.0   1.0   1.0   1.0   1.0
+```
