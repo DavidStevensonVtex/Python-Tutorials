@@ -414,3 +414,84 @@ $ python3 math_ldexp.py
    0.50       0    0.50
    0.50       3    4.00
 ```
+
+### 5.4.6 Positive and Negative Signs
+
+The absolute value of a number is its value without a sign. Use fabs() to calculate the absolute value of a floating point number.
+
+```
+# math_fabs.py
+import math
+
+print(math.fabs(-1.1))
+print(math.fabs(-0.0))
+print(math.fabs(0.0))
+print(math.fabs(1.1))
+```
+
+In practical terms, the absolute value of a float is represented as a positive value.
+
+```
+$ python3 math_fabs.py
+1.1
+0.0
+0.0
+1.1
+```
+
+To determine the sign of a value, either to give a set of values the same sign or to compare two values, use copysign() to set the sign of a known good value.
+
+
+```
+# math_copysign.py
+import math
+
+HEADINGS = ("f", "s", "< 0", "> 0", "= 0")
+print("{:^5} {:^5} {:^5} {:^5} {:^5}".format(*HEADINGS))
+print(
+    "{:-^5} {:-^5} {:-^5} {:-^5} {:-^5}".format(
+        "",
+        "",
+        "",
+        "",
+        "",
+    )
+)
+
+VALUES = [
+    -1.0,
+    0.0,
+    1.0,
+    float("-inf"),
+    float("inf"),
+    float("-nan"),
+    float("nan"),
+]
+
+for f in VALUES:
+    s = int(math.copysign(1, f))
+    print(
+        "{:5.1f} {:5d} {!s:5} {!s:5} {!s:5}".format(
+            f,
+            s,
+            f < 0,
+            f > 0,
+            f == 0,
+        )
+    )
+```
+
+An extra function like copysign() is needed because comparing nan and -nan directly with other values does not work.
+
+```
+$ python3 math_copysign.py
+  f     s    < 0   > 0   = 0 
+----- ----- ----- ----- -----
+ -1.0    -1 True  False False
+  0.0     1 False False True 
+  1.0     1 False True  False
+ -inf    -1 True  False False
+  inf     1 False True  False
+  nan    -1 False False False
+  nan     1 False False False
+```
