@@ -495,3 +495,180 @@ $ python3 math_copysign.py
   nan    -1 False False False
   nan     1 False False False
 ```
+
+### 5.4.7 Commonly Used Calculations
+
+Representing precise values in binary floating point memory is challenging. Some values cannot be represented exactly, and the more often a value is manipulated through repeated calculations, the more likely a representation error will be introduced. math includes a function for computing the sum of a series of floating point numbers using an efficient algorithm that minimizes such errors.
+
+```
+# math_fsum.py
+import math
+
+values = [0.1] * 10
+
+print("Input values:", values)
+
+print("sum()       : {:.20f}".format(sum(values)))
+
+s = 0.0
+for i in values:
+    s += i
+print("for-loop    : {:.20f}".format(s))
+
+print("math.fsum() : {:.20f}".format(math.fsum(values)))
+```
+
+Given a sequence of ten values, each equal to 0.1, the expected value for the sum of the sequence is 1.0. Since 0.1 cannot be represented exactly as a floating point value, however, errors are introduced into the sum unless it is calculated with fsum().
+
+```
+$ python3 math_fsum.py
+Input values: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+sum()       : 0.99999999999999988898
+for-loop    : 0.99999999999999988898
+math.fsum() : 1.00000000000000000000
+```
+
+factorial() is commonly used to calculate the number of permutations and combinations of a series of objects. The factorial of a positive integer n, expressed n!, is defined recursively as (n-1)! * n and stops with 0! == 1.
+
+```
+# math_factorial.py
+import math
+
+for i in [0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.1]:
+    try:
+        print("{:2.0f} {:6.0f}".format(i, math.factorial(i)))
+    except ValueError as err:
+        print("Error computing factorial({}): {}".format(i, err))
+```
+
+factorial() only works with whole numbers, but does accept float arguments as long as they can be converted to an integer without losing value.
+
+```
+$ python3 math_factorial.py
+ 0      1
+ 1      1
+ 2      2
+ 3      6
+ 4     24
+ 5    120
+Error computing factorial(6.1): factorial() only accepts integral values
+```
+
+gamma() is like factorial(), except it works with real numbers and the value is shifted down by one (gamma is equal to (n - 1)!).
+
+```
+# math_gamma.py
+import math
+
+for i in [0, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6]:
+    try:
+        print("{:2.1f} {:6.2f}".format(i, math.gamma(i)))
+    except ValueError as err:
+        print("Error computing gamma({}): {}".format(i, err))
+```
+
+Since zero causes the start value to be negative, it is not allowed.
+
+```
+$ python3 math_gamma.py
+Error computing gamma(0): math domain error
+1.1   0.95
+2.2   1.10
+3.3   2.68
+4.4  10.14
+5.5  52.34
+6.6 344.70
+```
+
+lgamma() returns the natural logarithm of the absolute value of gamma for the input value.
+
+```
+# math_lgamma.py
+import math
+
+for i in [0, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6]:
+    try:
+        print(
+            "{:2.1f} {:.20f} {:.20f}".format(
+                i,
+                math.lgamma(i),
+                math.log(math.gamma(i)),
+            )
+        )
+    except ValueError as err:
+        print("Error computing lgamma({}): {}".format(i, err))
+```
+
+Using lgamma() retains more precision than calculating the logarithm separately using the results of gamma().
+
+```
+$ python3 math_lgamma.py
+Error computing lgamma(0): math domain error
+1.1 -0.04987244125984036103 -0.04987244125983997245
+2.2 0.09694746679063825923 0.09694746679063866168
+3.3 0.98709857789473387513 0.98709857789473409717
+4.4 2.31610349142485727469 2.31610349142485727469
+5.5 3.95781396761871651080 3.95781396761871606671
+6.6 5.84268005527463252236 5.84268005527463252236
+```
+
+The modulo operator (%) computes the remainder of a division expression (i.e., 5 % 2 = 1). The operator built into the language works well with integers but, as with so many other floating point operations, intermediate calculations cause representational issues that result in a loss of data. fmod() provides a more accurate implementation for floating point values.
+
+```
+# math_fmod.py
+import math
+
+print("{:^4} {:^4} {:^5} {:^5}".format("x", "y", "%", "fmod"))
+print("{:-^4} {:-^4} {:-^5} {:-^5}".format("-", "-", "-", "-"))
+
+INPUTS = [
+    (5, 2),
+    (5, -2),
+    (-5, 2),
+]
+
+for x, y in INPUTS:
+    print(
+        "{:4.1f} {:4.1f} {:5.2f} {:5.2f}".format(
+            x,
+            y,
+            x % y,
+            math.fmod(x, y),
+        )
+    )
+```
+
+A potentially more frequent source of confusion is the fact that the algorithm used by fmod() for computing modulo is also different from that used by %, so the sign of the result is different.
+
+```
+$ python3 math_fmod.py
+ x    y     %   fmod 
+---- ---- ----- -----
+ 5.0  2.0  1.00  1.00
+ 5.0 -2.0 -1.00  1.00
+-5.0  2.0  1.00 -1.00
+```
+
+Use gcd() to find the largest integer that can divide evenly into two integers, the greatest common divisor.
+
+```
+# math_gcd.py
+import math
+
+print(math.gcd(10, 8))
+print(math.gcd(10, 0))
+print(math.gcd(50, 225))
+print(math.gcd(11, 9))
+print(math.gcd(0, 0))
+```
+
+If both values are 0, the result is 0.
+
+```
+$ python3 math_gcd.py
+2
+10
+25
+1
+0
+```
