@@ -21,3 +21,26 @@ The math module implements many of the IEEE functions that would normally be fou
 * [Hyperbolic Functions](https://pymotw.com/3/math/index.html#hyperbolic-functions)
 * [Special Functions](https://pymotw.com/3/math/index.html#special-functions)
 
+### 5.4.1 Special Constants
+
+Many math operations depend on special constants. math includes values for π (pi), e, nan (not a number), and infinity.
+
+```
+# math_constants.py
+import math
+
+print("  π: {:.30f}".format(math.pi))
+print("  e: {:.30f}".format(math.e))
+print("nan: {:.30f}".format(math.nan))
+print("inf: {:.30f}".format(math.inf))
+```
+
+Both π and e are limited in precision only by the platform’s floating point C library.
+
+```
+$ python3 math_constants.py
+  π: 3.141592653589793115997963468544
+  e: 2.718281828459045090795598298428
+nan: nan
+inf: inf
+```
