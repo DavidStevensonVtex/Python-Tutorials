@@ -44,3 +44,119 @@ $ python3 math_constants.py
 nan: nan
 inf: inf
 ```
+
+### 5.4.2 Testing for Exceptional Values
+
+Floating point calculations can result in two types of exceptional values. The first of these, inf (infinity), appears when the double used to hold a floating point value overflows from a value with a large absolute value.
+
+```
+# math_isinf.py
+import math
+
+print("{:^3} {:6} {:6} {:6}".format("e", "x", "x**2", "isinf"))
+print("{:-^3} {:-^6} {:-^6} {:-^6}".format("", "", "", ""))
+
+for e in range(0, 201, 20):
+    x = 10.0**e
+    y = x * x
+    print(
+        "{:3d} {:<6g} {:<6g} {!s:6}".format(
+            e,
+            x,
+            y,
+            math.isinf(y),
+        )
+    )
+```
+
+When the exponent in this example grows large enough, the square of x no longer fits inside a double, and the value is recorded as infinite.
+
+```
+$ python3 math_isinf.py
+ e  x      x**2   isinf 
+--- ------ ------ ------
+  0 1      1      False 
+ 20 1e+20  1e+40  False 
+ 40 1e+40  1e+80  False 
+ 60 1e+60  1e+120 False 
+ 80 1e+80  1e+160 False 
+100 1e+100 1e+200 False 
+120 1e+120 1e+240 False 
+140 1e+140 1e+280 False 
+160 1e+160 inf    True  
+180 1e+180 inf    True  
+200 1e+200 inf    True 
+```
+
+Not all floating point overflows result in inf values, however. Calculating an exponent with floating point values, in particular, raises OverflowError instead of preserving the inf result.
+
+```
+# math_overflow.py
+x = 10.0**200
+
+print("x    =", x)
+print("x*x  =", x * x)
+print("x**2 =", end=" ")
+try:
+    print(x**2)
+except OverflowError as err:
+    print(err)
+```
+
+This discrepancy is caused by an implementation difference in the library used by C Python.
+
+```
+$ python3 math_overflow.py
+x    = 1e+200
+x*x  = inf
+x**2 = (34, 'Numerical result out of range')
+```
+
+Division operations using infinite values are undefined. The result of dividing a number by infinity is nan (not a number).
+
+```
+# math_isnan.py
+import math
+
+x = (10.0**200) * (10.0**200)
+y = x / x
+
+print("x =", x)
+print("isnan(x) =", math.isnan(x))
+print("y = x / x =", x / x)
+print("y == nan =", y == float("nan"))
+print("isnan(y) =", math.isnan(y))
+```
+
+nan does not compare as equal to any value, even itself, so to check for nan use isnan().
+
+```
+$ python3 math_isnan.py
+x = inf
+isnan(x) = False
+y = x / x = nan
+y == nan = False
+isnan(y) = True
+```
+
+Use isfinite() to check for regular numbers or either of the special values inf or nan.
+
+```
+# math_isfinite.py
+import math
+
+for f in [0.0, 1.0, math.pi, math.e, math.inf, math.nan]:
+    print("{:5.2f} {!s}".format(f, math.isfinite(f)))
+```
+
+isfinite() returns false for either of the exceptional cases, and true otherwise.
+
+```
+$ python3 math_isfinite.py
+ 0.00 True
+ 1.00 True
+ 3.14 True
+ 2.72 True
+  inf False
+  nan False
+```
