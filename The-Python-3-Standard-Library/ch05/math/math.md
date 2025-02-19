@@ -160,3 +160,112 @@ $ python3 math_isfinite.py
   inf False
   nan False
 ```
+
+### 5.4.3 Comparing
+
+Comparisons for floating point values can be error prone, with each step of the computation potentially introducing errors due to the numerical representation. The isclose() function uses a stable algorithm to minimize these errors and provide a way for relative as well as absolute comparisons. The formula used is equivalent to
+
+`abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)`
+
+By default, isclose() uses relative comparison with the tolerance set to 1e-09, meaning that the difference between the values must be less than or equal to 1e-09 times the larger absolute value between a and b. Passing a keyword argument rel_tol to isclose() changes the tolerance. In this example, the values must be within 10% of each other.
+
+```
+# math_isclose.py
+import math
+
+INPUTS = [
+    (1000, 900, 0.1),
+    (100, 90, 0.1),
+    (10, 9, 0.1),
+    (1, 0.9, 0.1),
+    (0.1, 0.09, 0.1),
+]
+
+print(
+    "{:^8} {:^8} {:^8} {:^8} {:^8} {:^8}".format(
+        "a", "b", "rel_tol", "abs(a-b)", "tolerance", "close"
+    )
+)
+print(
+    "{:-^8} {:-^8} {:-^8} {:-^8} {:-^8} {:-^8}".format("-", "-", "-", "-", "-", "-"),
+)
+
+fmt = "{:8.2f} {:8.2f} {:8.2f} {:8.2f} {:8.2f} {!s:>8}"
+
+for a, b, rel_tol in INPUTS:
+    close = math.isclose(a, b, rel_tol=rel_tol)
+    tolerance = rel_tol * max(abs(a), abs(b))
+    abs_diff = abs(a - b)
+    print(fmt.format(a, b, rel_tol, abs_diff, tolerance, close))
+```
+
+The comparison between 0.1 and 0.09 fails because of the error representing 0.1.
+
+```
+$ python3 math_isclose.py
+   a        b     rel_tol  abs(a-b) tolerance  close  
+-------- -------- -------- -------- -------- --------
+ 1000.00   900.00     0.10   100.00   100.00     True
+  100.00    90.00     0.10    10.00    10.00     True
+   10.00     9.00     0.10     1.00     1.00     True
+    1.00     0.90     0.10     0.10     0.10     True
+    0.10     0.09     0.10     0.01     0.01    False
+```
+
+To use a fixed or “absolute” tolerance, pass abs_tol instead of rel_tol.
+
+```
+# math_isclose_abs_tol.py
+import math
+
+INPUTS = [
+    (1.0, 1.0 + 1e-07, 1e-08),
+    (1.0, 1.0 + 1e-08, 1e-08),
+    (1.0, 1.0 + 1e-09, 1e-08),
+]
+
+print(
+    "{:^8} {:^11} {:^8} {:^10} {:^8}".format("a", "b", "abs_tol", "abs(a-b)", "close")
+)
+print(
+    "{:-^8} {:-^11} {:-^8} {:-^10} {:-^8}".format("-", "-", "-", "-", "-"),
+)
+
+for a, b, abs_tol in INPUTS:
+    close = math.isclose(a, b, abs_tol=abs_tol)
+    abs_diff = abs(a - b)
+    print("{:8.2f} {:11} {:8} {:0.9f} {!s:>8}".format(a, b, abs_tol, abs_diff, close))
+```
+
+For an absolute tolerance, the difference between the input values must be less than the tolerance given.
+
+```
+$ python3 math_isclose_abs_tol.py
+   a          b      abs_tol   abs(a-b)   close  
+-------- ----------- -------- ---------- --------
+    1.00   1.0000001    1e-08 0.000000100    False
+    1.00  1.00000001    1e-08 0.000000010     True
+    1.00 1.000000001    1e-08 0.000000001     True
+```
+
+nan and inf are special cases.
+
+```
+# math_isclose_inf.py
+import math
+
+print("nan, nan:", math.isclose(math.nan, math.nan))
+print("nan, 1.0:", math.isclose(math.nan, 1.0))
+print("inf, inf:", math.isclose(math.inf, math.inf))
+print("inf, 1.0:", math.isclose(math.inf, 1.0))
+```
+
+nan is never close to another value, including itself. inf is only close to itself.
+
+```
+$ python3 math_isclose_inf.py
+nan, nan: False
+nan, 1.0: False
+inf, inf: True
+inf, 1.0: False
+```
