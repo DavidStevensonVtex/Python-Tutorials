@@ -946,3 +946,100 @@ $ python3 math_expm1.py
 0.0
 1e-25
 ```
+
+### 5.4.9 Angles
+
+Although degrees are more commonly used in everyday discussions of angles, radians are the standard unit of angular measure in science and math. A radian is the angle created by two lines intersecting at the center of a circle, with their ends on the circumference of the circle spaced one radius apart.
+
+The circumference is calculated as 2πr, so there is a relationship between radians and π, a value that shows up frequently in trigonometric calculations. That relationship leads to radians being used in trigonometry and calculus, because they result in more compact formulas.
+
+To convert from degrees to radians, use radians().
+
+```
+# math_radians.py
+import math
+
+print("{:^7} {:^7} {:^7}".format("Degrees", "Radians", "Expected"))
+print("{:-^7} {:-^7} {:-^7}".format("", "", ""))
+
+INPUTS = [
+    (0, 0),
+    (30, math.pi / 6),
+    (45, math.pi / 4),
+    (60, math.pi / 3),
+    (90, math.pi / 2),
+    (180, math.pi),
+    (270, 3 / 2.0 * math.pi),
+    (360, 2 * math.pi),
+]
+
+for deg, expected in INPUTS:
+    print(
+        "{:7d} {:7.2f} {:7.2f}".format(
+            deg,
+            math.radians(deg),
+            expected,
+        )
+    )
+```
+
+The formula for the conversion is rad = deg * π / 180.
+
+```
+$ python3 math_radians.py
+Degrees Radians Expected
+------- ------- -------
+      0    0.00    0.00
+     30    0.52    0.52
+     45    0.79    0.79
+     60    1.05    1.05
+     90    1.57    1.57
+    180    3.14    3.14
+    270    4.71    4.71
+    360    6.28    6.28
+```
+
+To convert from radians to degrees, use degrees().
+
+```
+# math_degrees.py
+import math
+
+INPUTS = [
+    (0, 0),
+    (math.pi / 6, 30),
+    (math.pi / 4, 45),
+    (math.pi / 3, 60),
+    (math.pi / 2, 90),
+    (math.pi, 180),
+    (3 * math.pi / 2, 270),
+    (2 * math.pi, 360),
+]
+
+print("{:^8} {:^8} {:^8}".format("Radians", "Degrees", "Expected"))
+print("{:-^8} {:-^8} {:-^8}".format("", "", ""))
+for rad, expected in INPUTS:
+    print(
+        "{:8.2f} {:8.2f} {:8.2f}".format(
+            rad,
+            math.degrees(rad),
+            expected,
+        )
+    )
+```
+
+The formula is deg = rad * 180 / π.
+
+```
+$ python3 math_degrees.py
+Radians  Degrees  Expected
+-------- -------- --------
+    0.00     0.00     0.00
+    0.52    30.00    30.00
+    0.79    45.00    45.00
+    1.05    60.00    60.00
+    1.57    90.00    90.00
+    3.14   180.00   180.00
+    4.71   270.00   270.00
+    6.28   360.00   360.00
+```
