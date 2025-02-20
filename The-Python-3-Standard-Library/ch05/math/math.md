@@ -675,7 +675,7 @@ $ python3 math_gcd.py
 
 ### 5.4.8 Exponents and Logarithms
 
-Exponential growth curves appear in economics, physics, and other sciences. Python has a built-in exponentiation operator (“**”), but pow() can be useful when a callable function is needed as an argument to another function.
+Exponential growth curves appear in economics, physics, and other sciences. Python has a built-in exponentiation operator (“\*\*”), but pow() can be useful when a callable function is needed as an argument to another function.
 
 ```
 # math_pow.py
@@ -735,7 +735,7 @@ $ python3 math_sqrt.py
 Cannot compute sqrt(-1): math domain error
 ```
 
-The logarithm function finds y where x = b ** y. By default, log() computes the natural logarithm (the base is e). If a second argument is provided, that value is used as the base.
+The logarithm function finds y where x = b \*\* y. By default, log() computes the natural logarithm (the base is e). If a second argument is provided, that value is used as the base.
 
 ```
 # math_log.py
@@ -888,7 +888,7 @@ log(1+x): 0.0
 log1p(x): 1e-25
 ```
 
-exp() computes the exponential function (e**x).
+exp() computes the exponential function (e\*\*x).
 
 ```
 # math_exp.py
@@ -902,7 +902,7 @@ print(fmt.format(math.pow(math.e, 2)))
 print(fmt.format(math.exp(2)))
 ```
 
-exp() computes the exponential function (e**x).
+exp() computes the exponential function (e\*\*x).
 
 ```
 # math_exp.py
@@ -925,7 +925,7 @@ $ python3 math_exp.py
 7.38905609893065040694
 ```
 
-expm1() is the inverse of log1p(), and calculates e**x - 1.
+expm1() is the inverse of log1p(), and calculates e\*\*x - 1.
 
 ```
 # math_expm1.py
@@ -1042,4 +1042,181 @@ Radians  Degrees  Expected
     3.14   180.00   180.00
     4.71   270.00   270.00
     6.28   360.00   360.00
+```
+
+### 5.4.10 Trigonometry
+
+Trigonometric functions relate angles in a triangle to the lengths of its sides. They show up in formulas with periodic properties such as harmonics, circular motion, or when dealing with angles. All of the trigonometric functions in the standard library take angles expressed as radians.
+
+Given an angle in a right triangle, the sine is the ratio of the length of the side opposite the angle to the hypotenuse (sin A = opposite/hypotenuse). The cosine is the ratio of the length of the adjacent side to the hypotenuse (cos A = adjacent/hypotenuse). And the tangent is the ratio of the opposite side to the adjacent side (tan A = opposite/adjacent).
+
+```
+# math_trig.py
+import math
+
+print(
+    "{:^7} {:^7} {:^7} {:^7} {:^7}".format(
+        "Degrees", "Radians", "Sine", "Cosine", "Tangent"
+    )
+)
+print("{:-^7} {:-^7} {:-^7} {:-^7} {:-^7}".format("-", "-", "-", "-", "-"))
+
+fmt = "{:7.2f} {:7.2f} {:7.2f} {:7.2f} {:7.2f}"
+
+for deg in range(0, 361, 30):
+    rad = math.radians(deg)
+    if deg in (90, 270):
+        t = float("inf")
+    else:
+        t = math.tan(rad)
+    print(fmt.format(deg, rad, math.sin(rad), math.cos(rad), t))
+```
+
+The tangent can also be defined as the ratio of the sine of the angle to its cosine, and since the cosine is 0 for π/2 and 3π/2 radians, the tangent is infinite.
+
+```
+$ python3 math_trig.py
+Degrees Radians  Sine   Cosine  Tangent
+------- ------- ------- ------- -------
+   0.00    0.00    0.00    1.00    0.00
+  30.00    0.52    0.50    0.87    0.58
+  60.00    1.05    0.87    0.50    1.73
+  90.00    1.57    1.00    0.00     inf
+ 120.00    2.09    0.87   -0.50   -1.73
+ 150.00    2.62    0.50   -0.87   -0.58
+ 180.00    3.14    0.00   -1.00   -0.00
+ 210.00    3.67   -0.50   -0.87    0.58
+ 240.00    4.19   -0.87   -0.50    1.73
+ 270.00    4.71   -1.00   -0.00     inf
+ 300.00    5.24   -0.87    0.50   -1.73
+ 330.00    5.76   -0.50    0.87   -0.58
+ 360.00    6.28   -0.00    1.00   -0.00
+```
+
+Given a point (x, y), the length of the hypotenuse for the triangle between the points [(0, 0), (x, 0), (x, y)] is (x\*\*2 + y\*\*2) \*\* 1/2, and can be computed with hypot().
+
+```
+# math_hypot.py
+import math
+
+print("{:^7} {:^7} {:^10}".format("X", "Y", "Hypotenuse"))
+print("{:-^7} {:-^7} {:-^10}".format("", "", ""))
+
+POINTS = [
+    # simple points
+    (1, 1),
+    (-1, -1),
+    (math.sqrt(2), math.sqrt(2)),
+    (3, 4),  # 3-4-5 triangle
+    # on the circle
+    (math.sqrt(2) / 2, math.sqrt(2) / 2),  # pi/4 rads
+    (0.5, math.sqrt(3) / 2),  # pi/3 rads
+]
+
+for x, y in POINTS:
+    h = math.hypot(x, y)
+    print("{:7.2f} {:7.2f} {:7.2f}".format(x, y, h))
+```
+
+Points on the circle always have hypotenuse equal to 1.
+
+```
+$ python3 math_hypot.py
+   X       Y    Hypotenuse
+------- ------- ----------
+   1.00    1.00    1.41
+  -1.00   -1.00    1.41
+   1.41    1.41    2.00
+   3.00    4.00    5.00
+   0.71    0.71    1.00
+   0.50    0.87    1.00
+```
+
+The same function can be used to find the distance between two points.
+
+```
+# math_distance_2_points.py
+import math
+
+print(
+    "{:^8} {:^8} {:^8} {:^8} {:^8}".format(
+        "X1",
+        "Y1",
+        "X2",
+        "Y2",
+        "Distance",
+    )
+)
+print(
+    "{:-^8} {:-^8} {:-^8} {:-^8} {:-^8}".format(
+        "",
+        "",
+        "",
+        "",
+        "",
+    )
+)
+
+POINTS = [
+    ((5, 5), (6, 6)),
+    ((-6, -6), (-5, -5)),
+    ((0, 0), (3, 4)),  # 3-4-5 triangle
+    ((-1, -1), (2, 3)),  # 3-4-5 triangle
+]
+
+for (x1, y1), (x2, y2) in POINTS:
+    x = x1 - x2
+    y = y1 - y2
+    h = math.hypot(x, y)
+    print(
+        "{:8.2f} {:8.2f} {:8.2f} {:8.2f} {:8.2f}".format(
+            x1,
+            y1,
+            x2,
+            y2,
+            h,
+        )
+    )
+```
+
+Use the difference in the x and y values to move one endpoint to the origin, and then pass the results to hypot().
+
+```
+$ python3 math_distance_2_points.py
+   X1       Y1       X2       Y2    Distance
+-------- -------- -------- -------- --------
+    5.00     5.00     6.00     6.00     1.41
+   -6.00    -6.00    -5.00    -5.00     1.41
+    0.00     0.00     3.00     4.00     5.00
+   -1.00    -1.00     2.00     3.00     5.00
+```
+
+math also defines inverse trigonometric functions.
+
+```
+# math_inverse_trig.py
+import math
+
+for r in [0, 0.5, 1]:
+    print("arcsine({:.1f})    = {:5.2f}".format(r, math.asin(r)))
+    print("arccosine({:.1f})  = {:5.2f}".format(r, math.acos(r)))
+    print("arctangent({:.1f}) = {:5.2f}".format(r, math.atan(r)))
+    print()
+```
+
+1.57 is roughly equal to π/2, or 90 degrees, the angle at which the sine is 1 and the cosine is 0.
+
+```
+$ python3 math_inverse_trig.py
+arcsine(0.0)    =  0.00
+arccosine(0.0)  =  1.57
+arctangent(0.0) =  0.00
+
+arcsine(0.5)    =  0.52
+arccosine(0.5)  =  1.05
+arctangent(0.5) =  0.46
+
+arcsine(1.0)    =  1.57
+arccosine(1.0)  =  0.00
+arctangent(1.0) =  0.79
 ```
