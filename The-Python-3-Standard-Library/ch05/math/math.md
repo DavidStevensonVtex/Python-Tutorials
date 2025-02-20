@@ -1269,3 +1269,75 @@ $ python3 math_hyperbolic.py
 
 Inverse hyperbolic functions acosh(), asinh(), and atanh() are also available.
 
+### 5.4.12 Special Functions
+
+The Gauss Error function is used in statistics.
+
+```
+# math_erf.py
+import math
+
+print("{:^5} {:7}".format("x", "erf(x)"))
+print("{:-^5} {:-^7}".format("", ""))
+
+for x in [-3, -2, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2, 3]:
+    print("{:5.2f} {:7.4f}".format(x, math.erf(x)))
+```
+
+For the error function, erf(-x) == -erf(x).
+
+```
+$ python3 math_erf.py
+  x   erf(x) 
+----- -------
+-3.00 -1.0000
+-2.00 -0.9953
+-1.00 -0.8427
+-0.50 -0.5205
+-0.25 -0.2763
+ 0.00  0.0000
+ 0.25  0.2763
+ 0.50  0.5205
+ 1.00  0.8427
+ 2.00  0.9953
+ 3.00  1.0000
+```
+
+The complimentary error function is 1 - erf(x).
+
+```
+# math_erfc.py
+import math
+
+print("{:^5} {:7}".format("x", "erfc(x)"))
+print("{:-^5} {:-^7}".format("", ""))
+
+for x in [-3, -2, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2, 3]:
+    print("{:5.2f} {:7.4f}".format(x, math.erfc(x)))
+```
+
+The implementation of erfc() avoids precision errors for small values of x when subtracting from 1.
+
+```
+$ python3 math_erfc.py
+  x   erfc(x)
+----- -------
+-3.00  2.0000
+-2.00  1.9953
+-1.00  1.8427
+-0.50  1.5205
+-0.25  1.2763
+ 0.00  1.0000
+ 0.25  0.7237
+ 0.50  0.4795
+ 1.00  0.1573
+ 2.00  0.0047
+ 3.00  0.0000
+```
+
+### See also
+
+* [Standard library documentation for math](https://docs.python.org/3/library/math.html)
+* [IEEE floating point arithmetic in Python](https://www.johndcook.com/blog/2009/07/21/ieee-arithmetic-python/) – Blog post by John Cook about how special values arise and are dealt with when doing math in Python.
+* [SciPy](https://scipy.org/) – Open source libraryes for scientific and mathematical calculations in Python.
+* [PEP 485](https://peps.python.org/pep-0485/) – “A function for testing approximate equality”
