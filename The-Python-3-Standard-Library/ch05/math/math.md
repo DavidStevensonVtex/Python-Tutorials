@@ -1220,3 +1220,52 @@ arcsine(1.0)    =  1.57
 arccosine(1.0)  =  0.00
 arctangent(1.0) =  0.79
 ```
+
+### 5.4.11 Hyperbolic Functions
+
+Hyperbolic functions appear in linear differential equations and are used when working with electromagnetic fields, fluid dynamics, special relativity, and other advanced physics and mathematics.
+
+```
+# math_hyperbolic.py
+import math
+
+print(
+    "{:^6} {:^6} {:^6} {:^6}".format(
+        "X",
+        "sinh",
+        "cosh",
+        "tanh",
+    )
+)
+print("{:-^6} {:-^6} {:-^6} {:-^6}".format("", "", "", ""))
+
+fmt = "{:6.4f} {:6.4f} {:6.4f} {:6.4f}"
+
+for i in range(0, 11, 2):
+    x = i / 10.0
+    print(
+        fmt.format(
+            x,
+            math.sinh(x),
+            math.cosh(x),
+            math.tanh(x),
+        )
+    )
+```
+
+Whereas the cosine and sine functions enscribe a circle, the hyperbolic cosine and hyperbolic sine form half of a hyperbola.
+
+```
+$ python3 math_hyperbolic.py
+  X     sinh   cosh   tanh 
+------ ------ ------ ------
+0.0000 0.0000 1.0000 0.0000
+0.2000 0.2013 1.0201 0.1974
+0.4000 0.4108 1.0811 0.3799
+0.6000 0.6367 1.1855 0.5370
+0.8000 0.8881 1.3374 0.6640
+1.0000 1.1752 1.5431 0.7616
+```
+
+Inverse hyperbolic functions acosh(), asinh(), and atanh() are also available.
+
