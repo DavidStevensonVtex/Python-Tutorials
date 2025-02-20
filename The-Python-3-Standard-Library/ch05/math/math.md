@@ -672,3 +672,277 @@ $ python3 math_gcd.py
 1
 0
 ```
+
+### 5.4.8 Exponents and Logarithms
+
+Exponential growth curves appear in economics, physics, and other sciences. Python has a built-in exponentiation operator (“**”), but pow() can be useful when a callable function is needed as an argument to another function.
+
+```
+# math_pow.py
+import math
+
+INPUTS = [
+    # Typical uses
+    (2, 3),
+    (2.1, 3.2),
+    # Always 1
+    (1.0, 5),
+    (2.0, 0),
+    # Not-a-number
+    (2, float("nan")),
+    # Roots
+    (9.0, 0.5),
+    (27.0, 1.0 / 3),
+]
+
+for x, y in INPUTS:
+    print("{:5.1f} ** {:5.3f} = {:6.3f}".format(x, y, math.pow(x, y)))
+```
+
+Raising 1 to any power always returns 1.0, as does raising any value to a power of 0.0. Most operations on the not-a-number value nan return nan. If the exponent is less than 1, pow() computes a root.
+
+```
+$ python3 math_pow.py
+  2.0 ** 3.000 =  8.000
+  2.1 ** 3.200 = 10.742
+  1.0 ** 5.000 =  1.000
+  2.0 ** 0.000 =  1.000
+  2.0 **   nan =    nan
+  9.0 ** 0.500 =  3.000
+ 27.0 ** 0.333 =  3.000
+```
+
+Since square roots (exponent of 1/2) are used so frequently, there is a separate function for computing them.
+
+```
+# math_sqrt.py
+import math
+
+print(math.sqrt(9.0))
+print(math.sqrt(3))
+try:
+    print(math.sqrt(-1))
+except ValueError as err:
+    print("Cannot compute sqrt(-1):", err)
+```
+
+Computing the square roots of negative numbers requires complex numbers, which are not handled by math. Any attempt to calculate a square root of a negative value results in a ValueError.
+
+```
+$ python3 math_sqrt.py
+3.0
+1.7320508075688772
+Cannot compute sqrt(-1): math domain error
+```
+
+The logarithm function finds y where x = b ** y. By default, log() computes the natural logarithm (the base is e). If a second argument is provided, that value is used as the base.
+
+```
+# math_log.py
+import math
+
+print(math.log(8))
+print(math.log(8, 2))
+print(math.log(0.5, 2))
+```
+
+Logarithms where x is less than one yield negative results.
+
+```
+$ python3 math_log.py
+2.0794415416798357
+3.0
+-1.0
+```
+
+There are three variations of log(). Given floating point representation and rounding errors, the computed value produced by log(x, b) has limited accuracy, especially for some bases. log10() computes log(x, 10), using a more accurate algorithm than log().
+
+```
+# math_log10.py
+import math
+
+print(
+    "{:2} {:^12} {:^10} {:^20} {:8}".format(
+        "i",
+        "x",
+        "accurate",
+        "inaccurate",
+        "mismatch",
+    )
+)
+print(
+    "{:-^2} {:-^12} {:-^10} {:-^20} {:-^8}".format(
+        "",
+        "",
+        "",
+        "",
+        "",
+    )
+)
+
+for i in range(0, 10):
+    x = math.pow(10, i)
+    accurate = math.log10(x)
+    inaccurate = math.log(x, 10)
+    match = "" if int(inaccurate) == i else "*"
+    print(
+        "{:2d} {:12.1f} {:10.8f} {:20.18f} {:^5}".format(
+            i,
+            x,
+            accurate,
+            inaccurate,
+            match,
+        )
+    )
+```
+
+The lines in the output with trailing * highlight the inaccurate values.
+
+```
+$ python3 math_log10.py
+i       x        accurate       inaccurate      mismatch
+-- ------------ ---------- -------------------- --------
+ 0          1.0 0.00000000 0.000000000000000000      
+ 1         10.0 1.00000000 1.000000000000000000      
+ 2        100.0 2.00000000 2.000000000000000000      
+ 3       1000.0 3.00000000 2.999999999999999556   *  
+ 4      10000.0 4.00000000 4.000000000000000000      
+ 5     100000.0 5.00000000 5.000000000000000000      
+ 6    1000000.0 6.00000000 5.999999999999999112   *  
+ 7   10000000.0 7.00000000 7.000000000000000000      
+ 8  100000000.0 8.00000000 8.000000000000000000      
+ 9 1000000000.0 9.00000000 8.999999999999998224   * 
+```
+
+Similar to log10(), log2() calculates the equivalent of math.log(x, 2).
+
+```
+# math_log2.py
+import math
+
+print(
+    "{:>2} {:^5} {:^5}".format(
+        "i",
+        "x",
+        "log2",
+    )
+)
+print(
+    "{:-^2} {:-^5} {:-^5}".format(
+        "",
+        "",
+        "",
+    )
+)
+
+for i in range(0, 10):
+    x = math.pow(2, i)
+    result = math.log2(x)
+    print(
+        "{:2d} {:5.1f} {:5.1f}".format(
+            i,
+            x,
+            result,
+        )
+    )
+```
+
+Depending on the underlying platform, using the built-in and special-purpose function can offer better performance and accuracy by using special-purpose algorithms for base 2 that are not found in the more general purpose function.
+
+```
+$ python3 math_log2.py
+ i   x   log2 
+-- ----- -----
+ 0   1.0   0.0
+ 1   2.0   1.0
+ 2   4.0   2.0
+ 3   8.0   3.0
+ 4  16.0   4.0
+ 5  32.0   5.0
+ 6  64.0   6.0
+ 7 128.0   7.0
+ 8 256.0   8.0
+ 9 512.0   9.0
+```
+
+log1p() calculates the Newton-Mercator series (the natural logarithm of 1+x).
+
+```
+# math_log1p.py
+import math
+
+x = 0.0000000000000000000000001
+print("x       :", x)
+print("1 + x   :", 1 + x)
+print("log(1+x):", math.log(1 + x))
+print("log1p(x):", math.log1p(x))
+```
+
+log1p() is more accurate for values of x very close to zero because it uses an algorithm that compensates for round-off errors from the initial addition.
+
+```
+$ python3 math_log1p.py
+x       : 1e-25
+1 + x   : 1.0
+log(1+x): 0.0
+log1p(x): 1e-25
+```
+
+exp() computes the exponential function (e**x).
+
+```
+# math_exp.py
+import math
+
+x = 2
+
+fmt = "{:.20f}"
+print(fmt.format(math.e**2))
+print(fmt.format(math.pow(math.e, 2)))
+print(fmt.format(math.exp(2)))
+```
+
+exp() computes the exponential function (e**x).
+
+```
+# math_exp.py
+import math
+
+x = 2
+
+fmt = "{:.20f}"
+print(fmt.format(math.e**2))
+print(fmt.format(math.pow(math.e, 2)))
+print(fmt.format(math.exp(2)))
+```
+
+As with other special-case functions, it uses an algorithm that produces more accurate results than the general-purpose equivalent math.pow(math.e, x).
+
+```
+$ python3 math_exp.py
+7.38905609893064951876
+7.38905609893064951876
+7.38905609893065040694
+```
+
+expm1() is the inverse of log1p(), and calculates e**x - 1.
+
+```
+# math_expm1.py
+import math
+
+x = 0.0000000000000000000000001
+
+print(x)
+print(math.exp(x) - 1)
+print(math.expm1(x))
+```
+
+Small values of x lose precision when the subtraction is performed separately, like with log1p().
+
+```
+$ python3 math_expm1.py
+1e-25
+0.0
+1e-25
+```
