@@ -197,3 +197,69 @@ PATH: /one/two/three/
 
 PREFIX: /one/two
 ```
+
+### 6.1.2 Building Paths
+
+Besides taking existing paths apart, it is frequently necessary to build paths from other strings. To combine several path components into a single value, use join():
+
+```
+# ospath_join.py
+import os.path
+
+PATHS = [
+    ("one", "two", "three"),
+    ("/", "one", "two", "three"),
+    ("/one", "/two", "/three"),
+]
+
+for parts in PATHS:
+    print("{} : {!r}".format(parts, os.path.join(*parts)))
+```
+
+If any argument to join begins with os.sep, all of the previous arguments are discarded and the new one becomes the beginning of the return value.
+
+```
+$ python3 ospath_join.py
+('one', 'two', 'three') : 'one/two/three'
+('/', 'one', 'two', 'three') : '/one/two/three'
+('/one', '/two', '/three') : '/three'
+```
+
+It is also possible to work with paths that include “variable” components that can be expanded automatically. For example, expanduser() converts the tilde (~) character to the name of a user’s home directory.
+
+```
+# ospath_expanduser.py
+import os.path
+
+for user in ["", "dstevenson", "nosuchuser"]:
+    lookup = "~" + user
+    print("{!r:>15} : {!r}".format(lookup, os.path.expanduser(lookup)))
+```
+
+If the user’s home directory cannot be found, the string is returned unchanged, as with ~nosuchuser in this example.
+
+```
+$ python3 ospath_expanduser.py
+            '~' : '/home/dstevenson'
+  '~dstevenson' : '/home/dstevenson'
+  '~nosuchuser' : '~nosuchuser'
+```
+
+expandvars() is more general, and expands any shell environment variables present in the path.
+
+```
+# ospath_expandvars.py
+import os.path
+import os
+
+os.environ["MYVAR"] = "VALUE"
+
+print(os.path.expandvars("/path/to/$MYVAR"))
+```
+
+No validation is performed to ensure that the variable value results in the name of a file that already exists.
+
+```
+$ python3 ospath_expandvars.py
+/path/to/VALUE
+```
