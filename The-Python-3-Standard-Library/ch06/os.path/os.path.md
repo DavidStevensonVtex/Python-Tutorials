@@ -263,3 +263,60 @@ No validation is performed to ensure that the variable value results in the name
 $ python3 ospath_expandvars.py
 /path/to/VALUE
 ```
+
+### 6.1.3 Normalizing Paths
+
+Paths assembled from separate strings using join() or with embedded variables might end up with extra separators or relative path components. Use normpath() to clean them up:
+
+```
+# ospath_normpath.py
+import os.path
+
+PATHS = [
+    "one//two//three",
+    "one/./two/./three",
+    "one/../alt/two/three",
+]
+
+for path in PATHS:
+    print("{!r:>22} : {!r}".format(path, os.path.normpath(path)))
+```
+
+Path segments made up of os.curdir and os.pardir are evaluated and collapsed.
+
+```
+$ python3 ospath_normpath.py
+     'one//two//three' : 'one/two/three'
+   'one/./two/./three' : 'one/two/three'
+'one/../alt/two/three' : 'alt/two/three'
+```
+
+To convert a relative path to an absolute filename, use abspath().
+
+```
+# ospath_abspath.py
+import os
+import os.path
+
+os.chdir("/usr")
+
+PATHS = [
+    ".",
+    "..",
+    "./one/two/three",
+    "../one/two/three",
+]
+
+for path in PATHS:
+    print("{!r:>21} : {!r}".format(path, os.path.abspath(path)))
+```
+
+The result is a complete path, starting at the top of the file system tree.
+
+```
+$ python3 ospath_abspath.py
+                  '.' : '/usr'
+                 '..' : '/'
+    './one/two/three' : '/usr/one/two/three'
+   '../one/two/three' : '/one/two/three'
+```
