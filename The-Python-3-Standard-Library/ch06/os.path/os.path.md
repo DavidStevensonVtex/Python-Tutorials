@@ -320,3 +320,30 @@ $ python3 ospath_abspath.py
     './one/two/three' : '/usr/one/two/three'
    '../one/two/three' : '/one/two/three'
 ```
+
+### 6.1.4 File Times
+
+Besides working with paths, os.path includes functions for retrieving file properties, similar to the ones returned by os.stat():
+
+```
+# ospath_properties.py
+import os.path
+import time
+
+print("File         :", __file__)
+print("Access time  :", time.ctime(os.path.getatime(__file__)))
+print("Modified time:", time.ctime(os.path.getmtime(__file__)))
+print("Change time  :", time.ctime(os.path.getctime(__file__)))
+print("Size         :", os.path.getsize(__file__))
+```
+
+os.path.getatime() returns the access time, os.path.getmtime() returns the modification time, and os.path.getctime() returns the creation time. os.path.getsize() returns the amount of data in the file, represented in bytes.
+
+```
+$ python3 ospath_properties.py
+File         : ospath_properties.py
+Access time  : Fri Feb 21 12:28:52 2025
+Modified time: Fri Feb 21 12:28:52 2025
+Change time  : Fri Feb 21 12:28:52 2025
+Size         : 328
+```
