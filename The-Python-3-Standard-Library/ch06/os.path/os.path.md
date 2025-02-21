@@ -347,3 +347,80 @@ Modified time: Fri Feb 21 12:28:52 2025
 Change time  : Fri Feb 21 12:28:52 2025
 Size         : 328
 ```
+
+### 6.1.5 Testing Files
+
+When a program encounters a path name, it often needs to know whether the path refers to a file, directory, or symlink and whether it exists. os.path includes functions for testing all of these conditions.
+
+```
+# ospath_tests.py
+import os.path
+
+FILENAMES = [
+    __file__,
+    os.path.dirname(__file__),
+    "/",
+    "./broken_link",
+]
+
+for file in FILENAMES:
+    print("File        : {!r}".format(file))
+    print("Absolute    :", os.path.isabs(file))
+    print("Is File?    :", os.path.isfile(file))
+    print("Is Dir?     :", os.path.isdir(file))
+    print("Is Link?    :", os.path.islink(file))
+    print("Mountpoint? :", os.path.ismount(file))
+    print("Exists?     :", os.path.exists(file))
+    print("Link Exists?:", os.path.lexists(file))
+    print()
+```
+
+All of the test functions return boolean values.
+
+```
+$ ln -s /does/not/exist broken_link
+$ python3 ospath_tests.py
+File        : 'ospath_tests.py'
+Absolute    : False
+Is File?    : True
+Is Dir?     : False
+Is Link?    : False
+Mountpoint? : False
+Exists?     : True
+Link Exists?: True
+
+File        : ''
+Absolute    : False
+Is File?    : False
+Is Dir?     : False
+Is Link?    : False
+Mountpoint? : False
+Exists?     : False
+Link Exists?: False
+
+File        : '/'
+Absolute    : True
+Is File?    : False
+Is Dir?     : True
+Is Link?    : False
+Mountpoint? : True
+Exists?     : True
+Link Exists?: True
+
+File        : './broken_link'
+Absolute    : False
+Is File?    : False
+Is Dir?     : False
+Is Link?    : True
+Mountpoint? : False
+Exists?     : False
+Link Exists?: True
+```
+
+### See also
+
+* [Standard library documentation for os.path](https://docs.python.org/3/library/os.path.html)
+* [Python 2 to 3 porting notes for os.path](https://pymotw.com/3/porting_notes.html#porting-os-path)
+* [pathlib](https://pymotw.com/3/pathlib/index.html#module-pathlib) – Paths as objects.
+* [os](https://pymotw.com/3/os/index.html#module-os) – The os module is a parent of os.path.
+* [time](https://pymotw.com/3/time/index.html#module-time) – The time module includes functions to convert between the representation used by the time property functions in os.path and easy-to-read strings.
