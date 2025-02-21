@@ -87,3 +87,73 @@ $ python3 statistics_median_grouped.py
 2: 29.00
 3: 28.50
 ```
+
+### 5.5.2 Variance
+
+Statistics uses two values to express how disperse a set of values is relative to the mean. The variance is the average of the square of the difference of each value and the mean, and the standard deviation is the square root of the variance (which is useful because taking the square root allows the standard deviation to be expressed in the same units as the input data). Large values for variance or standard deviation indicate that a set of data is disperse, while small values indicate that the data is clustered closer to the mean.
+
+```
+# statistics_variance.py
+from statistics import *
+import subprocess
+
+
+def get_line_lengths():
+    cmd = "wc -l ../[a-z]*/*.py"
+    out = subprocess.check_output(cmd, shell=True).decode("utf-8")
+    for line in out.splitlines():
+        parts = line.split()
+        if parts[1].strip().lower() == "total":
+            break
+        nlines = int(parts[0].strip())
+        if not nlines:
+            continue  # skip empty files
+        yield (nlines, parts[1].strip())
+
+
+data = list(get_line_lengths())
+
+lengths = [d[0] for d in data]
+sample = lengths[::2]
+
+print("Basic statistics:")
+print("  count     : {:3d}".format(len(lengths)))
+print("  min       : {:6.2f}".format(min(lengths)))
+print("  max       : {:6.2f}".format(max(lengths)))
+print("  mean      : {:6.2f}".format(mean(lengths)))
+
+print("\nPopulation variance:")
+print("  pstdev    : {:6.2f}".format(pstdev(lengths)))
+print("  pvariance : {:6.2f}".format(pvariance(lengths)))
+
+print("\nEstimated variance for sample:")
+print("  count     : {:3d}".format(len(sample)))
+print("  stdev     : {:6.2f}".format(stdev(sample)))
+print("  variance  : {:6.2f}".format(variance(sample)))
+```
+
+Python includes two sets of functions for computing variance and standard deviation, depending on whether the data set represents the entire population or a sample of the population. This example uses wc to count the number of lines in the input files for all of the example programs and then uses pvariance() and pstdev() to compute the variance and standard deviation for the entire population before using variance() and stddev() to compute the sample variance and standard deviation for a subset created by using the length of every second file found.
+
+```
+$ python3 statistics_variance.py
+Basic statistics:
+  count     :  72
+  min       :   5.00
+  max       :  58.00
+  mean      :  15.62
+
+Population variance:
+  pstdev    :  11.16
+  pvariance : 124.57
+
+Estimated variance for sample:
+  count     :  36
+  stdev     :   9.97
+  variance  :  99.31
+```
+
+See also
+
+* [Standard library documentation for statistics](https://docs.python.org/3/library/statistics.html)
+* [mathtips.com: Median for Discrete and Continuous Frequency Type Data (grouped data)](https://www.mathstips.com/median-for-discrete-and-continuous-frequency-type/) – Discussion of median for continuous data
+* [PEP 450](https://peps.python.org/pep-0450/) – Adding A Statistics Module To The Standard Library
