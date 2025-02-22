@@ -302,3 +302,54 @@ $ python3 pathlib_read_write.py
 read from open(): 'This is the content'
 read_text(): 'This is the content'
 ```
+
+### 6.2.7 Manipulating Directories and Symbolic Links
+
+Paths representing directories or symbolic links that do not exist can be used to create the associated file system entries.
+
+```
+# pathlib_mkdir.py
+import pathlib
+
+p = pathlib.Path("example_dir")
+
+print("Creating {}".format(p))
+p.mkdir()
+```
+
+If the path already exists, mkdir() raises a FileExistsError.
+
+```
+$ python3 pathlib_mkdir.py
+Creating example_dir
+$ python3 pathlib_mkdir.py
+Creating example_dir
+Traceback (most recent call last):
+  File "pathlib_mkdir.py", line 7, in <module>
+    p.mkdir()
+  File "/usr/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+FileExistsError: [Errno 17] File exists: 'example_dir'
+```
+
+Use symlink_to() to create a symbolic link. The link will be named based on the path’s value and will refer to the name given as argument to symlink_to().
+
+```
+# pathlib_symlink_to.py
+import pathlib
+
+p = pathlib.Path("example_link")
+
+p.symlink_to("pathlib.md")
+
+print(p)
+print(p.resolve().name)
+```
+
+This example creates a symbolic link, then uses resolve() to read the link to find what it points to and print the name.
+
+```
+$ python3 pathlib_symlink_to.py
+example_link
+pathlib.md
+```
