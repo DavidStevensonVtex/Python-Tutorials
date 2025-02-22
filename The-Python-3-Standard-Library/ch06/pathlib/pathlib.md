@@ -566,3 +566,66 @@ Before: 664
 Adding execute permission
 After: 764
 ```
+
+### 6.2.11 Deleting
+
+There are two methods for removing things from the file system, depending on the type. To remove an empty directory, use rmdir().
+
+```
+# pathlib_rmdir.py
+import pathlib
+
+p = pathlib.Path("example_dir")
+
+print("Removing {}".format(p))
+p.rmdir()
+```
+
+A `FileNotFoundError` exception is raised if the post-conditions are already met and the directory does not exist. It is also an error to try to remove a directory that is not empty.
+
+```
+$ mkdir example_dir
+$ python3 pathlib_rmdir.py
+Removing example_dir
+$ python3 pathlib_rmdir.py
+Removing example_dir
+Traceback (most recent call last):
+  File "pathlib_rmdir.py", line 7, in <module>
+    p.rmdir()
+  File "/usr/lib/python3.8/pathlib.py", line 1336, in rmdir
+    self._accessor.rmdir(self)
+FileNotFoundError: [Errno 2] No such file or directory: 'example_dir'
+```
+
+For files, symbolic links, and most other path types use unlink().
+
+```
+# pathlib_unlink.py
+import pathlib
+
+p = pathlib.Path("touched")
+
+p.touch()
+
+print("exists before removing:", p.exists())
+
+p.unlink()
+
+print("exists after removing:", p.exists())
+```
+
+The user must have permission to remove the file, symbolic link, socket, or other file system object.
+
+```
+$ python3 pathlib_unlink.py
+exists before removing: True
+exists after removing: False
+```
+
+### See also
+
+* [Standard library documentation for pathlib](https://docs.python.org/3/library/pathlib.html)
+* [os.path](https://pymotw.com/3/os.path/index.html#module-os.path) – Platform-independent manipulation of filenames
+* [Managing File System Permissions](https://pymotw.com/3/os/index.html#os-stat) – Discussion of os.stat() and os.lstat().
+* [glob](https://pymotw.com/3/glob/index.html#module-glob) – Unix shell pattern matching for filenames
+* [PEP 428](https://peps.python.org/pep-0428/) – The pathlib module
