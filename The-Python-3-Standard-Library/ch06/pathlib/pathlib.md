@@ -175,3 +175,27 @@ name  : pathlib_name.py
 suffix: .py
 stem  : pathlib_name
 ```
+
+### 6.2.4 Creating Concrete Paths
+
+Instances of the concrete Path class can be created from string arguments referring to the name (or potential name) of a file, directory, or symbolic link on the file system. The class also provides several convenience methods for building instances using commonly used locations that change, such as the current working directory and the user’s home directory.
+
+```
+# pathlib_convenience.py
+import pathlib
+
+home = pathlib.Path.home()
+print("home: ", home)
+
+cwd = pathlib.Path.cwd()
+print("cwd : ", cwd)
+```
+
+Both methods create Path instances pre-populated with an absolute file system reference.
+
+```
+$ python3 pathlib_convenience.py
+home:  /home/dstevenson
+cwd :  /home/dstevenson/Python/GitHub/Python-Tutorials/The-Python-3-Standard-Library/ch06/pathlib
+```
+
