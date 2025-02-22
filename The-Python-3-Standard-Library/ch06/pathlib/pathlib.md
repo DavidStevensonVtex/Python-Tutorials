@@ -106,3 +106,72 @@ source/pathlib/index.rst
 source/pathlib/pathlib_from_existing.py
 source/pathlib/pathlib_from_existing.pyc
 ```
+
+### 6.2.3 Parsing Paths
+
+Path objects have methods and properties for extracting partial values from the name. For example, the parts property produces a sequence of path segments parsed based on the path separator value.
+
+```
+# pathlib_parts.py
+import pathlib
+
+p = pathlib.PurePosixPath("/usr/local")
+print(p.parts)
+```
+
+The sequence is a tuple, reflecting the immutability of the path instance.
+
+```
+$ python3 pathlib_parts.py
+('/', 'usr', 'local')
+```
+
+There are two ways to navigate “up” the filesystem hierarchy from a given path object. The parent property refers to a new path instance for the directory containing the path, the value returned by os.path.dirname(). The parents property is an iterable that produces parent directory references, continually going “up” the path hierarchy until reaching the root.
+
+```
+# pathlib_parents.py
+import pathlib
+
+p = pathlib.PurePosixPath("/usr/local/lib")
+
+print("parent: {}".format(p.parent))
+
+print("\nhierarchy:")
+for up in p.parents:
+    print(up)
+```
+
+The example iterates over the parents property and prints the member values.
+
+```
+$ python3 pathlib_parents.py
+parent: /usr/local
+
+hierarchy:
+/usr/local
+/usr
+/
+```
+
+Other parts of the path can be accessed through properties of the path object. The name property holds the last part of the path, after the final path separator (the same value that os.path.basename() produces). The suffix property holds the value after the extension separator and the stem property holds the portion of the name before the suffix.
+
+```
+# pathlib_name.py
+import pathlib
+
+p = pathlib.PurePosixPath("./source/pathlib/pathlib_name.py")
+print("path  : {}".format(p))
+print("name  : {}".format(p.name))
+print("suffix: {}".format(p.suffix))
+print("stem  : {}".format(p.stem))
+```
+
+Although the suffix and stem values are similar to the values produced by os.path.splitext(), the values are based only on the value of name and not the full path.
+
+```
+$ python3 pathlib_name.py
+path  : source/pathlib/pathlib_name.py
+name  : pathlib_name.py
+suffix: .py
+stem  : pathlib_name
+```
