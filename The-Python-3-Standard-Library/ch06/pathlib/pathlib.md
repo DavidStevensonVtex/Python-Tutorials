@@ -199,3 +199,81 @@ home:  /home/dstevenson
 cwd :  /home/dstevenson/Python/GitHub/Python-Tutorials/The-Python-3-Standard-Library/ch06/pathlib
 ```
 
+### 6.2.5 Directory Contents
+
+There are three methods for accessing the directory listings to discover the names of files available on the file system. iterdir() is a generator, yielding a new Path instance for each item in the containing directory.
+
+```
+# pathlib_iterdir.py
+import pathlib
+
+p = pathlib.Path(".")
+
+for f in p.iterdir():
+    print(f)
+```
+
+If the Path does not refer to a directory, iterdir() raises NotADirectoryError.
+
+```
+$ python3 pathlib_iterdir.py
+pathlib_joinpath.py
+pathlib_from_existing.py
+pathlib_parts.py
+pathlib_convenience.py
+pathlib_iterdir.py
+pathlib_parents.py
+pathlib_operator.py
+pathlib_name.py
+pathlib_resolve.py
+pathlib.md
+```
+
+Use glob() to find only files matching a pattern.
+
+```
+# pathlib_glob.py
+import pathlib
+
+p = pathlib.Path("..")
+
+for f in p.glob("*.md"):
+    print(f)
+```
+
+This example shows all of the Markdown files in the parent directory of the script.
+
+```
+$ python3 pathlib_glob.py
+../the-file-system.md
+```
+
+The glob processor supports recursive scanning using the pattern prefix ** or by calling rglob() instead of glob().
+
+```
+# pathlib_rglob.py
+import pathlib
+
+p = pathlib.Path("..")
+
+for f in p.rglob("pathlib_*.py"):
+    print(f)
+```
+
+Because this example starts from the parent directory, a recursive search is necessary to find the example files matching pathlib_*.py.
+
+```
+$ python3 pathlib_rglob.py
+../pathlib/pathlib_joinpath.py
+../pathlib/pathlib_from_existing.py
+../pathlib/pathlib_glob.py
+../pathlib/pathlib_parts.py
+../pathlib/pathlib_rglob.py
+../pathlib/pathlib_convenience.py
+../pathlib/pathlib_iterdir.py
+../pathlib/pathlib_parents.py
+../pathlib/pathlib_operator.py
+../pathlib/pathlib_name.py
+../pathlib/pathlib_resolve.py
+```
+
