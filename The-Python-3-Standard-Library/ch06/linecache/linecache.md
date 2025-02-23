@@ -76,3 +76,27 @@ SOURCE:
 CACHE:
 'fermentum id, nonummy a, nonummy sit amet, ligula. Curabitur\n'
 ```
+
+### 6.5.3 Handling Blank Lines
+
+The return value always includes the newline at the end of the line, so if the line is empty the return value is just the newline.
+
+```
+# linecache_empty_line.py
+import linecache
+from linecache_data import *
+
+filename = make_tempfile()
+
+# Blank lines include the newline
+print("BLANK : {!r}".format(linecache.getline(filename, 8)))
+
+cleanup(filename)
+```
+
+Line eight of the input file contains no text.
+
+```
+$ python3 linecache_empty_line.py
+BLANK : '\n'
+```
