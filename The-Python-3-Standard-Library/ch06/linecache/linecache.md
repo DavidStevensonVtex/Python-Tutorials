@@ -43,3 +43,36 @@ def make_tempfile():
 def cleanup(filename):
     os.unlink(filename)
 ```
+
+### 6.5.2 Reading Specific Lines
+
+The line numbers of files read by the linecache module start with 1, but normally lists start indexing the array from 0.
+
+```
+# linecache_getline.py
+import linecache
+from linecache_data import *
+
+filename = make_tempfile()
+
+# Pick out the same line from source and cache.
+# (Notice that linecache counts from 1)
+print("SOURCE:")
+print("{!r}".format(lorem.split("\n")[4]))
+print()
+print("CACHE:")
+print("{!r}".format(linecache.getline(filename, 5)))
+
+cleanup(filename)
+```
+
+Each line returned includes a trailing newline.
+
+```
+$ python3 linecache_getline.py
+SOURCE:
+'fermentum id, nonummy a, nonummy sit amet, ligula. Curabitur'
+
+CACHE:
+'fermentum id, nonummy a, nonummy sit amet, ligula. Curabitur\n'
+```
