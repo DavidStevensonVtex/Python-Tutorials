@@ -64,3 +64,40 @@ Filename: fnmatch_fnmatch.py        False
 Filename: fnmatch_fnmatchcase.py    False
 ```
 
+### 6.4.2 Filtering
+
+To test a sequence of filenames, use filter(), which returns a list of the names that match the pattern argument.
+
+```
+# fnmatch_filter.py
+import fnmatch
+import os
+import pprint
+
+pattern = "fnmatch_*.py"
+print("Pattern :", pattern)
+
+files = list(sorted(os.listdir(".")))
+
+print("\nFiles   :")
+pprint.pprint(files)
+
+print("\nMatches :")
+pprint.pprint(fnmatch.filter(files, pattern))
+```
+
+In this example, filter() returns the list of names of the example source files associated with this section.
+
+```
+$ python3 fnmatch_filter.py
+Pattern : fnmatch_*.py
+
+Files   :
+['fnmatch.md',
+ 'fnmatch_filter.py',
+ 'fnmatch_fnmatch.py',
+ 'fnmatch_fnmatchcase.py']
+
+Matches :
+['fnmatch_filter.py', 'fnmatch_fnmatch.py', 'fnmatch_fnmatchcase.py']
+```
