@@ -148,3 +148,43 @@ The module never raises an exception when the caller tries to read data.
 $ python3 linecache_missing_file.py
 NO FILE: ''
 ```
+
+### 6.5.6 Reading Python Source Files
+
+Since linecache is used so heavily when producing tracebacks, one of its key features is the ability to find Python source modules in the import path by specifying the base name of the module.
+
+```
+# linecache_path_search.py
+import linecache
+import os
+
+# Look for the linecache module, using
+# the built in sys.path search.
+module_line = linecache.getline("linecache.py", 3)
+print("MODULE:")
+print(repr(module_line))
+
+# Look at the linecache module source directly.
+file_src = linecache.__file__
+if file_src.endswith(".pyc"):
+    file_src = file_src[:-1]
+print("\nFILE:")
+with open(file_src, "r") as f:
+    file_line = f.readlines()[2]
+print(repr(file_line))
+```
+
+The cache population code in linecache searches sys.path for the named module if it cannot find a file with that name in the current directory. This example looks for linecache.py. Since there is no copy in the current directory, the file from the standard library is found instead.
+
+```
+$ python3 linecache_path_search.py
+MODULE:
+'This is intended to read lines from modules imported -- hence if a filename\n'
+
+FILE:
+'This is intended to read lines from modules imported -- hence if a filename\n'
+```
+
+### See also
+
+* [Standard library documentation for linecache](https://docs.python.org/3/library/linecache.html)
