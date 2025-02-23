@@ -7,3 +7,24 @@ Purpose:	Use Unix shell rules to find filenames matching a pattern.
 Even though the glob API is small, the module packs a lot of power. It is useful in any situation where a program needs to look for a list of files on the file system with names matching a pattern. To create a list of filenames that all have a certain extension, prefix, or any common string in the middle, use glob instead of writing custom code to scan the directory contents.
 
 The pattern rules for glob are not the same as the regular expressions used by the re module. Instead, they follow standard Unix path expansion rules. There are only a few special characters used to implement two different wild-cards and character ranges. The pattern rules are applied to segments of the filename (stopping at the path separator, /). Paths in the pattern can be relative or absolute. Shell variable names and tilde (~) are not expanded.
+
+### 6.3.1 Example Data
+
+The examples in this section assume the following test files are present in the current working directory.
+
+```
+$ python3 glob_maketestdata.py
+dir
+dir/file.txt
+dir/file1.txt
+dir/file2.txt
+dir/filea.txt
+dir/fileb.txt
+dir/file?.txt
+dir/file*.txt
+dir/file[.txt
+dir/subdir
+dir/subdir/subfile.txt
+```
+
+If these files do not exist, use glob_maketestdata.py in the sample code to create them before running the following examples.
