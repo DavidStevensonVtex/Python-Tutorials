@@ -100,3 +100,51 @@ Line eight of the input file contains no text.
 $ python3 linecache_empty_line.py
 BLANK : '\n'
 ```
+
+### 6.5.4 Error Handling
+
+If the requested line number falls out of the range of valid lines in the file, getline() returns an empty string.
+
+```
+# linecache_out_of_range.py
+import linecache
+from linecache_data import *
+
+filename = make_tempfile()
+
+# The cache always returns a string, and uses
+# an empty string to indicate a line which does
+# not exist.
+not_there = linecache.getline(filename, 500)
+print("NOT THERE: {!r} includes {} characters".format(not_there, len(not_there)))
+
+cleanup(filename)
+```
+
+The input file only has 15 lines, so requesting line 500 is like trying to read past the end of the file.
+
+```
+$ python3 linecache_out_of_range.py
+NOT THERE: '' includes 0 characters
+```
+
+Reading from a file that does not exist is handled in the same way.
+
+```
+# linecache_missing_file.py
+import linecache
+
+# Errors are even hidden if linecache cannot find the file
+no_such_file = linecache.getline(
+    "this_file_does_not_exist.txt",
+    1,
+)
+print("NO FILE: {!r}".format(no_such_file))
+```
+
+The module never raises an exception when the caller tries to read data.
+
+```
+$ python3 linecache_missing_file.py
+NO FILE: ''
+```
