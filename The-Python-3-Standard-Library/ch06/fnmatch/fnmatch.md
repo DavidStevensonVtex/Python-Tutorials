@@ -101,3 +101,30 @@ Files   :
 Matches :
 ['fnmatch_filter.py', 'fnmatch_fnmatch.py', 'fnmatch_fnmatchcase.py']
 ```
+
+### 6.4.3 Translating Patterns
+
+Internally, fnmatch converts the glob pattern to a regular expression and uses the [re](https://pymotw.com/3/re/index.html#module-re) module to compare the name and pattern. The translate() function is the public API for converting glob patterns to regular expressions.
+
+```
+# fnmatch_translate.py
+import fnmatch
+
+pattern = "fnmatch_*.py"
+print("Pattern :", pattern)
+print("Regex   :", fnmatch.translate(pattern))
+```
+
+Some of the characters are escaped to make a valid expression.
+
+```
+$ python3 fnmatch_translate.py
+Pattern : fnmatch_*.py
+Regex   : (?s:fnmatch_.*\.py)\Z
+```
+
+### See also
+
+* [Standard library documentation for fnmatch](https://docs.python.org/3/library/fnmatch.html)
+* [glob](https://pymotw.com/3/glob/index.html#module-glob) – The glob module combines fnmatch matching with os.listdir() to produce lists of files and directories matching patterns.
+* [re](https://pymotw.com/3/re/index.html#module-re) – Regular expression pattern matching.
