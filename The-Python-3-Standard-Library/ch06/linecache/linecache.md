@@ -149,7 +149,7 @@ $ python3 linecache_missing_file.py
 NO FILE: ''
 ```
 
-### 6.5.6 Reading Python Source Files
+### 6.5.5 Reading Python Source Files
 
 Since linecache is used so heavily when producing tracebacks, one of its key features is the ability to find Python source modules in the import path by specifying the base name of the module.
 
