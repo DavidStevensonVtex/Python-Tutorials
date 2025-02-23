@@ -108,3 +108,22 @@ dir/filea.txt
 dir/fileb.txt
 ```
 
+### 6.3.4 Character Ranges
+
+Use a character range ([a-z]) instead of a question mark to match one of several characters. This example finds all of the files with a digit in the name before the extension.
+
+```
+# glob_charrange.py
+import glob
+
+for name in sorted(glob.glob("dir/*[0-9].*")):
+    print(name)
+```
+
+The character range [0-9] matches any single digit. The range is ordered based on the character code for each letter/digit, and the dash indicates an unbroken range of sequential characters. The same range value could be written [0123456789].
+
+```
+$ python3 glob_charrange.py
+dir/file1.txt
+dir/file2.txt
+```
