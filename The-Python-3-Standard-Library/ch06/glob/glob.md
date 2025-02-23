@@ -127,3 +127,42 @@ $ python3 glob_charrange.py
 dir/file1.txt
 dir/file2.txt
 ```
+
+### 6.3.5 Escaping Meta-characters
+
+Sometimes it is necessary to search for files with names containing the special meta-characters glob uses for its patterns. The escape() function builds a suitable pattern with the special characters “escaped” so they are not expanded or interpreted as special by glob.
+
+```
+# glob_escape.py
+import glob
+
+specials = "?*["
+
+for char in specials:
+    pattern = "dir/*" + glob.escape(char) + ".txt"
+    print("Searching for: {!r}".format(pattern))
+    for name in sorted(glob.glob(pattern)):
+        print(name)
+    print()
+```
+
+Each special character is escaped by building a character range containing a single entry.
+
+```
+$ python3 glob_escape.py
+Searching for: 'dir/*[?].txt'
+dir/file?.txt
+
+Searching for: 'dir/*[*].txt'
+dir/file*.txt
+
+Searching for: 'dir/*[[].txt'
+dir/file[.txt
+```
+
+### See also
+
+* [Standard library documentation for glob](https://docs.python.org/3/library/glob.html)
+* [Pattern Matching Notation](https://pubs.opengroup.org/onlinepubs/000095399/utilities/xcu_chap02.html#tag_02_13) – An explanation of globbing from The Open Group’s Shell Command Language specification.
+* [fnmatch](https://pymotw.com/3/fnmatch/index.html#module-fnmatch) – Filename matching implementation.
+* [Python 2 to 3 porting notes for glob](https://pymotw.com/3/porting_notes.html#porting-glob)
