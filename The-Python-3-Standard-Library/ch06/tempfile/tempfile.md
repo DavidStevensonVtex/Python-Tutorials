@@ -128,3 +128,59 @@ temp.name:
   '/tmp/tmpt848ui0e'
 Exists after close: False
 ```
+
+### 6.6.3 Spooled Files
+
+For temporary files containing relatively small amounts of data, it is likely to be more efficient to use a SpooledTemporaryFile because it holds the file contents in memory using a io.BytesIO or io.StringIO buffer until they reach a threshold size. When the amount of data passes the threshold, it is “rolled over” and written to disk, and then the buffer is replaced with a normal TemporaryFile().
+
+```
+# tempfile_SpooledTemporaryFile.py
+import tempfile
+
+with tempfile.SpooledTemporaryFile(max_size=100, mode="w+t", encoding="utf-8") as temp:
+    print("temp: {!r}".format(temp))
+
+    for i in range(3):
+        temp.write("This line is repeated over and over.\n")
+        print(temp._rolled, temp._file)
+```
+
+This example uses private attributes of the SpooledTemporaryFile to determine when the rollover to disk has happened. It is not normally necessary to check this status except when tuning the buffer size.
+
+```
+$ python3 tempfile_SpooledTemporaryFile.py
+temp: <tempfile.SpooledTemporaryFile object at 0x7f381f7e5dc0>
+False <_io.TextIOWrapper encoding='utf-8'>
+False <_io.TextIOWrapper encoding='utf-8'>
+True <_io.TextIOWrapper name=3 mode='w+t' encoding='utf-8'>
+```
+
+To explicitly cause the buffer to be written to disk, call the rollover() or fileno() methods.
+
+```
+# tempfile_SpooledTemporaryFile_explicit.py
+import tempfile
+
+with tempfile.SpooledTemporaryFile(max_size=1000, mode="w+t", encoding="utf-8") as temp:
+    print("temp: {!r}".format(temp))
+
+    for i in range(3):
+        temp.write("This line is repeated over and over.\n")
+        print(temp._rolled, temp._file)
+    print("rolling over")
+    temp.rollover()
+    print(temp._rolled, temp._file)
+```
+
+In this example, because the buffer size is so much larger than the amount of data, no file would be created on disk except that rollover() was called.
+
+```
+$ python3 tempfile_SpooledTemporaryFile_explicit.py
+temp: <tempfile.SpooledTemporaryFile object at 0x7fe3af7dcdc0>
+False <_io.TextIOWrapper encoding='utf-8'>
+False <_io.TextIOWrapper encoding='utf-8'>
+False <_io.TextIOWrapper encoding='utf-8'>
+rolling over
+True <_io.TextIOWrapper name=3 mode='w+t' encoding='utf-8'>
+```
+
