@@ -184,3 +184,30 @@ rolling over
 True <_io.TextIOWrapper name=3 mode='w+t' encoding='utf-8'>
 ```
 
+### 6.6.4 Temporary Directories
+
+When several temporary files are needed, it may be more convenient to create a single temporary directory with TemporaryDirectory and open all of the files in that directory.
+
+```
+# tempfile_TemporaryDirectory.py
+import pathlib
+import tempfile
+
+with tempfile.TemporaryDirectory() as directory_name:
+    the_dir = pathlib.Path(directory_name)
+    print(the_dir)
+    a_file = the_dir / "a_file.txt"
+    a_file.write_text("This file is deleted.")
+
+print("Directory exists after?", the_dir.exists())
+print("Contents after:", list(the_dir.glob("*")))
+```
+
+The context manager produces the name of the directory, which can then be used within the context block to build other file names.
+
+```
+$ python3 tempfile_TemporaryDirectory.py
+/tmp/tmp5816tjb6
+Directory exists after? False
+Contents after: []
+```
