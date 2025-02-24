@@ -96,3 +96,35 @@ $ python3 tempfile_TemporaryFile_text.py
 first
 second
 ```
+
+### 6.6.2 Named Files
+
+There are situations where having a named temporary file is important. For applications spanning multiple processes, or even hosts, naming the file is the simplest way to pass it between parts of the application. The NamedTemporaryFile() function creates a file without unlinking it, so it retains its name (accessed with the name attribute).
+
+```
+# tempfile_NamedTemporaryFile.py
+import os
+import pathlib
+import tempfile
+
+with tempfile.NamedTemporaryFile() as temp:
+    print("temp:")
+    print("  {!r}".format(temp))
+    print("temp.name:")
+    print("  {!r}".format(temp.name))
+
+    f = pathlib.Path(temp.name)
+
+print("Exists after close:", f.exists())
+```
+
+The file is removed after the handle is closed.
+
+```
+$ python3 tempfile_NamedTemporaryFile.py
+temp:
+  <tempfile._TemporaryFileWrapper object at 0x7f76c878ff10>
+temp.name:
+  '/tmp/tmpt848ui0e'
+Exists after close: False
+```
