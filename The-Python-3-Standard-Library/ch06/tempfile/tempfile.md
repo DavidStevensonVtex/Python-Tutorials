@@ -243,3 +243,50 @@ temp.name:
    /tmp/prefix_adj6xtr6_suffix
 ```
 
+### 6.6.6 Temporary File Location
+
+If an explicit destination is not given using the dir argument, the path used for the temporary files will vary based on the current platform and settings. The tempfile module includes two functions for querying the settings being used at runtime.
+
+```
+# tempfile_settings.py
+import tempfile
+
+print("gettempdir():", tempfile.gettempdir())
+print("gettempprefix():", tempfile.gettempprefix())
+```
+
+gettempdir() returns the default directory that will hold all of the temporary files and gettempprefix() returns the string prefix for new file and directory names.
+
+```
+$ python3 tempfile_settings.py
+gettempdir(): /tmp
+gettempprefix(): tmp
+```
+
+The value returned by gettempdir() is set based on a straightforward algorithm of looking through a list of locations for the first place the current process can create a file. The search list is:
+
+1. The environment variable TMPDIR
+1. The environment variable TEMP
+1. The environment variable TMP
+1. A fallback, based on the platform. (Windows uses the first available of C:\temp, C:\tmp, \temp, or \tmp. Other platforms use /tmp, /var/tmp, or /usr/tmp.)
+1. If no other directory can be found, the current working directory is used.
+
+```
+# tempfile_tempdir.py
+import tempfile
+
+tempfile.tempdir = "/I/changed/this/path"
+print("gettempdir():", tempfile.gettempdir())
+```
+
+Programs that need to use a global location for all temporary files without using any of these environment variables should set tempfile.tempdir directly by assigning a value to the variable.
+
+```
+$ python3 tempfile_tempdir.py
+gettempdir(): /I/changed/this/path
+```
+
+### See also
+
+* [Standard library documentation for tempfile](https://docs.python.org/3/library/tempfile.html)
+* [random](https://pymotw.com/3/random/index.html#module-random) – Psuedorandom number generators, used to introduce random values into temporary file names
