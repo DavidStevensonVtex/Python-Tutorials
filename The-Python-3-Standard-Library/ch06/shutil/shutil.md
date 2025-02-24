@@ -156,3 +156,78 @@ DEST:
   Accessed: Mon Feb 24 14:13:49 2025
   Modified: Mon Feb 24 14:13:49 2025
 ```
+
+### 6.7.2 Copying File Metadata
+
+By default when a new file is created under Unix, it receives permissions based on the umask of the current user. To copy the permissions from one file to another, use copymode().
+
+```
+# shutil_copymode.py
+import os
+import shutil
+import subprocess
+
+with open("file_to_change.txt", "wt") as f:
+    f.write("content")
+os.chmod("file_to_change.txt", 0o444)
+
+print("BEFORE:", oct(os.stat("file_to_change.txt").st_mode))
+
+shutil.copymode("shutil_copymode.py", "file_to_change.txt")
+
+print("AFTER :", oct(os.stat("file_to_change.txt").st_mode))
+```
+
+This example script creates a file to be modified, then uses copymode() to duplicate the permissions of the script to the example file.
+
+```
+$ python3 shutil_copymode.py
+BEFORE: 0o100444
+AFTER : 0o100664
+```
+
+To copy other metadata about the file use copystat().
+
+```
+# shutil_copystat.py
+import os
+import shutil
+import time
+
+
+def show_file_info(filename):
+    stat_info = os.stat(filename)
+    print("  Mode    :", oct(stat_info.st_mode))
+    print("  Created :", time.ctime(stat_info.st_ctime))
+    print("  Accessed:", time.ctime(stat_info.st_atime))
+    print("  Modified:", time.ctime(stat_info.st_mtime))
+
+
+with open("file_to_change.txt", "wt") as f:
+    f.write("content")
+os.chmod("file_to_change.txt", 0o444)
+
+print("BEFORE:")
+show_file_info("file_to_change.txt")
+
+shutil.copystat("shutil_copystat.py", "file_to_change.txt")
+
+print("AFTER:")
+show_file_info("file_to_change.txt")
+```
+
+Only the permissions and dates associated with the file are duplicated with copystat().
+
+```
+$ python3 shutil_copystat.py
+BEFORE:
+  Mode    : 0o100444
+  Created : Mon Feb 24 14:21:48 2025
+  Accessed: Mon Feb 24 14:21:48 2025
+  Modified: Mon Feb 24 14:21:48 2025
+AFTER:
+  Mode    : 0o100664
+  Created : Mon Feb 24 14:21:48 2025
+  Accessed: Mon Feb 24 14:20:22 2025
+  Modified: Mon Feb 24 14:20:22 2025
+```
