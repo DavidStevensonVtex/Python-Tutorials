@@ -211,3 +211,35 @@ $ python3 tempfile_TemporaryDirectory.py
 Directory exists after? False
 Contents after: []
 ```
+
+### 6.6.5 Predicting Names
+
+While less secure than strictly anonymous temporary files, including a predictable portion in the name makes it possible to find the file and examine it for debugging purposes. All of the functions described so far take three arguments to control the filenames to some degree. Names are generated using the formula:
+
+`dir + prefix + random + suffix`
+
+All of the values except random can be passed as arguments to the functions for creating temporary files or directories.
+
+```
+# tempfile_NamedTemporaryFile_args.py
+import tempfile
+
+with tempfile.NamedTemporaryFile(
+    suffix="_suffix", prefix="prefix_", dir="/tmp"
+) as temp:
+    print("temp:")
+    print("  ", temp)
+    print("temp.name:")
+    print("  ", temp.name)
+```
+
+The prefix and suffix arguments are combined with a random string of characters to build the filename, and the dir argument is taken as-is and used as the location of the new file.
+
+```
+$ python3 tempfile_NamedTemporaryFile_args.py
+temp:
+   <tempfile._TemporaryFileWrapper object at 0x7efc615480a0>
+temp.name:
+   /tmp/prefix_adj6xtr6_suffix
+```
+
