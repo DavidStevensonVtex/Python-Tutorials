@@ -110,3 +110,50 @@ b'Lorem ipsum dolor sit amet, reutetcesnoc adipiscing elit.'
 File  :
 Lorem ipsum dolor sit amet, reutetcesnoc adipiscing elit.
 ```
+
+#### 6.9.2.1 Copy Mode
+
+Using the access setting ACCESS_COPY does not write changes to the file on disk.
+
+```
+# mmap_write_copy.py
+import mmap
+import shutil
+
+# Copy the example file
+shutil.copyfile("lorem.txt", "lorem_copy.txt")
+
+word = b"consectetuer"
+reversed = word[::-1]
+
+with open("lorem_copy.txt", "r+") as f:
+    with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_COPY) as m:
+        print("Memory Before:\n{}".format(m.readline().rstrip()))
+        print("File Before  :\n{}\n".format(f.readline().rstrip()))
+
+        m.seek(0)  # rewind
+        loc = m.find(word)
+        m[loc : loc + len(word)] = reversed
+
+        m.seek(0)  # rewind
+        print("Memory After :\n{}".format(m.readline().rstrip()))
+
+        f.seek(0)
+        print("File After   :\n{}".format(f.readline().rstrip()))
+```
+
+It is necessary to rewind the file handle in this example separately from the mmap handle, because the internal state of the two objects is maintained separately.
+
+```
+$ python3 mmap_write_copy.py
+Memory Before:
+b'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.'
+File Before  :
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+
+Memory After :
+b'Lorem ipsum dolor sit amet, reutetcesnoc adipiscing elit.'
+File After   :
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+```
+
