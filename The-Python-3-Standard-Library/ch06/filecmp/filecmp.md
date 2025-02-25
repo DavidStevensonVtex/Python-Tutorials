@@ -113,3 +113,93 @@ example/dir2/file_only_in_dir2
 ```
 
 The same directory structure is repeated one time under the “common_dir” directories to give interesting recursive comparison options.
+
+### 6.8.2 Comparing Files
+
+cmp() compares two files on the file system.
+
+```
+# filecmp_cmp.py
+import filecmp
+
+print("common_file    :", end=" ")
+print(
+    filecmp.cmp("example/dir1/common_file", "example/dir2/common_file", shallow=True),
+    end=" ",
+)
+print(
+    filecmp.cmp("example/dir1/common_file", "example/dir2/common_file", shallow=False)
+)
+
+print("contents_differ:", end=" ")
+print(
+    filecmp.cmp(
+        "example/dir1/contents_differ", "example/dir2/contents_differ", shallow=True
+    ),
+    end=" ",
+)
+print(
+    filecmp.cmp(
+        "example/dir1/contents_differ", "example/dir2/contents_differ", shallow=False
+    )
+)
+
+print("identical      :", end=" ")
+print(
+    filecmp.cmp(
+        "example/dir1/file_only_in_dir1", "example/dir1/file_only_in_dir1", shallow=True
+    ),
+    end=" ",
+)
+print(
+    filecmp.cmp(
+        "example/dir1/file_only_in_dir1",
+        "example/dir1/file_only_in_dir1",
+        shallow=False,
+    )
+)
+```
+
+The shallow argument tells cmp() whether to look at the contents of the file, in addition to its metadata. The default is to perform a shallow comparison using the information available from os.stat(). If the stat results are the same, the files are considered the same. Because the stat output includes the inode on Linux, separate files are not treated as the same even if all of their other metadata (size, creation time, etc.) match. In those cases, the file contents are compared. When shallow is False, the contents of the file are always compared.
+
+```
+$ python3 filecmp_cmp.py
+common_file    : True True
+contents_differ: True False
+identical      : True True
+```
+
+To compare a set of files in two directories without recursing, use cmpfiles(). The arguments are the names of the directories and a list of files to be checked in the two locations. The list of common files passed in should contain only filenames (directories always result in a mismatch) and the files must be present in both locations. The next example shows a simple way to build the common list. The comparison also takes the shallow flag, just as with cmp().
+
+```
+# filecmp_cmpfiles.py
+import filecmp
+import os
+
+# Determine the items that exist in both directories
+d1_contents = set(os.listdir("example/dir1"))
+d2_contents = set(os.listdir("example/dir2"))
+common = list(d1_contents & d2_contents)
+common_files = [f for f in common if os.path.isfile(os.path.join("example/dir1", f))]
+print("Common files:", common_files)
+
+# Compare the directories
+match, mismatch, errors = filecmp.cmpfiles(
+    "example/dir1",
+    "example/dir2",
+    common_files,
+)
+print("Match       :", match)
+print("Mismatch    :", mismatch)
+print("Errors      :", errors)
+```
+
+cmpfiles() returns three lists of filenames containing files that match, files that do not match, and files that could not be compared (due to permission problems or for any other reason).
+
+```
+$ python3 filecmp_cmpfiles.py
+Common files: ['file_in_dir1', 'common_file', 'contents_differ']
+Match       : ['common_file', 'contents_differ']
+Mismatch    : ['file_in_dir1']
+Errors      : []
+```
