@@ -271,3 +271,190 @@ diff example/dir1/common_dir/dir2/dir_only_in_dir2 example/dir2/common_dir/dir2/
 diff example/dir1/common_dir/dir2/file_in_dir1 example/dir2/common_dir/dir2/file_in_dir1
 ```
 
+### 6.8.4 Using Differences in a Program
+
+Besides producing printed reports, dircmp calculates lists of files that can be used in programs directly. Each of the following attributes is calculated only when requested, so creating a dircmp instance does not incur overhead for unused data.
+
+```
+# filecmp_dircmp_list.py
+import filecmp
+import pprint
+
+dc = filecmp.dircmp("example/dir1", "example/dir2")
+print("Left:")
+pprint.pprint(dc.left_list)
+
+print("\nRight:")
+pprint.pprint(dc.right_list)
+```
+
+The files and subdirectories contained in the directories being compared are listed in left_list and right_list.
+
+```
+$ python3 filecmp_dircmp_list.py
+Left:
+['common_dir',
+ 'common_file',
+ 'contents_differ',
+ 'dir_only_in_dir1',
+ 'file_in_dir1',
+ 'file_only_in_dir1']
+
+Right:
+['common_dir',
+ 'common_file',
+ 'contents_differ',
+ 'dir_only_in_dir2',
+ 'file_in_dir1',
+ 'file_only_in_dir2']
+```
+
+The inputs can be filtered by passing a list of names to ignore to the constructor. By default the names RCS, CVS, and tags are ignored.
+
+```
+# filecmp_dircmp_list_filter.py
+import filecmp
+import pprint
+
+dc = filecmp.dircmp("example/dir1", "example/dir2", ignore=["common_file"])
+
+print("Left:")
+pprint.pprint(dc.left_list)
+
+print("\nRight:")
+pprint.pprint(dc.right_list)
+```
+
+In this case, the “common_file” is left out of the list of files to be compared.
+
+```
+$ python3 filecmp_dircmp_list_filter.py
+Left:
+['common_dir',
+ 'contents_differ',
+ 'dir_only_in_dir1',
+ 'file_in_dir1',
+ 'file_only_in_dir1']
+
+Right:
+['common_dir',
+ 'contents_differ',
+ 'dir_only_in_dir2',
+ 'file_in_dir1',
+ 'file_only_in_dir2']
+```
+
+The names of files common to both input directories are saved in common, and the files unique to each directory are listed in left_only, and right_only.
+
+```
+# filecmp_dircmp_membership.py
+import filecmp
+import pprint
+
+dc = filecmp.dircmp("example/dir1", "example/dir2")
+print("Common:")
+pprint.pprint(dc.common)
+
+print("\nLeft:")
+pprint.pprint(dc.left_only)
+
+print("\nRight:")
+pprint.pprint(dc.right_only)
+```
+
+The “left” directory is the first argument to dircmp() and the “right” directory is the second.
+
+```
+$ python3 filecmp_dircmp_membership.py
+Common:
+['common_dir', 'common_file', 'contents_differ', 'file_in_dir1']
+
+Left:
+['dir_only_in_dir1', 'file_only_in_dir1']
+
+Right:
+['dir_only_in_dir2', 'file_only_in_dir2']
+```
+
+The common members can be further broken down into files, directories and “funny” items (anything that has a different type in the two directories or where there is an error from os.stat()).
+
+```
+# filecmp_dircmp_common.py
+import filecmp
+import pprint
+
+dc = filecmp.dircmp("example/dir1", "example/dir2")
+print("Common:")
+pprint.pprint(dc.common)
+
+print("\nDirectories:")
+pprint.pprint(dc.common_dirs)
+
+print("\nFiles:")
+pprint.pprint(dc.common_files)
+
+print("\nFunny:")
+pprint.pprint(dc.common_funny)
+```
+
+In the example data, the item named “file_in_dir1” is a file in one directory and a subdirectory in the other, so it shows up in the funny list.
+
+```
+$ python3 filecmp_dircmp_common.py
+Common:
+['common_dir', 'common_file', 'contents_differ', 'file_in_dir1']
+
+Directories:
+['common_dir']
+
+Files:
+['common_file', 'contents_differ']
+
+Funny:
+['file_in_dir1']
+```
+
+The differences between files are broken down similarly.
+
+```
+# filecmp_dircmp_diff.py
+import filecmp
+
+dc = filecmp.dircmp("example/dir1", "example/dir2")
+print("Same      :", dc.same_files)
+print("Different :", dc.diff_files)
+print("Funny     :", dc.funny_files)
+```
+
+The file not_the_same is only being compared via os.stat(), and the contents are not examined, so it is included in the same_files list.
+
+```
+$ python3 filecmp_dircmp_diff.py
+Same      : ['common_file', 'contents_differ']
+Different : []
+Funny     : []
+```
+
+Finally, the subdirectories are also saved to allow easy recursive comparison.
+
+```
+# filecmp_dircmp_subdirs.py
+import filecmp
+
+dc = filecmp.dircmp("example/dir1", "example/dir2")
+print("Subdirectories:")
+print(dc.subdirs)
+```
+
+The attribute subdirs is a dictionary mapping the directory name to new dircmp objects.
+
+```
+$ python3 filecmp_dircmp_subdirs.py
+Subdirectories:
+{'common_dir': <filecmp.dircmp object at 0x7f67157b1340>}
+```
+
+### See also
+
+* [Standard library documentation for filecmp](https://docs.python.org/3/library/filecmp.html)
+* [difflib](https://pymotw.com/3/difflib/index.html#module-difflib) – Computing the differences between two sequences.
