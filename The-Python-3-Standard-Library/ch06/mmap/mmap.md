@@ -157,3 +157,36 @@ File After   :
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
 ```
 
+### 6.9.3 Regular Expressions
+
+Since a memory mapped file can act like a string, it can be used with other modules that operate on strings, such as regular expressions. This example finds all of the sentences with “nulla” in them.
+
+```
+# mmap_regex.py
+import mmap
+import re
+
+pattern = re.compile(
+    rb"(\.\W+)?([^.]?nulla[^.]*?\.)", re.DOTALL | re.IGNORECASE | re.MULTILINE
+)
+
+with open("lorem.txt", "r") as f:
+    with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
+        for match in pattern.findall(m):
+            print(match[1].replace(b"\n", b" "))
+```
+
+Because the pattern includes two groups, the return value from findall() is a sequence of tuples. The print statement pulls out the matching sentence and replaces newlines with spaces so each result prints on a single line.
+
+```
+$ python3 mmap_regex.py
+b'Nulla facilisi.'
+b'Nulla feugiat augue eleifend nulla.'
+```
+
+### See also
+
+* [Standard library documentation for mmap](https://docs.python.org/3/library/mmap.html)
+* [Python 2 to 3 porting notes for mmap](https://pymotw.com/3/porting_notes.html#porting-mmap)
+* [os](https://pymotw.com/3/os/index.html#module-os) – The os module.
+* [re](https://pymotw.com/3/re/index.html#module-re) – Regular expressions.
