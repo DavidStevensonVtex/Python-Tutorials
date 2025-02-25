@@ -610,3 +610,34 @@ shutil/shutil.md
 shutil/shutil_move.py
 ```
 
+### 6.7.6 File System Space
+
+It can be useful to examine the local file system to see how much space is available before performing a long running operation that may exhaust that space. disk_usage() returns a tuple with the total space, the amount currently being used, and the amount remaining free.
+
+```
+# shutil_disk_usage.py
+import shutil
+
+total_b, used_b, free_b = shutil.disk_usage(".")
+
+gib = 2**30  # GiB == gibibyte
+gb = 10**9  # GB == gigabyte
+
+print("Total: {:6.2f} GB  {:6.2f} GiB".format(total_b / gb, total_b / gib))
+print("Used : {:6.2f} GB  {:6.2f} GiB".format(used_b / gb, used_b / gib))
+print("Free : {:6.2f} GB  {:6.2f} GiB".format(free_b / gb, free_b / gib))
+```
+
+The values returned by disk_usage() are the number of bytes, so the example program converts them to more readable units before printing them.
+
+```
+$ python3 shutil_disk_usage.py
+Total: 982.82 GB  915.32 GiB
+Used :  22.09 GB   20.58 GiB
+Free : 910.73 GB  848.18 GiB
+```
+
+### See also
+
+* [Standard library documentation for shutil](https://docs.python.org/3/library/shutil.html)
+* [Data Compression and Archiving](https://pymotw.com/3/compression.html) – Modules for dealing with archive and compression formats.
