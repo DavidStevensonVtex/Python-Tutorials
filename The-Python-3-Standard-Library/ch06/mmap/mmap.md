@@ -30,3 +30,35 @@ Note
 
 There are differences in the arguments and behaviors for mmap() between Unix and Windows, which are not fully discussed here. For more details, refer to the standard library documentation.
 
+### 6.9.1 Reading
+
+Use the mmap() function to create a memory-mapped file. The first argument is a file descriptor, either from the fileno() method of a file object or from os.open(). The caller is responsible for opening the file before invoking mmap(), and closing it after it is no longer needed.
+
+The second argument to mmap() is a size in bytes for the portion of the file to map. If the value is 0, the entire file is mapped. If the size is larger than the current size of the file, the file is extended.
+
+Note
+
+Windows does not support creating a zero-length mapping.
+
+An optional keyword argument, access, is supported by both platforms. Use ACCESS_READ for read-only access, ACCESS_WRITE for write-through (assignments to the memory go directly to the file), or ACCESS_COPY for copy-on-write (assignments to memory are not written to the file).
+
+```
+# mmap_read.py
+import mmap
+
+with open("lorem.txt", "r") as f:
+    with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
+        print("First 10 bytes via read :", m.read(10))
+        print("First 10 bytes via slice:", m[:10])
+        print("2nd   10 bytes via read :", m.read(10))
+```
+
+The file pointer tracks the last byte accessed through a slice operation. In this example, the pointer moves ahead 10 bytes after the first read. It is then reset to the beginning of the file by the slice operation, and moved ahead 10 bytes again by the slice. After the slice operation, calling read() again gives the bytes 11-20 in the file.
+
+```
+$ python3 mmap_read.py
+First 10 bytes via read : b'Lorem ipsu'
+First 10 bytes via slice: b'Lorem ipsu'
+2nd   10 bytes via read : b'm dolor si'
+```
+
