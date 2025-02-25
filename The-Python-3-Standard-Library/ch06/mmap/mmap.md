@@ -62,3 +62,51 @@ First 10 bytes via slice: b'Lorem ipsu'
 2nd   10 bytes via read : b'm dolor si'
 ```
 
+### 6.9.2 Writing
+
+To set up the memory mapped file to receive updates, start by opening it for appending with mode 'r+' (not 'w') before mapping it. Then use any of the API methods that change the data (write(), assignment to a slice, etc.).
+
+The next example uses the default access mode of ACCESS_WRITE and assigning to a slice to modify part of a line in place.
+
+```
+# mmap_write_slice.py
+import mmap
+import shutil
+
+# Copy the example file
+shutil.copyfile("lorem.txt", "lorem_copy.txt")
+
+word = b"consectetuer"
+reversed = word[::-1]
+print("Looking for    :", word)
+print("Replacing with :", reversed)
+
+with open("lorem_copy.txt", "r+") as f:
+    with mmap.mmap(f.fileno(), 0) as m:
+        print("Before:\n{}".format(m.readline().rstrip()))
+        m.seek(0)  # rewind
+
+        loc = m.find(word)
+        m[loc : loc + len(word)] = reversed
+        m.flush()
+
+        m.seek(0)  # rewind
+        print("After :\n{}".format(m.readline().rstrip()))
+
+        f.seek(0)  # rewind
+        print("File  :\n{}".format(f.readline().rstrip()))
+```
+
+The word “consectetuer” is replaced in the middle of the first line in memory and in the file.
+
+```
+$ python3 mmap_write_slice.py
+Looking for    : b'consectetuer'
+Replacing with : b'reutetcesnoc'
+Before:
+b'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.'
+After :
+b'Lorem ipsum dolor sit amet, reutetcesnoc adipiscing elit.'
+File  :
+Lorem ipsum dolor sit amet, reutetcesnoc adipiscing elit.
+```
