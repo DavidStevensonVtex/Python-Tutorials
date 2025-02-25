@@ -457,3 +457,156 @@ $ touch config.ini
 $ python3 shutil_which_regular_file.py
 ./config.ini
 ```
+
+### 6.7.5 Archives
+
+Python’s standard library includes many modules for managing archive files such as tarfile and zipfile. There are also several higher-level functions for creating and extracting archives in shutil. get_archive_formats() returns a sequence of names and descriptions for formats supported on the current system.
+
+```
+# shutil_get_archive_formats.py
+import shutil
+
+for format, description in shutil.get_archive_formats():
+    print("{:<5}: {}".format(format, description))
+```
+
+The formats supported depend on which modules and underlying libraries are available, so the output for this example may change based on where it is run.
+
+```
+$ python3 shutil_get_archive_formats.py
+bztar: bzip2'ed tar-file
+gztar: gzip'ed tar-file
+tar  : uncompressed tar file
+xztar: xz'ed tar-file
+zip  : ZIP file
+```
+
+Use make_archive() to create a new archive file. Its inputs are designed to best support archiving an entire directory and all of its contents, recursively. By default it uses the current working directory, so that all of the files and subdirectories appear at the top level of the archive. To change that behavior, use the root_dir argument to move to a new relative position on the filesystem and the base_dir argument to specify a directory to add to the archive.
+
+```
+# shutil_make_archive.py
+import logging
+import shutil
+import sys
+import tarfile
+
+logging.basicConfig(
+    format="%(message)s",
+    stream=sys.stdout,
+    level=logging.DEBUG,
+)
+logger = logging.getLogger("pymotw")
+
+print("Creating archive:")
+shutil.make_archive(
+    "example",
+    "gztar",
+    root_dir="..",
+    base_dir="shutil",
+    logger=logger,
+)
+
+print("\nArchive contents:")
+with tarfile.open("example.tar.gz", "r") as t:
+    for n in t.getnames():
+        print(n)
+```
+
+This example starts within the source directory for the examples for shutil and moves up one level in the file system, then adds the shutil directory to a tar archive compressed with gzip. The logging module is configured to show messages from make_archive() about what it is doing.
+
+```
+$ python3 shutil_make_archive.py
+Creating archive:
+changing into '..'
+Creating tar archive
+changing back to '/home/dstevenson/Python/GitHub/Python-Tutorials/The-Python-3-Standard-Library/ch06/shutil'
+
+Archive contents:
+shutil
+shutil/shutil.md
+shutil/shutil_copy.py
+shutil/shutil_copy2.py
+shutil/shutil_copyfile.py
+shutil/shutil_copyfile.py.copy
+shutil/shutil_copyfileobj.py
+shutil/shutil_copymode.py
+shutil/shutil_copystat.py
+shutil/shutil_copytree.py
+shutil/shutil_copytree_verbose.py
+shutil/shutil_get_archive_formats.py
+shutil/shutil_make_archive.py
+shutil/shutil_move.py
+shutil/shutil_rmtree.py
+shutil/shutil_which.py
+shutil/shutil_which_regular_file.py
+```
+
+shutil maintains a registry of formats that can be unpacked on the current system, accessible via get_unpack_formats().
+
+```
+# shutil_get_unpack_formats.py
+import shutil
+
+for format, exts, description in shutil.get_unpack_formats():
+    print("{:<5}: {}, names ending in {}".format(format, description, exts))
+```
+
+This registry is different from the registry for creating archives because it also includes common file extensions used for each format so that the function for extracting an archive can guess which format to use based on the file extension.
+
+```
+$ python3 shutil_get_unpack_formats.py
+bztar: bzip2'ed tar-file, names ending in ['.tar.bz2', '.tbz2']
+gztar: gzip'ed tar-file, names ending in ['.tar.gz', '.tgz']
+tar  : uncompressed tar file, names ending in ['.tar']
+xztar: xz'ed tar-file, names ending in ['.tar.xz', '.txz']
+zip  : ZIP file, names ending in ['.zip']
+```
+
+Extract the archive with unpack_archive(), passing the archive file name and optionally the directory where it should be extracted. If no directory is given, the current directory is used.
+
+```
+# shutil_unpack_archive.py
+import pathlib
+import shutil
+import sys
+import tempfile
+
+with tempfile.TemporaryDirectory() as d:
+    print("Unpacking archive:")
+    shutil.unpack_archive(
+        "example.tar.gz",
+        extract_dir=d,
+    )
+
+    print("\nCreated:")
+    prefix_len = len(d) + 1
+    for extracted in pathlib.Path(d).rglob("*"):
+        print(str(extracted)[prefix_len:])
+```
+
+In this example unpack_archive() is able to determine the format of the archive because the filename ends with tar.gz, and that value is associated with the gztar format in the unpack format registry.
+
+```
+$ python3 shutil_unpack_archive.py
+Unpacking archive:
+
+Created:
+shutil
+shutil/shutil_copy2.py
+shutil/shutil_copyfile.py.copy
+shutil/shutil_make_archive.py
+shutil/shutil_copytree_verbose.py
+shutil/shutil_which_regular_file.py
+shutil/shutil_get_archive_formats.py
+shutil/shutil_copystat.py
+shutil/shutil_copyfile.py
+shutil/shutil_which.py
+shutil/shutil_copytree.py
+shutil/shutil_copy.py
+shutil/shutil_rmtree.py
+shutil/shutil_copyfileobj.py
+shutil/shutil_copymode.py
+shutil/shutil.md
+shutil/shutil_move.py
+```
+
