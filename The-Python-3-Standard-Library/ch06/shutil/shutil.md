@@ -377,3 +377,83 @@ $ python3 shutil_move.py
 BEFORE:  ['example.txt']
 AFTER :  ['example.out']
 ```
+
+### 6.7.4 Finding Files
+
+The which() function scans a search path looking for a named file. The typical use case is to find an executable program on the shell’s search path defined in the environment variable PATH.
+
+```
+# shutil_which.py
+import shutil
+
+print(shutil.which("ls"))
+print(shutil.which("python3"))
+print(shutil.which("no-such-program"))
+```
+
+If no file matching the search parameters can be found, which() returns None.
+
+```
+$ python3 shutil_which.py
+/bin/ls
+/usr/bin/python3
+None
+```
+
+which() takes arguments to filter based on the permissions the file has, and the search path to examine. The path argument defaults to os.environ('PATH'), but can be any string containing directory names separated by os.pathsep. The mode argument should be a bitmask matching the permissions of the file. By default the mask looks for executable files, but the following example uses a readable bitmask and an alternate search path to find a configuration file.
+
+```
+# shutil_which_regular_file.py
+import os
+import shutil
+
+path = os.pathsep.join(
+    [
+        ".",
+        os.path.expanduser("~/pymotw"),
+    ]
+)
+
+mode = os.F_OK | os.R_OK
+
+filename = shutil.which(
+    "config.ini",
+    mode=mode,
+    path=path,
+)
+
+print(filename)
+```
+
+which() takes arguments to filter based on the permissions the file has, and the search path to examine. The path argument defaults to os.environ('PATH'), but can be any string containing directory names separated by os.pathsep. The mode argument should be a bitmask matching the permissions of the file. By default the mask looks for executable files, but the following example uses a readable bitmask and an alternate search path to find a configuration file.
+
+```
+# shutil_which_regular_file.py
+import os
+import shutil
+
+path = os.pathsep.join(
+    [
+        ".",
+        os.path.expanduser("~/pymotw"),
+    ]
+)
+
+mode = os.F_OK | os.R_OK
+
+filename = shutil.which(
+    "config.ini",
+    mode=mode,
+    path=path,
+)
+
+print(filename)
+```
+
+There is still a race condition searching for readable files this way, because in the time between finding the file and actually trying to use it, the file can be deleted or its permissions can be changed.
+
+```
+$ touch config.ini
+$ python3 shutil_which_regular_file.py
+./config.ini
+```
