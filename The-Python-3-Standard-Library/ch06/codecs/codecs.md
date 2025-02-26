@@ -389,3 +389,64 @@ The other lossless error handling scheme is backslashreplace, which produces an 
 $ python3 codecs_encode_error.py backslashreplace
 File contents: b'fran\\xe7ais'
 ```
+
+#### 6.10.4.2 Decoding Errors
+
+It is also possible to see errors when decoding data, especially if the wrong encoding is used.
+
+```
+# codecs_decode_error.py
+import codecs
+import sys
+
+from codecs_to_hex import to_hex
+
+error_handling = sys.argv[1]
+
+text = "français"
+print("Original     :", repr(text))
+
+# Save the data with one encoding
+with codecs.open("decode_error.txt", "w", encoding="utf-16") as f:
+    f.write(text)
+
+# Dump the bytes from the file
+with open("decode_error.txt", "rb") as f:
+    print("File contents:", to_hex(f.read(), 1))
+
+# Try to read the data with the wrong encoding
+with codecs.open("decode_error.txt", "r", encoding="utf-8", errors=error_handling) as f:
+    try:
+        data = f.read()
+    except UnicodeDecodeError as err:
+        print("ERROR:", err)
+    else:
+        print("Read         :", repr(data))
+```
+
+As with encoding, strict error handling mode raises an exception if the byte stream cannot be properly decoded. In this case, a UnicodeDecodeError results from trying to convert part of the UTF-16 BOM to a character using the UTF-8 decoder.
+
+```
+$ python3 codecs_decode_error.py strict
+Original     : 'français'
+File contents: b'ff fe 66 00 72 00 61 00 6e 00 e7 00 61 00 69 00 73 00'
+ERROR: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+```
+
+Switching to ignore causes the decoder to skip over the invalid bytes. The result is still not quite what is expected, though, since it includes embedded null bytes.
+
+```
+$ python3 codecs_decode_error.py ignore
+Original     : 'français'
+File contents: b'ff fe 66 00 72 00 61 00 6e 00 e7 00 61 00 69 00 73 00'
+Read         : 'f\x00r\x00a\x00n\x00\x00a\x00i\x00s\x00'
+```
+
+In replace mode invalid bytes are replaced with \uFFFD, the official Unicode replacement character, which looks like a diamond with a black background containing a white question mark.
+
+```
+$ python3 codecs_decode_error.py replace
+Original     : 'français'
+File contents: b'ff fe 66 00 72 00 61 00 6e 00 e7 00 61 00 69 00 73 00'
+Read         : '��f\x00r\x00a\x00n\x00�\x00a\x00i\x00s\x00'
+```
