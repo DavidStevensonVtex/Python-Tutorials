@@ -568,3 +568,84 @@ Read first line : b'abcdefghijklmnopqrstuvwxyz\n'
 Uncompressed    : 1350
 Same            : True
 ```
+
+### 6.10.7 Incremental Encoding
+
+Some of the encodings provided, especially bz2 and zlib, may dramatically change the length of the data stream as they work on it. For large data sets, these encodings operate better incrementally, working on one small chunk of data at a time. The IncrementalEncoder and IncrementalDecoder API is designed for this purpose.
+
+```
+# codecs_incremental_bz2.py
+import codecs
+import sys
+
+from codecs_to_hex import to_hex
+
+text = b"abcdefghijklmnopqrstuvwxyz\n"
+repetitions = 50
+
+print("Text length :", len(text))
+print("Repetitions :", repetitions)
+print("Expected len:", len(text) * repetitions)
+
+# Encode the text several times to build up a
+# large amount of data
+encoder = codecs.getincrementalencoder("bz2")()
+encoded = []
+
+print()
+print("Encoding:", end=" ")
+last = repetitions - 1
+for i in range(repetitions):
+    en_c = encoder.encode(text, final=(i == last))
+    if en_c:
+        print("\nEncoded : {} bytes".format(len(en_c)))
+        encoded.append(en_c)
+    else:
+        sys.stdout.write(".")
+
+all_encoded = b"".join(encoded)
+print()
+print("Total encoded length:", len(all_encoded))
+print()
+
+# Decode the byte string one byte at a time
+decoder = codecs.getincrementaldecoder("bz2")()
+decoded = []
+
+print("Decoding:", end=" ")
+for i, b in enumerate(all_encoded):
+    final = (i + 1) == len(text)
+    c = decoder.decode(bytes([b]), final)
+    if c:
+        print("\nDecoded : {} characters".format(len(c)))
+        print("Decoding:", end=" ")
+        decoded.append(c)
+    else:
+        sys.stdout.write(".")
+print()
+
+restored = b"".join(decoded)
+
+print()
+print("Total uncompressed length:", len(restored))
+```
+
+Each time data is passed to the encoder or decoder its internal state is updated. When the state is consistent (as defined by the codec), data is returned and the state resets. Until that point, calls to encode() or decode() will not return any data. When the last bit of data is passed in, the argument final should be set to True so the codec knows to flush any remaining buffered data.
+
+```
+$ python3 codecs_incremental_bz2.py
+Text length : 27
+Repetitions : 50
+Expected len: 1350
+
+Encoding: .................................................
+Encoded : 99 bytes
+
+Total encoded length: 99
+
+Decoding: ........................................................................................
+Decoded : 1350 characters
+Decoding: ..........
+
+Total uncompressed length: 1350
+```
