@@ -496,3 +496,75 @@ Start as UTF-8   : b'66 72 61 6e c3 a7 61 69 73'
 Encoded to UTF-16: b'fffe 6600 7200 6100 6e00 e700 6100 6900 7300'
 Back to UTF-8    : b'66 72 61 6e c3 a7 61 69 73'
 ```
+
+### 6.10.6 Non-Unicode Encodings
+
+Although most of the earlier examples use Unicode encodings, codecs can be used for many other data translations. For example, Python includes codecs for working with base-64, bzip2, ROT-13, ZIP, and other data formats.
+
+```
+# codecs_rot13.py
+import codecs
+import io
+
+buffer = io.StringIO()
+stream = codecs.getwriter("rot_13")(buffer)
+
+text = "abcdefghijklmnopqrstuvwxyz"
+
+stream.write(text)
+stream.flush()
+
+print("Original:", text)
+print("ROT-13  :", buffer.getvalue())
+```
+
+Any transformation that can be expressed as a function taking a single input argument and returning a byte or Unicode string can be registered as a codec. For the 'rot_13' codec, the input should be a Unicode string and the output will also be a Unicode string.
+
+```
+$ python3 codecs_rot13.py
+Original: abcdefghijklmnopqrstuvwxyz
+ROT-13  : nopqrstuvwxyzabcdefghijklm
+```
+
+Using codecs to wrap a data stream provides a simpler interface than working directly with [zlib](https://pymotw.com/3/zlib/index.html#module-zlib).
+
+```
+# codecs_zlib.py
+import codecs
+import io
+
+from codecs_to_hex import to_hex
+
+buffer = io.BytesIO()
+stream = codecs.getwriter("zlib")(buffer)
+
+text = b"abcdefghijklmnopqrstuvwxyz\n" * 50
+
+stream.write(text)
+stream.flush()
+
+print("Original length :", len(text))
+compressed_data = buffer.getvalue()
+print("ZIP compressed  :", len(compressed_data))
+
+buffer = io.BytesIO(compressed_data)
+stream = codecs.getreader("zlib")(buffer)
+
+first_line = stream.readline()
+print("Read first line :", repr(first_line))
+
+uncompressed_data = first_line + stream.read()
+print("Uncompressed    :", len(uncompressed_data))
+print("Same            :", text == uncompressed_data)
+```
+
+Not all of the compression or encoding systems support reading a portion of the data through the stream interface using readline() or read() because they need to find the end of a compressed segment to expand it. If a program cannot hold the entire uncompressed data set in memory, use the incremental access features of the compression library, instead of codecs.
+
+```
+$ python3 codecs_zlib.py
+Original length : 1350
+ZIP compressed  : 48
+Read first line : b'abcdefghijklmnopqrstuvwxyz\n'
+Uncompressed    : 1350
+Same            : True
+```
