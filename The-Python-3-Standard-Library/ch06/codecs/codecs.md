@@ -450,3 +450,49 @@ Original     : 'français'
 File contents: b'ff fe 66 00 72 00 61 00 6e 00 e7 00 61 00 69 00 73 00'
 Read         : '��f\x00r\x00a\x00n\x00�\x00a\x00i\x00s\x00'
 ```
+
+### 6.10.5 Encoding Translation
+
+Although most applications will work with str data internally, decoding or encoding it as part of an I/O operation, there are times when changing a file’s encoding without holding on to that intermediate data format is useful. EncodedFile() takes an open file handle using one encoding and wraps it with a class that translates the data to another encoding as the I/O occurs.
+
+```
+# codecs_encodedfile.py
+from codecs_to_hex import to_hex
+
+import codecs
+import io
+
+# Raw version of the original data.
+data = "français"
+
+# Manually encode it as UTF-8.
+utf8 = data.encode("utf-8")
+print("Start as UTF-8   :", to_hex(utf8, 1))
+
+# Set up an output buffer, then wrap it as an EncodedFile.
+output = io.BytesIO()
+encoded_file = codecs.EncodedFile(output, data_encoding="utf-8", file_encoding="utf-16")
+encoded_file.write(utf8)
+
+# Fetch the buffer contents as a UTF-16 encoded byte string
+utf16 = output.getvalue()
+print("Encoded to UTF-16:", to_hex(utf16, 2))
+
+# Set up another buffer with the UTF-16 data for reading,
+# and wrap it with another EncodedFile.
+buffer = io.BytesIO(utf16)
+encoded_file = codecs.EncodedFile(buffer, data_encoding="utf-8", file_encoding="utf-16")
+
+# Read the UTF-8 encoded version of the data.
+recoded = encoded_file.read()
+print("Back to UTF-8    :", to_hex(recoded, 1))
+```
+
+This example shows reading from and writing to separate handles returned by EncodedFile(). No matter whether the handle is used for reading or writing, the file_encoding always refers to the encoding in use by the open file handle passed as the first argument, and data_encoding value refers to the encoding in use by the data passing through the read() and write() calls.
+
+```
+$ python3 codecs_encodedfile.py
+Start as UTF-8   : b'66 72 61 6e c3 a7 61 69 73'
+Encoded to UTF-16: b'fffe 6600 7200 6100 6e00 e700 6100 6900 7300'
+Back to UTF-8    : b'66 72 61 6e c3 a7 61 69 73'
+```
