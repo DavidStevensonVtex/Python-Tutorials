@@ -649,3 +649,154 @@ Decoding: ..........
 
 Total uncompressed length: 1350
 ```
+
+### 6.10.8 Unicode Data and Network Communication
+
+Network sockets are byte-streams, and unlike the standard input and output streams they do not support encoding by default. That means programs that want to send or receive Unicode data over the network must encode into bytes before it is written to a socket. This server echos data it receives back to the sender.
+
+```
+# codecs_socket_fail.py
+import sys
+import socketserver
+
+
+class Echo(socketserver.BaseRequestHandler):
+
+    def handle(self):
+        # Get some bytes and echo them back to the client.
+        data = self.request.recv(1024)
+        self.request.send(data)
+        return
+
+
+if __name__ == "__main__":
+    import codecs
+    import socket
+    import threading
+
+    address = ("localhost", 0)  # let the kernel assign a port
+    server = socketserver.TCPServer(address, Echo)
+    ip, port = server.server_address  # what port was assigned?
+
+    t = threading.Thread(target=server.serve_forever)
+    t.setDaemon(True)  # don't hang on exit
+    t.start()
+
+    # Connect to the server
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((ip, port))
+
+    # Send the data
+    # WRONG: Not encoded first!
+    text = "français"
+    len_sent = s.send(text)
+
+    # Receive a response
+    response = s.recv(len_sent)
+    print(repr(response))
+
+    # Clean up
+    s.close()
+    server.socket.close()
+```
+
+The data could be encoded explicitly before each call to send(), but missing one call to send() would result in an encoding error.
+
+```
+$ python3 codecs_socket_fail.py
+Traceback (most recent call last):
+  File "codecs_socket_fail.py", line 35, in <module>
+    len_sent = s.send(text)
+TypeError: a bytes-like object is required, not 'str'
+```
+
+Using makefile() to get a file-like handle for the socket, and then wrapping that with a stream-based reader or writer, means Unicode strings will be encoded on the way in to and out of the socket.
+
+```
+# codecs_socket.py
+import sys
+import socketserver
+
+
+class Echo(socketserver.BaseRequestHandler):
+
+    def handle(self):
+        """Get some bytes and echo them back to the client.
+
+        There is no need to decode them, since they are not used.
+
+        """
+        data = self.request.recv(1024)
+        self.request.send(data)
+
+
+class PassThrough:
+
+    def __init__(self, other):
+        self.other = other
+
+    def write(self, data):
+        print("Writing :", repr(data))
+        return self.other.write(data)
+
+    def read(self, size=-1):
+        print("Reading :", end=" ")
+        data = self.other.read(size)
+        print(repr(data))
+        return data
+
+    def flush(self):
+        return self.other.flush()
+
+    def close(self):
+        return self.other.close()
+
+
+if __name__ == "__main__":
+    import codecs
+    import socket
+    import threading
+
+    address = ("localhost", 0)  # let the kernel assign a port
+    server = socketserver.TCPServer(address, Echo)
+    ip, port = server.server_address  # what port was assigned?
+
+    t = threading.Thread(target=server.serve_forever)
+    t.setDaemon(True)  # don't hang on exit
+    t.start()
+
+    # Connect to the server
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((ip, port))
+
+    # Wrap the socket with a reader and writer.
+    read_file = s.makefile("rb")
+    incoming = codecs.getreader("utf-8")(PassThrough(read_file))
+    write_file = s.makefile("wb")
+    outgoing = codecs.getwriter("utf-8")(PassThrough(write_file))
+
+    # Send the data
+    text = "français"
+    print("Sending :", repr(text))
+    outgoing.write(text)
+    outgoing.flush()
+
+    # Receive a response
+    response = incoming.read()
+    print("Received:", repr(response))
+
+    # Clean up
+    s.close()
+    server.socket.close()
+```
+
+This example uses PassThrough to show that the data is encoded before being sent, and the response is decoded after it is received in the client.
+
+```
+$ python3 codecs_socket.py
+Sending : 'français'
+Writing : b'fran\xc3\xa7ais'
+Reading : b'fran\xc3\xa7ais'
+Reading : b''
+Received: 'français'
+```
