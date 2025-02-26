@@ -191,3 +191,117 @@ $ python3 codecs_open_read.py utf-32
 Reading from utf-32.txt
 'français'
 ```
+
+### 6.10.3 Byte Order
+
+Multi-byte encodings such as UTF-16 and UTF-32 pose a problem when transferring the data between different computer systems, either by copying the file directly or with network communication. Different systems use different ordering of the high and low order bytes. This characteristic of the data, known as its endianness, depends on factors such as the hardware architecture and choices made by the operating system and application developer. There is not always a way to know in advance what byte order to use for a given set of data, so the multi-byte encodings include a byte-order marker (BOM) as the first few bytes of encoded output. For example, UTF-16 is defined in such a way that 0xFFFE and 0xFEFF are not valid characters, and can be used to indicate the byte order. codecs defines constants for the byte order markers used by UTF-16 and UTF-32.
+
+```
+# codecs_bom.py
+import codecs
+from codecs_to_hex import to_hex
+
+BOM_TYPES = [
+    "BOM",
+    "BOM_BE",
+    "BOM_LE",
+    "BOM_UTF8",
+    "BOM_UTF16",
+    "BOM_UTF16_BE",
+    "BOM_UTF16_LE",
+    "BOM_UTF32",
+    "BOM_UTF32_BE",
+    "BOM_UTF32_LE",
+]
+
+for name in BOM_TYPES:
+    print("{:12} : {}".format(name, to_hex(getattr(codecs, name), 2)))
+```
+
+BOM, BOM_UTF16, and BOM_UTF32 are automatically set to the appropriate big-endian or little-endian values depending on the current system’s native byte order.
+
+```
+$ python3 codecs_bom.py
+BOM          : b'fffe'
+BOM_BE       : b'feff'
+BOM_LE       : b'fffe'
+BOM_UTF8     : b'efbb bf'
+BOM_UTF16    : b'fffe'
+BOM_UTF16_BE : b'feff'
+BOM_UTF16_LE : b'fffe'
+BOM_UTF32    : b'fffe 0000'
+BOM_UTF32_BE : b'0000 feff'
+BOM_UTF32_LE : b'fffe 0000'
+```
+
+Byte ordering is detected and handled automatically by the decoders in codecs, but an explicit ordering can be specified when encoding.
+
+```
+# codecs_bom_create_file.py
+import codecs
+from codecs_to_hex import to_hex
+
+# Pick the nonnative version of UTF-16 encoding
+if codecs.BOM_UTF16 == codecs.BOM_UTF16_BE:
+    bom = codecs.BOM_UTF16_LE
+    encoding = "utf_16_le"
+else:
+    bom = codecs.BOM_UTF16_BE
+    encoding = "utf_16_be"
+
+print("Native order  :", to_hex(codecs.BOM_UTF16, 2))
+print("Selected order:", to_hex(bom, 2))
+
+# Encode the text.
+encoded_text = "français".encode(encoding)
+print("{:14}: {}".format(encoding, to_hex(encoded_text, 2)))
+
+with open("nonnative-encoded.txt", mode="wb") as f:
+    # Write the selected byte-order marker.  It is not included
+    # in the encoded text because the byte order was given
+    # explicitly when selecting the encoding.
+    f.write(bom)
+    # Write the byte string for the encoded text.
+    f.write(encoded_text)
+```
+
+codecs_bom_create_file.py figures out the native byte ordering, then uses the alternate form explicitly so the next example can demonstrate auto-detection while reading.
+
+```
+$ python3 codecs_bom_create_file.py
+Native order  : b'fffe'
+Selected order: b'feff'
+utf_16_be     : b'0066 0072 0061 006e 00e7 0061 0069 0073'
+```
+
+codecs_bom_detection.py does not specify a byte order when opening the file, so the decoder uses the BOM value in the first two bytes of the file to determine it.
+
+```
+# codecs_bom_detection.py
+import codecs
+from codecs_to_hex import to_hex
+
+# Look at the raw data
+with open("nonnative-encoded.txt", mode="rb") as f:
+    raw_bytes = f.read()
+
+print("Raw    :", to_hex(raw_bytes, 2))
+
+# Re-open the file and let codecs detect the BOM
+with codecs.open(
+    "nonnative-encoded.txt",
+    mode="r",
+    encoding="utf-16",
+) as f:
+    decoded_text = f.read()
+
+print("Decoded:", repr(decoded_text))
+```
+
+Since the first two bytes of the file are used for byte order detection, they are not included in the data returned by read().
+
+```
+$ python3 codecs_bom_detection.py
+Raw    : b'feff 0066 0072 0061 006e 00e7 0061 0069 0073'
+Decoded: 'français'
+```
