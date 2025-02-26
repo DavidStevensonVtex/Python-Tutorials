@@ -800,3 +800,253 @@ Reading : b'fran\xc3\xa7ais'
 Reading : b''
 Received: 'français'
 ```
+
+### 6.10.9 Defining a Custom Encoding
+
+Since Python comes with a large number of standard codecs already, it is unlikely that an application will need to define a custom encoder or decoder. When it is necessary, though, there are several base classes in codecs to make the process easier.
+
+The first step is to understand the nature of the transformation described by the encoding. These examples will use an “invertcaps” encoding which converts uppercase letters to lowercase, and lowercase letters to uppercase. Here is a simple definition of an encoding function that performs this transformation on an input string.
+
+```
+# codecs_invertcaps.py
+import string
+
+
+def invertcaps(text):
+    """Return new string with the case of all letters switched."""
+    return "".join(
+        (
+            c.upper()
+            if c in string.ascii_lowercase
+            else c.lower() if c in string.ascii_uppercase else c
+        )
+        for c in text
+    )
+
+
+if __name__ == "__main__":
+    print(invertcaps("ABCdef"))
+    print(invertcaps("abcDEF"))
+```
+
+In this case, the encoder and decoder are the same function (as is also the case with ROT-13).
+
+```
+$ python3 codecs_invertcaps.py
+abcDEF
+ABCdef
+```
+
+Although it is easy to understand, this implementation is not efficient, especially for very large text strings. Fortunately, codecs includes some helper functions for creating character map based codecs such as invertcaps. A character map encoding is made up of two dictionaries. The encoding map converts character values from the input string to byte values in the output and the decoding map goes the other way. Create the decoding map first, and then use make_encoding_map() to convert it to an encoding map. The C functions charmap_encode() and charmap_decode() use the maps to convert their input data efficiently.
+
+```
+# codecs_invertcaps_charmap.py
+import codecs
+import string
+
+# Map every character to itself
+decoding_map = codecs.make_identity_dict(range(256))
+
+# Make a list of pairs of ordinal values for the lower
+# and uppercase letters
+pairs = list(
+    zip(
+        [ord(c) for c in string.ascii_lowercase],
+        [ord(c) for c in string.ascii_uppercase],
+    )
+)
+
+# Modify the mapping to convert upper to lower and
+# lower to upper.
+decoding_map.update({upper: lower for (lower, upper) in pairs})
+decoding_map.update({lower: upper for (lower, upper) in pairs})
+
+# Create a separate encoding map.
+encoding_map = codecs.make_encoding_map(decoding_map)
+
+if __name__ == "__main__":
+    print(codecs.charmap_encode("abcDEF", "strict", encoding_map))
+    print(codecs.charmap_decode(b"abcDEF", "strict", decoding_map))
+    print(encoding_map == decoding_map)
+```
+
+Although the encoding and decoding maps for invertcaps are the same, that may not always be the case. make_encoding_map() detects situations where more than one input character is encoded to the same output byte and replaces the encoding value with None to mark the encoding as undefined.
+
+```
+$ python3 codecs_invertcaps_charmap.py
+(b'ABCdef', 6)
+('ABCdef', 6)
+True
+```
+
+The character map encoder and decoder support all of the standard error handling methods described earlier, so no extra work is needed to comply with that part of the API.
+
+```
+# codecs_invertcaps_error.py
+import codecs
+from codecs_invertcaps_charmap import encoding_map
+
+text = "pi: \u03c0"
+
+for error in ["ignore", "replace", "strict"]:
+    try:
+        encoded = codecs.charmap_encode(text, error, encoding_map)
+    except UnicodeEncodeError as err:
+        encoded = str(err)
+    print("{:7}: {}".format(error, encoded))
+```
+
+Because the Unicode code point for π is not in the encoding map, the strict error handling mode raises an exception.
+
+```
+$ python3 codecs_invertcaps_error.py
+ignore : (b'PI: ', 5)
+replace: (b'PI: ?', 5)
+strict : 'charmap' codec can't encode character '\u03c0' in position 4: character maps to <undefined>
+```
+
+After the encoding and decoding maps are defined, a few additional classes need to be set up, and the encoding should be registered. register() adds a search function to the registry so that when a user wants to use the encoding codecs can locate it. The search function must take a single string argument with the name of the encoding, and return a CodecInfo object if it knows the encoding, or None if it does not.
+
+```
+# codecs_register.py
+import codecs
+import encodings
+
+
+def search1(encoding):
+    print("search1: Searching for:", encoding)
+    return None
+
+
+def search2(encoding):
+    print("search2: Searching for:", encoding)
+    return None
+
+
+codecs.register(search1)
+codecs.register(search2)
+
+utf8 = codecs.lookup("utf-8")
+print("UTF-8:", utf8)
+
+try:
+    unknown = codecs.lookup("no-such-encoding")
+except LookupError as err:
+    print("ERROR:", err)
+```
+
+Multiple search functions can be registered, and each will be called in turn until one returns a CodecInfo or the list is exhausted. The internal search function registered by codecs knows how to load the standard codecs such as UTF-8 from encodings, so those names will never be passed to custom search functions.
+
+```
+$ python3 codecs_register.py
+UTF-8: <codecs.CodecInfo object for encoding utf-8 at 0x7f5d8616d820>
+search1: Searching for: no-such-encoding
+search2: Searching for: no-such-encoding
+ERROR: unknown encoding: no-such-encoding
+```
+
+The CodecInfo instance returned by the search function tells codecs how to encode and decode using all of the different mechanisms supported: stateless, incremental, and stream. codecs includes base classes to help with setting up a character map encoding. This example puts all of the pieces together to register a search function that returns a CodecInfo instance configured for the invertcaps codec.
+
+```
+# codecs_invertcaps_register.py
+import codecs
+
+from codecs_invertcaps_charmap import encoding_map, decoding_map
+
+
+class InvertCapsCodec(codecs.Codec):
+    "Stateless encoder/decoder"
+
+    def encode(self, input, errors="strict"):
+        return codecs.charmap_encode(input, errors, encoding_map)
+
+    def decode(self, input, errors="strict"):
+        return codecs.charmap_decode(input, errors, decoding_map)
+
+
+class InvertCapsIncrementalEncoder(codecs.IncrementalEncoder):
+    def encode(self, input, final=False):
+        data, nbytes = codecs.charmap_encode(input, self.errors, encoding_map)
+        return data
+
+
+class InvertCapsIncrementalDecoder(codecs.IncrementalDecoder):
+    def decode(self, input, final=False):
+        data, nbytes = codecs.charmap_decode(input, self.errors, decoding_map)
+        return data
+
+
+class InvertCapsStreamReader(InvertCapsCodec, codecs.StreamReader):
+    pass
+
+
+class InvertCapsStreamWriter(InvertCapsCodec, codecs.StreamWriter):
+    pass
+
+
+def find_invertcaps(encoding):
+    """Return the codec for 'invertcaps'."""
+    if encoding == "invertcaps":
+        return codecs.CodecInfo(
+            name="invertcaps",
+            encode=InvertCapsCodec().encode,
+            decode=InvertCapsCodec().decode,
+            incrementalencoder=InvertCapsIncrementalEncoder,
+            incrementaldecoder=InvertCapsIncrementalDecoder,
+            streamreader=InvertCapsStreamReader,
+            streamwriter=InvertCapsStreamWriter,
+        )
+    return None
+
+
+codecs.register(find_invertcaps)
+
+if __name__ == "__main__":
+
+    # Stateless encoder/decoder
+    encoder = codecs.getencoder("invertcaps")
+    text = "abcDEF"
+    encoded_text, consumed = encoder(text)
+    print(
+        'Encoded "{}" to "{}", consuming {} characters'.format(
+            text, encoded_text, consumed
+        )
+    )
+
+    # Stream writer
+    import io
+
+    buffer = io.BytesIO()
+    writer = codecs.getwriter("invertcaps")(buffer)
+    print("StreamWriter for io buffer: ")
+    print('  writing "abcDEF"')
+    writer.write("abcDEF")
+    print("  buffer contents: ", buffer.getvalue())
+
+    # Incremental decoder
+    decoder_factory = codecs.getincrementaldecoder("invertcaps")
+    decoder = decoder_factory()
+    decoded_text_parts = []
+    for c in encoded_text:
+        decoded_text_parts.append(decoder.decode(bytes([c]), final=False))
+    decoded_text_parts.append(decoder.decode(b"", final=True))
+    decoded_text = "".join(decoded_text_parts)
+    print(
+        "IncrementalDecoder converted {!r} to {!r}".format(encoded_text, decoded_text)
+    )
+```
+
+The stateless encoder/decoder base class is Codec. Override encode() and decode() with the new implementation (in this case, calling charmap_encode() and charmap_decode() respectively). Each method must return a tuple containing the transformed data and the number of the input bytes or characters consumed. Conveniently, charmap_encode() and charmap_decode() already return that information.
+
+IncrementalEncoder and IncrementalDecoder serve as base classes for the incremental interfaces. The encode() and decode() methods of the incremental classes are defined in such a way that they only return the actual transformed data. Any information about buffering is maintained as internal state. The invertcaps encoding does not need to buffer data (it uses a one-to-one mapping). For encodings that produce a different amount of output depending on the data being processed, such as compression algorithms, BufferedIncrementalEncoder and BufferedIncrementalDecoder are more appropriate base classes, since they manage the unprocessed portion of the input.
+
+StreamReader and StreamWriter need encode() and decode() methods, too, and since they are expected to return the same value as the version from Codec multiple inheritance can be used for the implementation.
+
+```
+$ python3 codecs_invertcaps_register.py
+Encoded "abcDEF" to "b'ABCdef'", consuming 6 characters
+StreamWriter for io buffer: 
+  writing "abcDEF"
+  buffer contents:  b'ABCdef'
+IncrementalDecoder converted b'ABCdef' to 'abcDEF'
+```
