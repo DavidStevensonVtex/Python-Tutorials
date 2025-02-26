@@ -323,3 +323,69 @@ ignore	            Skips the data.
 xmlcharrefreplace	XML character (encoding only)
 backslashreplace	escape sequence (encoding only)
 ```
+
+#### 6.10.4.1 Encoding Errors
+
+The most common error condition is receiving a UnicodeEncodeError when writing Unicode data to an ASCII output stream, such as a regular file or sys.stdout without a more robust encoding set. This sample program can be used to experiment with the different error handling modes.
+
+```
+# codecs_encode_error.py
+import codecs
+import sys
+
+error_handling = sys.argv[1]
+
+text = "français"
+
+try:
+    # Save the data, encoded as ASCII, using the error
+    # handling mode specified on the command line.
+    with codecs.open(
+        "encode_error.txt", "w", encoding="ascii", errors=error_handling
+    ) as f:
+        f.write(text)
+
+except UnicodeEncodeError as err:
+    print("ERROR:", err)
+
+else:
+    # If there was no error writing to the file,
+    # show what it contains.
+    with open("encode_error.txt", "rb") as f:
+        print("File contents: {!r}".format(f.read()))
+```
+
+While strict mode is safest for ensuring an application explicitly sets the correct encoding for all I/O operations, it can lead to program crashes when an exception is raised.
+
+```
+$ python3 codecs_encode_error.py strict
+ERROR: 'ascii' codec can't encode character '\xe7' in position 4: ordinal not in range(128)
+```
+
+Some of the other error modes are more flexible. For example, replace ensures that no error is raised, at the expense of possibly losing data that cannot be converted to the requested encoding. The Unicode character for pi still cannot be encoded in ASCII, but instead of raising an exception the character is replaced with ? in the output.
+
+```
+$ python3 codecs_encode_error.py replace
+File contents: b'fran?ais'
+```
+
+To skip over problem data entirely, use ignore. Any data that cannot be encoded is discarded.
+
+```
+$ python3 codecs_encode_error.py ignore
+File contents: b'franais'
+```
+
+There are two lossless error handling options, both of which replace the character with an alternate representation defined by a standard separate from the encoding. xmlcharrefreplace uses an XML character reference as a substitute (the list of character references is specified in the W3C document XML Entity Definitions for Characters).
+
+```
+$ python3 codecs_encode_error.py xmlcharrefreplace
+File contents: b'fran&#231;ais'
+```
+
+The other lossless error handling scheme is backslashreplace, which produces an output format like the value returned when repr() of a unicode object is printed. Unicode characters are replaced with \u followed by the hexadecimal value of the code point.
+
+```
+$ python3 codecs_encode_error.py backslashreplace
+File contents: b'fran\\xe7ais'
+```
