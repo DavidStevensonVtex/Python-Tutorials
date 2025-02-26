@@ -305,3 +305,21 @@ $ python3 codecs_bom_detection.py
 Raw    : b'feff 0066 0072 0061 006e 00e7 0061 0069 0073'
 Decoded: 'français'
 ```
+
+### 6.10.4 Error Handling
+
+The previous sections pointed out the need to know the encoding being used when reading and writing Unicode files. Setting the encoding correctly is important for two reasons. If the encoding is configured incorrectly while reading from a file, the data will be interpreted wrong and may be corrupted or simply fail to decode. Not all Unicode characters can be represented in all encodings, so if the wrong encoding is used while writing then an error will be generated and data may be lost.
+
+codecs uses the same five error handling options that are provided by the encode() method of str and the decode() method of bytes, listed in the table below.
+
+**Codec Error Handling Modes**
+
+```
+Error Mode	        Description
+
+strict	            Raises an exception if the data cannot be converted.
+replace	            Substitutes a special marker character for data that cannot be encoded.
+ignore	            Skips the data.
+xmlcharrefreplace	XML character (encoding only)
+backslashreplace	escape sequence (encoding only)
+```
