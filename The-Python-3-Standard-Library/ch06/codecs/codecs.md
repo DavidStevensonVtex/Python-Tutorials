@@ -112,3 +112,82 @@ Decoded  : 'français' <class 'str'>
 Note
 
 The default encoding is set during the interpreter start-up process, when [site](https://pymotw.com/3/site/index.html#module-site) is loaded. Refer to the [Unicode Defaults](https://pymotw.com/3/sys/interpreter.html#sys-unicode-defaults) section from the discussion of [sys](https://pymotw.com/3/sys/index.html#module-sys) for a description of the default encoding settings.
+
+### 6.10.2 Working with Files
+
+Encoding and decoding strings is especially important when dealing with I/O operations. Whether writing to a file, socket, or other stream, the data must use the proper encoding. In general, all text data needs to be decoded from its byte representation as it is read, and encoded from the internal values to a specific representation as it is written. A program can explicitly encode and decode data, but depending on the encoding used it can be non-trivial to determine whether enough bytes have been read in order to fully decode the data. codecs provides classes that manage the data encoding and decoding, so applications do not have to do that work.
+
+The simplest interface provided by codecs is an alternative to the built-in open() function. The new version works just like the built-in, but adds two new arguments to specify the encoding and desired error handling technique.
+
+```
+# codecs_open_write.py
+from codecs_to_hex import to_hex
+
+import codecs
+import sys
+
+encoding = sys.argv[1]
+filename = encoding + ".txt"
+
+print("Writing to", filename)
+with codecs.open(filename, mode="w", encoding=encoding) as f:
+    f.write("français")
+
+# Determine the byte grouping to use for to_hex()
+nbytes = {
+    "utf-8": 1,
+    "utf-16": 2,
+    "utf-32": 4,
+}.get(encoding, 1)
+
+# Show the raw bytes in the file
+print("File contents:")
+with open(filename, mode="rb") as f:
+    print(to_hex(f.read(), nbytes))
+```
+
+This example starts with a unicode string with “ç” and saves the text to a file using an encoding specified on the command line.
+
+```
+$ python3 codecs_open_write.py utf-8
+Writing to utf-8.txt
+File contents:
+b'66 72 61 6e c3 a7 61 69 73'
+$ python3 codecs_open_write.py utf-16
+Writing to utf-16.txt
+File contents:
+b'fffe 6600 7200 6100 6e00 e700 6100 6900 7300'
+$ python3 codecs_open_write.py utf-32
+Writing to utf-32.txt
+File contents:
+b'fffe0000 66000000 72000000 61000000 6e000000 e7000000 61000000 69000000 73000000'
+```
+
+Reading the data with open() is straightforward, with one catch: the encoding must be known in advance, in order to set up the decoder correctly. Some data formats, such as XML, specify the encoding as part of the file, but usually it is up to the application to manage. codecs simply takes the encoding as an argument and assumes it is correct.
+
+```
+# codecs_open_read.py
+import codecs
+import sys
+
+encoding = sys.argv[1]
+filename = encoding + ".txt"
+
+print("Reading from", filename)
+with codecs.open(filename, mode="r", encoding=encoding) as f:
+    print(repr(f.read()))
+```
+
+This example reads the files created by the previous program, and prints the representation of the resulting unicode object to the console.
+
+```
+$ python3 codecs_open_read.py utf-8
+Reading from utf-8.txt
+'français'
+$ python3 codecs_open_read.py utf-16
+Reading from utf-16.txt
+'français'
+$ python3 codecs_open_read.py utf-32
+Reading from utf-32.txt
+'français'
+```
