@@ -281,3 +281,107 @@ Warning
 
 If the return value is false, then `__setstate__()` is not called when the object is unpickled.
 </div>
+
+### 7.1.5 Circular References
+
+The pickle protocol automatically handles circular references between objects, so complex data structures do not need any special handling. Consider the directed graph in the figure. It includes several cycles, yet the correct structure can be pickled and then reloaded.
+
+<p align="center">
+<img src="https://pymotw.com/3/_images/graphviz-6918aca85154b5d4f11d0d7f943c1305a3b781d7.png" />
+</p>
+
+```
+# pickle_cycle.py
+import pickle
+
+
+class Node:
+    """A simple digraph"""
+
+    def __init__(self, name):
+        self.name = name
+        self.connections = []
+
+    def add_edge(self, node):
+        "Create an edge between this node and the other."
+        self.connections.append(node)
+
+    def __iter__(self):
+        return iter(self.connections)
+
+
+def preorder_traversal(root, seen=None, parent=None):
+    """Generator function to yield the edges in a graph."""
+    if seen is None:
+        seen = set()
+    yield (parent, root)
+    if root in seen:
+        return
+    seen.add(root)
+    for node in root:
+        recurse = preorder_traversal(node, seen, root)
+        for parent, subnode in recurse:
+            yield (parent, subnode)
+
+
+def show_edges(root):
+    "Print all the edges in the graph."
+    for parent, child in preorder_traversal(root):
+        if not parent:
+            continue
+        print("{:>5} -> {:>2} ({})".format(parent.name, child.name, id(child)))
+
+
+# Set up the nodes.
+root = Node("root")
+a = Node("a")
+b = Node("b")
+c = Node("c")
+
+# Add edges between them.
+root.add_edge(a)
+root.add_edge(b)
+a.add_edge(b)
+b.add_edge(a)
+b.add_edge(c)
+a.add_edge(a)
+
+print("ORIGINAL GRAPH:")
+show_edges(root)
+
+# Pickle and unpickle the graph to create
+# a new set of nodes.
+dumped = pickle.dumps(root)
+reloaded = pickle.loads(dumped)
+
+print("\nRELOADED GRAPH:")
+show_edges(reloaded)
+```
+
+The reloaded nodes are not the same object, but the relationship between the nodes is maintained and only one copy of the object with multiple references is reloaded. Both of these statements can be verified by examining the id() values for the nodes before and after being passed through pickle.
+
+```
+$ python3 pickle_cycle.py
+ORIGINAL GRAPH:
+ root ->  a (140494403862688)
+    a ->  b (140494403214064)
+    b ->  a (140494403862688)
+    b ->  c (140494402916944)
+    a ->  a (140494403862688)
+ root ->  b (140494403214064)
+
+RELOADED GRAPH:
+ root ->  a (140494402643184)
+    a ->  b (140494402643568)
+    b ->  a (140494402643184)
+    b ->  c (140494402424736)
+    a ->  a (140494402643184)
+ root ->  b (140494402643568)
+```
+
+### See also
+
+* [Standard library documentation for pickle](https://docs.python.org/3/library/pickle.html)
+* [PEP 3154](https://peps.python.org/pep-3154/) – Pickle protocol version 4
+* [shelve](https://pymotw.com/3/shelve/index.html#module-shelve) – The shelve module uses pickle to store data in a DBM database.
+* [Pickle: An interesting stack language.](https://peadrop.com/blog/2007/06/18/pickle-an-interesting-stack-language/) – by Alexandre Vassalotti
