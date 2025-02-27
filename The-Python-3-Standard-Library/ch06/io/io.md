@@ -73,3 +73,49 @@ b'This goes into the buffer. \xc3\x81\xc3\x87\xc3\x8a'
 b'Initial value for read buffer'
 ```
 
+### 6.11.2 Wrapping Byte Streams for Text Data
+
+Raw byte streams such as sockets can be wrapped with a layer to handle string encoding and decoding, making it easier to use them with text data. The TextIOWrapper class supports writing as well as reading. The write_through argument disables buffering, and flushes all data written to the wrapper through to the underlying buffer immediately.
+
+```
+# io_textiowrapper.py
+import io
+
+# Writing to a buffer
+output = io.BytesIO()
+wrapper = io.TextIOWrapper(
+    output,
+    encoding="utf-8",
+    write_through=True,
+)
+wrapper.write("This goes into the buffer. ")
+wrapper.write("ÁÇÊ")
+
+# Retrieve the value written
+print(output.getvalue())
+
+output.close()  # discard buffer memory
+
+# Initialize a read buffer
+input = io.BytesIO(
+    b"Initial value for read buffer with unicode characters " + "ÁÇÊ".encode("utf-8")
+)
+wrapper = io.TextIOWrapper(input, encoding="utf-8")
+
+# Read from the buffer
+print(wrapper.read())
+```
+
+This example uses a BytesIO instance as the stream. Examples for [bz2](https://pymotw.com/3/bz2/index.html#module-bz2), [http.server](https://pymotw.com/3/http.server/index.html#module-http.server), and [subprocess](https://pymotw.com/3/subprocess/index.html#module-subprocess) demonstrate using TextIOWrapper with other types of file-like objects.
+
+```
+$ python3 io_textiowrapper.py
+b'This goes into the buffer. \xc3\x81\xc3\x87\xc3\x8a'
+Initial value for read buffer with unicode characters ÁÇÊ
+```
+
+### See also
+
+* [Standard library documentation for io](https://docs.python.org/3/library/io.html)
+* [HTTP POST example](https://pymotw.com/3/http.server/index.html#http-server-post) – Uses the detach() of TextIOWrapper to manage the wrapper separately from the wrapped socket.
+* [Efficient String Concatenation in Python](https://realpython.com/python-string-concatenation/) – Examines various methods of combining strings and their relative merits.
