@@ -1050,3 +1050,21 @@ StreamWriter for io buffer:
   buffer contents:  b'ABCdef'
 IncrementalDecoder converted b'ABCdef' to 'abcDEF'
 ```
+
+### See also
+
+* [Standard library documentation for codecs](https://docs.python.org/3/library/codecs.html)
+* [locale](https://pymotw.com/3/locale/index.html#module-locale) – Accessing and managing the localization-based configuration settings and behaviors.
+* [io](https://pymotw.com/3/io/index.html#module-io) – The io module includes file and stream wrappers that handle encoding and decoding, too.
+* [socketserver](https://pymotw.com/3/socketserver/index.html#module-socketserver) – For a more detailed example of an echo server, see the socketserver module.
+encodings – Package in the standard library containing the encoder/decoder implementations provided by Python.
+* [PEP 100](https://peps.python.org/pep-0100/) – Python Unicode Integration PEP.
+* [Unicode HOWTO](https://docs.python.org/3/howto/unicode.html) – The official guide for using Unicode with Python.
+* [Text vs. Data Instead of Unicode vs. 8-bit](https://docs.python.org/3.0/whatsnew/3.0.html#text-vs-data-instead-of-unicode-vs-8-bit) – Section of the “What’s New” article for Python 3.0 covering the text handling changes.
+* Python Unicode Objects – Fredrik Lundh’s article about using non-ASCII character sets in Python 2.0.
+* [How to Use UTF-8 with Python](https://www.evanjones.ca/python-utf8.html) – Evan Jones’ quick guide to working with Unicode, including XML data and the Byte-Order Marker.
+* [On the Goodness of Unicode](https://www.tbray.org/ongoing/When/200x/2003/04/06/Unicode) – Introduction to internationalization and Unicode by Tim Bray.
+* [On Character Strings](https://www.tbray.org/ongoing/When/200x/2003/04/13/Strings) – A look at the history of string processing in programming languages, by Tim Bray.
+* [Characters vs. Bytes](https://www.tbray.org/ongoing/When/200x/2003/04/26/UTF) – Part one of Tim Bray’s “essay on modern character string processing for computer programmers.” This installment covers in-memory representation of text in formats other than ASCII bytes.
+* [Endianness](https://en.wikipedia.org/wiki/Endianness) – Explanation of endianness in Wikipedia.
+* [W3C XML Entity Definitions for Characters](https://www.w3.org/TR/xml-entity-names/) – Specification for XML representations of character references that cannot be represented in an encoding.
