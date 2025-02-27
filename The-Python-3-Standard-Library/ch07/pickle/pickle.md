@@ -67,3 +67,64 @@ AFTER :  [{'a': 'A', 'b': 2, 'c': 3.0}]
 SAME? : False
 EQUAL?: True
 ```
+
+### 7.1.2 Working with Streams
+
+In addition to dumps() and loads(), pickle provides convenience functions for working with file-like streams. It is possible to write multiple objects to a stream, and then read them from the stream without knowing in advance how many objects are written, or how big they are.
+
+```
+# pickle_stream.py
+import io
+import pickle
+import pprint
+
+
+class SimpleObject:
+
+    def __init__(self, name):
+        self.name = name
+        self.name_backwards = name[::-1]
+        return
+
+
+data = []
+data.append(SimpleObject("pickle"))
+data.append(SimpleObject("preserve"))
+data.append(SimpleObject("last"))
+
+# Simulate a file.
+out_s = io.BytesIO()
+
+# Write to the stream
+for o in data:
+    print("WRITING : {} ({})".format(o.name, o.name_backwards))
+    pickle.dump(o, out_s)
+    out_s.flush()
+
+# Set up a read-able stream
+in_s = io.BytesIO(out_s.getvalue())
+
+# Read the data
+while True:
+    try:
+        o = pickle.load(in_s)
+    except EOFError:
+        break
+    else:
+        print("READ    : {} ({})".format(o.name, o.name_backwards))
+```
+
+The example simulates streams using two BytesIO buffers. The first receives the pickled objects, and its value is fed to a second from which load() reads. A simple database format could use pickles to store objects, too. The [shelve](https://pymotw.com/3/shelve/index.html#module-shelve) module is one such implementation.
+
+```
+$ python3 pickle_stream.py
+WRITING : pickle (elkcip)
+WRITING : preserve (evreserp)
+WRITING : last (tsal)
+READ    : pickle (elkcip)
+READ    : preserve (evreserp)
+READ    : last (tsal)
+```
+
+Besides storing data, pickles are handy for inter-process communication. For example, os.fork() and os.pipe() can be used to establish worker processes that read job instructions from one pipe and write the results to another pipe. The core code for managing the worker pool and sending jobs in and receiving responses can be reused, since the job and response objects do not have to be based on a particular class. When using pipes or sockets, do not forget to flush after dumping each object, to push the data through the connection to the other end. See the [multiprocessing](https://pymotw.com/3/multiprocessing/index.html#module-multiprocessing) module for a reusable worker pool manager.
+
