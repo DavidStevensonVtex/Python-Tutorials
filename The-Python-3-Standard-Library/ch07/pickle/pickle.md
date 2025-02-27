@@ -212,3 +212,72 @@ READ: pickle (elkcip)
 READ: preserve (evreserp)
 READ: last (tsal)
 ```
+
+### 7.1.4 Unpicklable Objects
+
+Not all objects can be pickled. Sockets, file handles, database connections, and other objects with runtime state that depends on the operating system or another process may not be able to be saved in a meaningful way. Objects that have non-picklable attributes can define `__getstate__()` and `__setstate__()` to return a subset of the state of the instance to be pickled.
+
+The `__getstate__()` method must return an object containing the internal state of the object. One convenient way to represent that state is with a dictionary, but the value can be any picklable object. The state is stored, and passed to `__setstate__()` when the object is loaded from the pickle.
+
+```
+# pickle_state.py
+import pickle
+
+
+class State:
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return "State({!r})".format(self.__dict__)
+
+
+class MyClass:
+
+    def __init__(self, name):
+        print("MyClass.__init__({})".format(name))
+        self._set_name(name)
+
+    def _set_name(self, name):
+        self.name = name
+        self.computed = name[::-1]
+
+    def __repr__(self):
+        return "MyClass({!r}) (computed={!r})".format(self.name, self.computed)
+
+    def __getstate__(self):
+        state = State(self.name)
+        print("__getstate__ -> {!r}".format(state))
+        return state
+
+    def __setstate__(self, state):
+        print("__setstate__({!r})".format(state))
+        self._set_name(state.name)
+
+
+inst = MyClass("name here")
+print("Before:", inst)
+
+dumped = pickle.dumps(inst)
+
+reloaded = pickle.loads(dumped)
+print("After:", reloaded)
+```
+
+This example uses a separate State object to hold the internal state of MyClass. When an instance of MyClass is loaded from a pickle,` __setstate__()` is passed a State instance which it uses to initialize the object.
+
+```
+$ python3 pickle_state.py
+MyClass.__init__(name here)
+Before: MyClass('name here') (computed='ereh eman')
+__getstate__ -> State({'name': 'name here'})
+__setstate__(State({'name': 'name here'}))
+After: MyClass('name here') (computed='ereh eman')
+```
+
+<div style="background-color: pink; color: black;">
+Warning
+
+If the return value is false, then `__setstate__()` is not called when the object is unpickled.
+</div>
