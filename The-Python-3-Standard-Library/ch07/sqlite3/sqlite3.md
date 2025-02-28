@@ -147,3 +147,92 @@ $ sqlite3 todo.db 'select * from task'
 2|1|write about random|waiting|2016-08-22||pymotw
 3|1|write about sqlite3|active|2017-07-31||pymotw
 ```
+
+### 7.4.2 Retrieving Data
+
+To retrieve the values saved in the task table from within a Python program, create a Cursor from a database connection. A cursor produces a consistent view of the data, and is the primary means of interacting with a transactional database system like SQLite.
+
+```
+# sqlite3_select_tasks.py
+import sqlite3
+
+db_filename = "todo.db"
+
+with sqlite3.connect(db_filename) as conn:
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+    select id, priority, details, status, deadline from task
+    where project = 'pymotw'
+    """
+    )
+
+    for row in cursor.fetchall():
+        task_id, priority, details, status, deadline = row
+        print(
+            "{:2d} [{:d}] {:<25} [{:<8}] ({})".format(
+                task_id, priority, details, status, deadline
+            )
+        )
+```
+
+Querying is a two step process. First, run the query with the cursor’s execute() method to tell the database engine what data to collect. Then, use fetchall() to retrieve the results. The return value is a sequence of tuples containing the values for the columns included in the select clause of the query.
+
+```
+$ python3 sqlite3_select_tasks.py
+ 1 [1] write about select        [done    ] (2016-04-25)
+ 2 [1] write about random        [waiting ] (2016-08-22)
+ 3 [1] write about sqlite3       [active  ] (2017-07-31)
+```
+
+The results can be retrieved one at a time with fetchone(), or in fixed-size batches with fetchmany().
+
+```
+# sqlite3_select_variations.py
+import sqlite3
+
+db_filename = "todo.db"
+
+with sqlite3.connect(db_filename) as conn:
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+    select name, description, deadline from project
+    where name = 'pymotw'
+    """
+    )
+    name, description, deadline = cursor.fetchone()
+
+    print("Project details for {} ({})\n  due {}".format(description, name, deadline))
+
+    cursor.execute(
+        """
+    select id, priority, details, status, deadline from task
+    where project = 'pymotw' order by deadline
+    """
+    )
+
+    print("\nNext 5 tasks:")
+    for row in cursor.fetchmany(5):
+        task_id, priority, details, status, deadline = row
+        print(
+            "{:2d} [{:d}] {:<25} [{:<8}] ({})".format(
+                task_id, priority, details, status, deadline
+            )
+        )
+```
+
+The value passed to fetchmany() is the maximum number of items to return. If fewer items are available, the sequence returned will be smaller than the maximum value.
+
+```
+$ python3 sqlite3_select_variations.py
+Project details for Python Module of the Week (pymotw)
+  due 2016-11-01
+
+Next 5 tasks:
+ 1 [1] write about select        [done    ] (2016-04-25)
+ 2 [1] write about random        [waiting ] (2016-08-22)
+ 3 [1] write about sqlite3       [active  ] (2017-07-31)
+```
