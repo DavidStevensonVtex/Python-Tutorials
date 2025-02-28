@@ -28,3 +28,44 @@ The dbm.ndbm module provides an interface to the Unix ndbm implementations of th
 
 The dbm.dumb module is a portable fallback implementation of the DBM API when no other implementations are available. No external dependencies are required to use dbm.dumb, but it is slower than most other implementations.
 
+### 7.3.2 Creating a New Database
+
+The storage format for new databases is selected by looking for usable versions of each of the sub-modules in order.
+
+* dbm.gnu
+* dbm.ndbm
+* dbm.dumb
+
+The open() function takes flags to control how the database file is managed. To create a new database when necessary, use 'c'. Using 'n' always creates a new database, overwriting an existing file.
+
+```
+# dbm_new.py
+import dbm
+
+with dbm.open("/tmp/example.db", "n") as db:
+    db["key"] = "value"
+    db["today"] = "Sunday"
+    db["author"] = "Doug"
+```
+
+In this example, the file is always re-initialized.
+
+```
+$ python3 dbm_new.py
+```
+
+whichdb() reports the type of database that was created.
+
+```
+# dbm_whichdb.py
+import dbm
+
+print(dbm.whichdb("/tmp/example.db"))
+```
+
+Output from the example program will vary, depending on which modules are installed on the system.
+
+```
+$ python3 dbm_whichdb.py
+dbm.gnu
+```
