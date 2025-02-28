@@ -69,3 +69,29 @@ Output from the example program will vary, depending on which modules are instal
 $ python3 dbm_whichdb.py
 dbm.gnu
 ```
+
+### 7.3.3 Opening an Existing Database
+
+To open an existing database, use flags of either 'r' (for read-only) or 'w' (for read-write). Existing databases are automatically given to whichdb() to identify, so it as long as a file can be identified, the appropriate module is used to open it.
+
+```
+# dbm_existing.py
+import dbm
+
+with dbm.open("/tmp/example.db", "r") as db:
+    print("keys():", db.keys())
+    for k in db.keys():
+        print("iterating:", k, db[k])
+    print('db["author"] =', db["author"])
+```
+
+Once open, db is a dictionary-like object. New keys are always converted to byte strings when added to the database, and returned as byte strings.
+
+```
+$ python3 dbm_existing.py
+keys(): [b'today', b'author', b'key']
+iterating: b'today' b'Sunday'
+iterating: b'author' b'Doug'
+iterating: b'key' b'value'
+db["author"] = b'Doug'
+```
