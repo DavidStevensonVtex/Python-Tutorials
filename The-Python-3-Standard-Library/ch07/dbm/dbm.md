@@ -95,3 +95,52 @@ iterating: b'author' b'Doug'
 iterating: b'key' b'value'
 db["author"] = b'Doug'
 ```
+
+### 7.3.4 Error Cases
+
+The keys of the database need to be strings.
+
+```
+# dbm_intkeys.py
+import dbm
+
+with dbm.open("/tmp/example.db", "w") as db:
+    try:
+        db[1] = "one"
+    except TypeError as err:
+        print(err)
+```
+
+Passing another type results in a TypeError.
+
+```
+$ python3 dbm_intkeys.py
+gdbm mappings have bytes or string indices only
+```
+
+Values must be strings or None.
+
+```
+# dbm_intvalue.py
+import dbm
+
+with dbm.open("/tmp/example.db", "w") as db:
+    try:
+        db["one"] = 1
+    except TypeError as err:
+        print(err)
+```
+
+A similar TypeError is raised if a value is not a string.
+
+```
+$ python3 dbm_intvalue.py
+gdbm mappings have bytes or string indices only
+```
+
+### See also
+
+* [Standard library documentation for dbm](https://docs.python.org/3/library/dbm.html)
+* [Python 2 to 3 porting notes for anydbm](https://pymotw.com/3/porting_notes.html#porting-anydbm)
+* [Python 2 to 3 porting notes for whichdb](https://pymotw.com/3/porting_notes.html#porting-whichdb)
+* [shelve](https://pymotw.com/3/shelve/index.html) – Examples for the shelve module, which uses dbm to store data.
