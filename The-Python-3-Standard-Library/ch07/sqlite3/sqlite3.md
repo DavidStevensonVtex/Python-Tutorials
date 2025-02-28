@@ -335,3 +335,10 @@ Next 5 tasks:
  2 [1] write about random        [waiting ] (2016-08-22)
  3 [1] write about sqlite3       [active  ] (2017-07-31)
 ```
+
+### 7.4.5 Using Variables with Queries
+
+Using queries defined as literal strings embedded in a program is inflexible. For example, when another project is added to the database the query to show the top five tasks should be updated to work with either project. One way to add more flexibility is to build an SQL statement with the desired query by combining values in Python. However, building a query string in this way is dangerous, and should be avoided. Failing to correctly escape special characters in the variable parts of the query can result in SQL parsing errors, or worse, a class of security vulnerabilities known as SQL-injection attacks, which allow intruders to execute arbitrary SQL statements in the database.
+
+The proper way to use dynamic values with queries is through host variables passed to execute() along with the SQL instruction. A placeholder value in the SQL is replaced with the value of the host variable when the statement is executed. Using host variables instead of inserting arbitrary values into the SQL before it is parsed avoids injection attacks because there is no chance that the untrusted values will affect how the SQL is parsed. SQLite supports two forms for queries with placeholders, positional and named.
+
