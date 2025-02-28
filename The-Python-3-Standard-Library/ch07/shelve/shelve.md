@@ -65,3 +65,68 @@ Existing: {'int': 10, 'float': 9.5, 'string': 'Sample data'}
 ERROR: Reader can't store
 ```
 
+### 7.2.2 Write-back
+
+Shelves do not track modifications to volatile objects, by default. That means if the contents of an item stored in the shelf are changed, the shelf must be updated explicitly by storing the entire item again.
+
+```
+# shelve_withoutwriteback.py
+import shelve
+
+with shelve.open("test_shelf.db") as s:
+    print(s["key1"])
+    s["key1"]["new_value"] = "this was not here before"
+
+with shelve.open("test_shelf.db", writeback=True) as s:
+    print(s["key1"])
+```
+
+In this example, the dictionary at 'key1' is not stored again, so when the shelf is re-opened, the changes have not been preserved.
+
+```
+$ python3 shelve_create.py
+$ python3 shelve_withoutwriteback.py
+{'int': 10, 'float': 9.5, 'string': 'Sample data'}
+{'int': 10, 'float': 9.5, 'string': 'Sample data'}
+```
+
+To automatically catch changes to volatile objects stored in the shelf, open it with writeback enabled. The writeback flag causes the shelf to remember all of the objects retrieved from the database using an in-memory cache. Each cache object is also written back to the database when the shelf is closed.
+
+```
+# shelve_writeback.py
+import shelve
+import pprint
+
+with shelve.open("test_shelf.db", writeback=True) as s:
+    print("Initial data:")
+    pprint.pprint(s["key1"])
+
+    s["key1"]["new_value"] = "this was not here before"
+    print("\nModified:")
+    pprint.pprint(s["key1"])
+
+with shelve.open("test_shelf.db", writeback=True) as s:
+    print("\nPreserved:")
+    pprint.pprint(s["key1"])
+```
+
+Although it reduces the chance of programmer error, and can make object persistence more transparent, using writeback mode may not be desirable in every situation. The cache consumes extra memory while the shelf is open, and pausing to write every cached object back to the database when it is closed slows down the application. All of the cached objects are written back to the database because there is no way to tell if they have been modified. If the application reads data more than it writes, writeback will impact performance unnecessarily.
+
+```
+$ python3 shelve_create.py
+$ python3 shelve_writeback.py
+Initial data:
+{'float': 9.5, 'int': 10, 'string': 'Sample data'}
+
+Modified:
+{'float': 9.5,
+ 'int': 10,
+ 'new_value': 'this was not here before',
+ 'string': 'Sample data'}
+
+Preserved:
+{'float': 9.5,
+ 'int': 10,
+ 'new_value': 'this was not here before',
+ 'string': 'Sample data'}
+```
