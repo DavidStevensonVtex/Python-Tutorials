@@ -19,3 +19,8 @@ Besides the standard 'r', 'w', 'c', and 'n' flags, dbm.gnu.open() supports:
 * 'f' to open the database in _fast_ mode. In fast mode, writes to the database are not synchronized.
 * 's' to open the database in _synchronized_ mode. Changes to the database are written to the file as they are made, rather than being delayed until the database is closed or synced explicitly.
 * 'u' to open the database unlocked.
+* 
+#### 7.3.1.2 dbm.ndbm
+
+The dbm.ndbm module provides an interface to the Unix ndbm implementations of the dbm format, depending on how the module was configured during compilation. The module attribute library identifies the name of the library configure was able to find when the extension module was compiled.
+
