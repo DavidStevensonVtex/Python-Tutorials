@@ -382,3 +382,70 @@ $ python3 sqlite3_argument_positional.py pymotw
  3 [1] write about sqlite3       [active  ] (2017-07-31)
 ```
 
+#### 7.4.5.2 Named Parameters
+
+Use named parameters for more complex queries with a lot of parameters, or where some parameters are repeated multiple times within the query. Named parameters are prefixed with a colon (e.g., :param_name).
+
+```
+# sqlite3_argument_named.py
+import sqlite3
+import sys
+
+db_filename = "todo.db"
+project_name = sys.argv[1]
+
+with sqlite3.connect(db_filename) as conn:
+    cursor = conn.cursor()
+
+    query = """
+    select id, priority, details, status, deadline from task
+    where project = :project_name
+    order by deadline, priority
+    """
+
+    cursor.execute(query, {"project_name": project_name})
+
+    for row in cursor.fetchall():
+        task_id, priority, details, status, deadline = row
+        print(
+            "{:2d} [{:d}] {:<25} [{:<8}] ({})".format(
+                task_id, priority, details, status, deadline
+            )
+        )
+```
+
+Neither positional nor named parameters need to be quoted or escaped, since they are given special treatment by the query parser.
+
+```
+$ python3 sqlite3_argument_named.py pymotw
+ 1 [1] write about select        [done    ] (2016-04-25)
+ 2 [1] write about random        [waiting ] (2016-08-22)
+ 3 [1] write about sqlite3       [active  ] (2017-07-31)
+```
+
+Query parameters can be used with select, insert, and update statements. They can appear in any part of the query where a literal value is legal.
+
+```
+# sqlite3_argument_update.py
+import sqlite3
+import sys
+
+db_filename = "todo.db"
+id = int(sys.argv[1])
+status = sys.argv[2]
+
+with sqlite3.connect(db_filename) as conn:
+    cursor = conn.cursor()
+    query = "update task set status = :status where id = :id"
+    cursor.execute(query, {"status": status, "id": id})
+```
+
+This update statement uses two named parameters. The id value is used to find the right row to modify, and the status value is written to the table.
+
+```
+$ python3 sqlite3_argument_update.py 2 done
+$ python3 sqlite3_argument_named.py pymotw
+ 1 [1] write about select        [done    ] (2016-04-25)
+ 2 [1] write about random        [done    ] (2016-08-22)
+ 3 [1] write about sqlite3       [active  ] (2017-07-31)
+```
