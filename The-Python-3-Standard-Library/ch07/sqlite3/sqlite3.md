@@ -274,3 +274,64 @@ Task table has these columns:
 ('completed_on', None, None, None, None, None, None)
 ('project', None, None, None, None, None, None)
 ```
+
+### 7.4.4 Row Objects
+
+By default, the values returned by the fetch methods as “rows” from the database are tuples. The caller is responsible for knowing the order of the columns in the query and extracting individual values from the tuple. When the number of values in a query grows, or the code working with the data is spread out in a library, it is usually easier to work with an object and access values using their column names. That way, the number and order of the tuple contents can change over time as the query is edited, and code depending on the query results is less likely to break.
+
+Connection objects have a row_factory property that allows the calling code to control the type of object created to represent each row in the query result set. sqlite3 also includes a Row class intended to be used as a row factory. Column values can be accessed through Row instances by using the column index or name.
+
+```
+# sqlite3_row_factory.py
+import sqlite3
+
+db_filename = "todo.db"
+
+with sqlite3.connect(db_filename) as conn:
+    # Change the row factory to use Row
+    conn.row_factory = sqlite3.Row
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+    select name, description, deadline from project
+    where name = 'pymotw'
+    """
+    )
+    name, description, deadline = cursor.fetchone()
+
+    print("Project details for {} ({})\n  due {}".format(description, name, deadline))
+
+    cursor.execute(
+        """
+    select id, priority, status, deadline, details from task
+    where project = 'pymotw' order by deadline
+    """
+    )
+
+    print("\nNext 5 tasks:")
+    for row in cursor.fetchmany(5):
+        print(
+            "{:2d} [{:d}] {:<25} [{:<8}] ({})".format(
+                row["id"],
+                row["priority"],
+                row["details"],
+                row["status"],
+                row["deadline"],
+            )
+        )
+```
+
+This version of the sqlite3_select_variations.py example has been re-written using Row instances instead of tuples. The row from the project table is still printed by accessing the column values through position, but the print statement for tasks uses keyword lookup instead, so it does not matter that the order of the columns in the query has been changed.
+
+```
+$ python3 sqlite3_row_factory.py
+Project details for Python Module of the Week (pymotw)
+  due 2016-11-01
+
+Next 5 tasks:
+ 1 [1] write about select        [done    ] (2016-04-25)
+ 2 [1] write about random        [waiting ] (2016-08-22)
+ 3 [1] write about sqlite3       [active  ] (2017-07-31)
+```
