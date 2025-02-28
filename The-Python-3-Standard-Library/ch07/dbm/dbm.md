@@ -24,3 +24,7 @@ Besides the standard 'r', 'w', 'c', and 'n' flags, dbm.gnu.open() supports:
 
 The dbm.ndbm module provides an interface to the Unix ndbm implementations of the dbm format, depending on how the module was configured during compilation. The module attribute library identifies the name of the library configure was able to find when the extension module was compiled.
 
+#### 7.3.1.3 dbm.dumb
+
+The dbm.dumb module is a portable fallback implementation of the DBM API when no other implementations are available. No external dependencies are required to use dbm.dumb, but it is slower than most other implementations.
+
