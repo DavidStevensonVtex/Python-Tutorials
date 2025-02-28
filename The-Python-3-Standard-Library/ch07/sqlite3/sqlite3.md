@@ -236,3 +236,41 @@ Next 5 tasks:
  2 [1] write about random        [waiting ] (2016-08-22)
  3 [1] write about sqlite3       [active  ] (2017-07-31)
 ```
+
+### 7.4.3 Query Metadata
+
+The DB-API 2.0 specification says that after execute() has been called, the Cursor should set its description attribute to hold information about the data that will be returned by the fetch methods. The API specification say that the description value is a sequence of tuples containing the column name, type, display size, internal size, precision, scale, and a flag that says whether null values are accepted.
+
+```
+# sqlite3_cursor_description.py
+import sqlite3
+
+db_filename = "todo.db"
+
+with sqlite3.connect(db_filename) as conn:
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+    select * from task where project = 'pymotw'
+    """
+    )
+
+    print("Task table has these columns:")
+    for colinfo in cursor.description:
+        print(colinfo)
+```
+
+Because sqlite3 does not enforce type or size constraints on data inserted into a database, only the column name value is filled in.
+
+```
+$ python3 sqlite3_cursor_description.py
+Task table has these columns:
+('id', None, None, None, None, None, None)
+('priority', None, None, None, None, None, None)
+('details', None, None, None, None, None, None)
+('status', None, None, None, None, None, None)
+('deadline', None, None, None, None, None, None)
+('completed_on', None, None, None, None, None, None)
+('project', None, None, None, None, None, None)
+```
