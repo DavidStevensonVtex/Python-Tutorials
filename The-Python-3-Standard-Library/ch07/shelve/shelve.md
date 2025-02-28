@@ -130,3 +130,14 @@ Preserved:
  'new_value': 'this was not here before',
  'string': 'Sample data'}
 ```
+
+### 7.2.3 Specific Shelf Types
+
+The earlier examples all used the default shelf implementation. Using shelve.open() instead of one of the shelf implementations directly is a common usage pattern, especially if it does not matter what type of database is used to store the data. There are times, however, when the database format is important. In those situations, use DbfilenameShelf or BsdDbShelf directly, or even subclass Shelf for a custom solution.
+
+### See also
+
+* [Standard library documentation for shelve](https://docs.python.org/3/library/shelve.html)
+* [dbm](https://pymotw.com/3/dbm/index.html) – The dbm module finds an available DBM library to create a new database.
+* [feedcache](https://github.com/dhellmann/feedcache) – The feedcache module uses shelve as a default storage option.
+* [shove](https://pypi.org/project/shove/) – Shove implements a similar API with more back-end formats.
