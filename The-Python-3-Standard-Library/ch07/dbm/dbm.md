@@ -10,3 +10,12 @@ dbm is a front-end for DBM-style databases that use simple string values as keys
 
 Python comes with several modules for accessing DBM-style databases. The default implementation selected depends on the libraries available on the current system and the options used when Python was compiled. Separate interfaces to the specific implementations allow Python programs to exchange data with programs in other languages that do not automatically switch between available formats, or to write portable data files that will work on multiple platforms.
 
+#### 7.3.1.1 dbm.gnu
+
+dbm.gnu is an interface to the version of the dbm library from the GNU project. It works the same as the other DBM implementations described here, with a few changes to the flags supported by open().
+
+Besides the standard 'r', 'w', 'c', and 'n' flags, dbm.gnu.open() supports:
+
+* 'f' to open the database in _fast_ mode. In fast mode, writes to the database are not synchronized.
+* 's' to open the database in _synchronized_ mode. Changes to the database are written to the file as they are made, rather than being delayed until the database is closed or synced explicitly.
+* 'u' to open the database unlocked.
