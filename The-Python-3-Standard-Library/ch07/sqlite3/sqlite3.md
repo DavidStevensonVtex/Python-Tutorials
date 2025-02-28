@@ -342,3 +342,43 @@ Using queries defined as literal strings embedded in a program is inflexible. Fo
 
 The proper way to use dynamic values with queries is through host variables passed to execute() along with the SQL instruction. A placeholder value in the SQL is replaced with the value of the host variable when the statement is executed. Using host variables instead of inserting arbitrary values into the SQL before it is parsed avoids injection attacks because there is no chance that the untrusted values will affect how the SQL is parsed. SQLite supports two forms for queries with placeholders, positional and named.
 
+#### 7.4.5.1 Positional Parameters
+
+A question mark (?) denotes a positional argument, passed to execute() as a member of a tuple.
+
+```
+# sqlite3_argument_positional.py
+import sqlite3
+import sys
+
+db_filename = "todo.db"
+project_name = sys.argv[1]
+
+with sqlite3.connect(db_filename) as conn:
+    cursor = conn.cursor()
+
+    query = """
+    select id, priority, details, status, deadline from task
+    where project = ?
+    """
+
+    cursor.execute(query, (project_name,))
+
+    for row in cursor.fetchall():
+        task_id, priority, details, status, deadline = row
+        print(
+            "{:2d} [{:d}] {:<25} [{:<8}] ({})".format(
+                task_id, priority, details, status, deadline
+            )
+        )
+```
+
+The command line argument is passed safely to the query as a positional argument, and there is no chance for bad data to corrupt the database.
+
+```
+$ python3 sqlite3_argument_positional.py pymotw
+ 1 [1] write about select        [done    ] (2016-04-25)
+ 2 [1] write about random        [waiting ] (2016-08-22)
+ 3 [1] write about sqlite3       [active  ] (2017-07-31)
+```
+
