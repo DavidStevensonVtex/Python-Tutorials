@@ -727,4 +727,72 @@ Retrieved 2 MyObj(42)
 
 ### 7.4.9 Transactions
 
-One of the key features of relational databases is the use of transactions to maintain a consistent internal state. With transactions enabled, several changes can be made through one connection without effecting any other users until the results are committed and flushed to the actual database.
+One of the key features of relational databases is the use of _transactions_ to maintain a consistent internal state. With transactions enabled, several changes can be made through one connection without effecting any other users until the results are _committed_ and flushed to the actual database.
+
+#### 7.4.9.1 Preserving Changes
+
+Changes to the database, either through insert or update statements, need to be saved by explicitly calling commit(). This requirement gives an application an opportunity to make several related changes together, so they are stored atomically instead of incrementally, and avoids a situation where partial updates are seen by different clients connecting to the database simultaneously.
+
+The effect of calling commit() can be seen with a program that uses several connections to the database. A new row is inserted with the first connection, and then two attempts are made to read it back using separate connections.
+
+```
+# sqlite3_transaction_commit.py
+import sqlite3
+
+db_filename = "todo.db"
+
+
+def show_projects(conn):
+    cursor = conn.cursor()
+    cursor.execute("select name, description from project")
+    for name, desc in cursor.fetchall():
+        print("  ", name)
+
+
+with sqlite3.connect(db_filename) as conn1:
+    print("Before changes:")
+    show_projects(conn1)
+
+    # Insert in one cursor
+    cursor1 = conn1.cursor()
+    cursor1.execute(
+        """
+    insert into project (name, description, deadline)
+    values ('virtualenvwrapper', 'Virtualenv Extensions',
+            '2011-01-01')
+    """
+    )
+
+    print("\nAfter changes in conn1:")
+    show_projects(conn1)
+
+    # Select from another connection, without committing first
+    print("\nBefore commit:")
+    with sqlite3.connect(db_filename) as conn2:
+        show_projects(conn2)
+
+    # Commit then select from another connection
+    conn1.commit()
+    print("\nAfter commit:")
+    with sqlite3.connect(db_filename) as conn3:
+        show_projects(conn3)
+```
+
+When show_projects() is called before conn1 has been committed, the results depend on which connection is used. Since the change was made through conn1, it sees the altered data. However, conn2 does not. After committing, the new connection conn3 sees the inserted row.
+
+```
+$ python3 sqlite3_transaction_commit.py
+Before changes:
+   pymotw
+
+After changes in conn1:
+   pymotw
+   virtualenvwrapper
+
+Before commit:
+   pymotw
+
+After commit:
+   pymotw
+   virtualenvwrapper
+```
