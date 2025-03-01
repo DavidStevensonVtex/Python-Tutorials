@@ -497,3 +497,140 @@ $ python3 sqlite3_argument_named.py pymotw
  4 [2] finish reviewing markup   [active  ] (2016-11-30)
  3 [1] write about sqlite3       [active  ] (2017-07-31)
 ```
+
+### 7.4.7 Defining New Column Types
+
+SQLite has native support for integer, floating point, and text columns. Data of these types is converted automatically by sqlite3 from Python’s representation to a value that can be stored in the database, and back again, as needed. Integer values are loaded from the database into int or long variables, depending on the size of the value. Text is saved and retrieved as str, unless the text_factory for the Connection has been changed.
+
+Although SQLite only supports a few data types internally, sqlite3 includes facilities for defining custom types to allow a Python application to store any type of data in a column. Conversion for types beyond those supported by default is enabled in the database connection using the detect_types flag. Use PARSE_DECLTYPES if the column was declared using the desired type when the table was defined.
+
+```
+# sqlite3_date_types.py
+import sqlite3
+import sys
+
+db_filename = "todo.db"
+
+sql = "select id, details, deadline from task"
+
+
+def show_deadline(conn):
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    row = cursor.fetchone()
+    for col in ["id", "details", "deadline"]:
+        print("  {:<8}  {!r:<26} {}".format(col, row[col], type(row[col])))
+    return
+
+
+print("Without type detection:")
+with sqlite3.connect(db_filename) as conn:
+    show_deadline(conn)
+
+print("\nWith type detection:")
+with sqlite3.connect(
+    db_filename,
+    detect_types=sqlite3.PARSE_DECLTYPES,
+) as conn:
+    show_deadline(conn)
+```
+
+sqlite3 provides converters for date and timestamp columns, using the classes date and datetime from the datetime module to represent the values in Python. Both date-related converters are enabled automatically when type-detection is turned on.
+
+```
+$ python3 sqlite3_date_types.py
+Without type detection:
+  id        1                          <class 'int'>
+  details   'write about select'       <class 'str'>
+  deadline  '2016-04-25'               <class 'str'>
+
+With type detection:
+  id        1                          <class 'int'>
+  details   'write about select'       <class 'str'>
+  deadline  datetime.date(2016, 4, 25) <class 'datetime.date'>
+```
+
+Two functions need to be registered to define a new type. The adapter takes the Python object as input and returns a byte string that can be stored in the database. The converter receives the string from the database and returns a Python object. Use register_adapter() to define an adapter function, and register_converter() for a converter function.
+
+```
+# sqlite3_custom_type.py
+import pickle
+import sqlite3
+
+db_filename = "todo.db"
+
+
+def adapter_func(obj):
+    """Convert from in-memory to storage representation."""
+    print("adapter_func({})\n".format(obj))
+    return pickle.dumps(obj)
+
+
+def converter_func(data):
+    """Convert from storage to in-memory representation."""
+    print("converter_func({!r})\n".format(data))
+    return pickle.loads(data)
+
+
+class MyObj:
+
+    def __init__(self, arg):
+        self.arg = arg
+
+    def __str__(self):
+        return "MyObj({!r})".format(self.arg)
+
+
+# Register the functions for manipulating the type.
+sqlite3.register_adapter(MyObj, adapter_func)
+sqlite3.register_converter("MyObj", converter_func)
+
+# Create some objects to save.  Use a list of tuples so
+# the sequence can be passed directly to executemany().
+to_save = [
+    (MyObj("this is a value to save"),),
+    (MyObj(42),),
+]
+
+with sqlite3.connect(db_filename, detect_types=sqlite3.PARSE_DECLTYPES) as conn:
+    # Create a table with column of type "MyObj"
+    conn.execute(
+        """
+    create table if not exists obj (
+        id    integer primary key autoincrement not null,
+        data  MyObj
+    )
+    """
+    )
+    cursor = conn.cursor()
+
+    # Insert the objects into the database
+    cursor.executemany("insert into obj (data) values (?)", to_save)
+
+    # Query the database for the objects just saved
+    cursor.execute("select id, data from obj")
+    for obj_id, obj in cursor.fetchall():
+        print("Retrieved", obj_id, obj)
+        print("  with type", type(obj))
+        print()
+```
+
+This example uses pickle to save an object to a string that can be stored in the database, a useful technique for storing arbitrary objects, but one that does not allow querying based on object attributes. A real object-relational mapper, such as SQLAlchemy, that stores attribute values in their own columns will be more useful for large amounts of data.
+
+```
+$ python3 sqlite3_custom_type.py
+adapter_func(MyObj('this is a value to save'))
+
+adapter_func(MyObj(42))
+
+converter_func(b'\x80\x04\x95=\x00\x00\x00\x00\x00\x00\x00\x8c\x08__main__\x94\x8c\x05MyObj\x94\x93\x94)\x81\x94}\x94\x8c\x03arg\x94\x8c\x17this is a value to save\x94sb.')
+
+converter_func(b'\x80\x04\x95%\x00\x00\x00\x00\x00\x00\x00\x8c\x08__main__\x94\x8c\x05MyObj\x94\x93\x94)\x81\x94}\x94\x8c\x03arg\x94K*sb.')
+
+Retrieved 1 MyObj('this is a value to save')
+  with type <class '__main__.MyObj'>
+
+Retrieved 2 MyObj(42)
+  with type <class '__main__.MyObj'>
+```
