@@ -724,3 +724,7 @@ Retrieved 1 MyObj('this is a value to save')
 Retrieved 2 MyObj(42)
   with type <class '__main__.MyObj'>
 ```
+
+### 7.4.9 Transactions
+
+One of the key features of relational databases is the use of transactions to maintain a consistent internal state. With transactions enabled, several changes can be made through one connection without effecting any other users until the results are committed and flushed to the actual database.
