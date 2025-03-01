@@ -449,3 +449,51 @@ $ python3 sqlite3_argument_named.py pymotw
  2 [1] write about random        [done    ] (2016-08-22)
  3 [1] write about sqlite3       [active  ] (2017-07-31)
 ```
+
+### 7.4.6 Bulk Loading
+
+To apply the same SQL instruction to a large set of data, use executemany(). This is useful for loading data, since it avoids looping over the inputs in Python and lets the underlying library apply loop optimizations. This example program reads a list of tasks from a comma-separated value file using the [csv](https://pymotw.com/3/csv/index.html) module and loads them into the database.
+
+```
+# sqlite3_load_csv.py
+import csv
+import sqlite3
+import sys
+
+db_filename = "todo.db"
+data_filename = sys.argv[1]
+
+SQL = """
+insert into task (details, priority, status, deadline, project)
+values (:details, :priority, 'active', :deadline, :project)
+"""
+
+with open(data_filename, "rt") as csv_file:
+    csv_reader = csv.DictReader(csv_file)
+
+    with sqlite3.connect(db_filename) as conn:
+        cursor = conn.cursor()
+        cursor.executemany(SQL, csv_reader)
+```
+
+The sample data file tasks.csv contains:
+
+```
+deadline,project,priority,details
+2016-11-30,pymotw,2,"finish reviewing markup"
+2016-08-20,pymotw,2,"revise chapter intros"
+2016-11-01,pymotw,1,"subtitle"
+```
+
+Running the program produces:
+
+```
+$ python3 sqlite3_load_csv.py tasks.csv
+$ python3 sqlite3_argument_named.py pymotw
+ 1 [1] write about select        [done    ] (2016-04-25)
+ 5 [2] revise chapter intros     [active  ] (2016-08-20)
+ 2 [1] write about random        [done    ] (2016-08-22)
+ 6 [1] subtitle                  [active  ] (2016-11-01)
+ 4 [2] finish reviewing markup   [active  ] (2016-11-30)
+ 3 [1] write about sqlite3       [active  ] (2017-07-31)
+```
