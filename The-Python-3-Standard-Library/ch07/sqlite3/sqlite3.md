@@ -1033,3 +1033,78 @@ $ python3 sqlite3_autocommit.py
 ### 7.4.11 In-Memory Databases
 
 SQLite supports managing an entire database in RAM, instead of relying on a disk file. In-memory databases are useful for automated testing, where the database does not need to be preserved between test runs, or when experimenting with a schema or other database features. To open an in-memory database, use the string ':memory:' instead of a filename when creating the Connection. Each ':memory:' connection creates a separate database instance, so changes made by a cursor in one do not effect other connections.
+
+### 7.4.12 Exporting the Contents of a Database
+
+The contents of an in-memory database can be saved using the iterdump() method of the Connection. The iterator returned by iterdump() produces a series of strings that together build SQL instructions to recreate the state of the database.
+
+```
+# sqlite3_iterdump.py
+import sqlite3
+
+schema_filename = "todo_schema.sql"
+
+with sqlite3.connect(":memory:") as conn:
+    conn.row_factory = sqlite3.Row
+
+    print("Creating schema")
+    with open(schema_filename, "rt") as f:
+        schema = f.read()
+    conn.executescript(schema)
+
+    print("Inserting initial data")
+    conn.execute(
+        """
+    insert into project (name, description, deadline)
+    values ('pymotw', 'Python Module of the Week',
+            '2010-11-01')
+    """
+    )
+    data = [
+        ("write about select", "done", "2010-10-03", "pymotw"),
+        ("write about random", "waiting", "2010-10-10", "pymotw"),
+        ("write about sqlite3", "active", "2010-10-17", "pymotw"),
+    ]
+    conn.executemany(
+        """
+    insert into task (details, status, deadline, project)
+    values (?, ?, ?, ?)
+    """,
+        data,
+    )
+
+    print("Dumping:")
+    for text in conn.iterdump():
+        print(text)
+```
+
+iterdump() can also be used with databases saved to files, but it is most useful for preserving a database that would not otherwise be saved. This output has been edited to fit on the page while remaining syntactically correct.
+
+```
+$ python3 sqlite3_iterdump.py
+Creating schema
+Inserting initial data
+Dumping:
+BEGIN TRANSACTION;
+CREATE TABLE project (
+    name        text primary key,
+    description text,
+    deadline    date
+);
+INSERT INTO "project" VALUES('pymotw','Python Module of the Week','2010-11-01');
+DELETE FROM "sqlite_sequence";
+INSERT INTO "sqlite_sequence" VALUES('task',3);
+CREATE TABLE task (
+    id           integer primary key autoincrement not null,
+    priority     integer default 1,
+    details      text,
+    status       text,
+    deadline     date,
+    completed_on date,
+    project      text not null references project(name)
+);
+INSERT INTO "task" VALUES(1,1,'write about select','done','2010-10-03',NULL,'pymotw');
+INSERT INTO "task" VALUES(2,1,'write about random','waiting','2010-10-10',NULL,'pymotw');
+INSERT INTO "task" VALUES(3,1,'write about sqlite3','active','2010-10-17',NULL,'pymotw');
+COMMIT;
+```
