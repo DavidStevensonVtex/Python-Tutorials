@@ -1273,3 +1273,59 @@ $ python3 sqlite3_regex.py
  3 [9] write about sqlite3       [active  ] (2017-07-31)
 ```
 
+### 7.4.15 Custom Aggregation
+
+An aggregation function collects many pieces of individual data and summarizes it in some way. Examples of built-in aggregation functions are avg() (average), min(), max(), and count().
+
+The API for aggregators used by sqlite3 is defined in terms of a class with two methods. The step() method is called once for each data value as the query is processed. The finalize() method is called one time at the end of the query and should return the aggregate value. This example implements an aggregator for the arithmetic mode. It returns the value that appears most frequently in the input.
+
+```
+# sqlite3_create_aggregate.py
+import sqlite3
+import collections
+
+db_filename = "todo.db"
+
+
+class Mode:
+
+    def __init__(self):
+        self.counter = collections.Counter()
+
+    def step(self, value):
+        print("step({!r})".format(value))
+        self.counter[value] += 1
+
+    def finalize(self):
+        result, count = self.counter.most_common(1)[0]
+        print("finalize() -> {!r} ({} times)".format(result, count))
+        return result
+
+
+with sqlite3.connect(db_filename) as conn:
+    conn.create_aggregate("mode", 1, Mode)
+
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+    select mode(deadline) from task where project = 'pymotw'
+    """
+    )
+    row = cursor.fetchone()
+    print("mode(deadline) is:", row[0])
+```
+
+The aggregator class is registered with the create_aggregate() method of the Connection. The parameters are the name of the function (as it should be used from within SQL), the number of arguments the step() method takes, and the class to use.
+
+```
+$ python3 sqlite3_create_aggregate.py
+step('2016-04-25')
+step('2016-08-22')
+step('2017-07-31')
+step('2016-11-30')
+step('2016-08-20')
+step('2016-11-01')
+finalize() -> '2016-04-25' (1 times)
+mode(deadline) is: 2016-04-25
+```
+
