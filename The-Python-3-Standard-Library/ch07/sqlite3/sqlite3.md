@@ -935,3 +935,26 @@ if __name__ == "__main__":
 ```
 
 The threads are synchronized using an Event object from the [threading](https://pymotw.com/3/threading/index.html) module. The writer() function connects and make changes to the database, but does not commit before the event fires. The reader() function connects, then waits to query the database until after the synchronization event occurs.
+
+#### 7.4.10.1 Deferred
+
+The default isolation level is DEFERRED. Using deferred mode locks the database, but only once a change is begun. All of the previous examples use deferred mode.
+
+```
+$ python3 sqlite3_isolation_levels.py DEFERRED
+2025-03-02 11:43:03,308 (Reader 2  ) waiting to synchronize
+2025-03-02 11:43:03,308 (Reader 1  ) waiting to synchronize
+2025-03-02 11:43:03,315 (Writer 2  ) waiting to synchronize
+2025-03-02 11:43:04,289 (MainThread) setting ready
+2025-03-02 11:43:04,290 (Reader 2  ) wait over
+2025-03-02 11:43:04,290 (Reader 1  ) wait over
+2025-03-02 11:43:04,290 (Writer 2  ) PAUSING
+2025-03-02 11:43:04,291 (Reader 2  ) SELECT EXECUTED
+2025-03-02 11:43:04,291 (Reader 1  ) SELECT EXECUTED
+2025-03-02 11:43:04,291 (Reader 2  ) results fetched
+2025-03-02 11:43:04,292 (Reader 1  ) results fetched
+2025-03-02 11:43:05,356 (Writer 2  ) CHANGES COMMITTED
+2025-03-02 11:43:05,440 (Writer 1  ) waiting to synchronize
+2025-03-02 11:43:05,440 (Writer 1  ) PAUSING
+2025-03-02 11:43:06,523 (Writer 1  ) CHANGES COMMITTED
+```
