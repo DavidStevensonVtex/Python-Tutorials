@@ -958,3 +958,27 @@ $ python3 sqlite3_isolation_levels.py DEFERRED
 2025-03-02 11:43:05,440 (Writer 1  ) PAUSING
 2025-03-02 11:43:06,523 (Writer 1  ) CHANGES COMMITTED
 ```
+
+#### 7.4.10.2 Immediate
+
+Immediate mode locks the database as soon as a change starts and prevents other cursors from making changes until the transaction is committed. It is suitable for a database with complicated writes, but more readers than writers, since the readers are not blocked while the transaction is ongoing.
+
+```
+$ python3 sqlite3_isolation_levels.py IMMEDIATE
+2025-03-02 11:47:20,790 (Reader 1  ) waiting to synchronize
+2025-03-02 11:47:20,791 (Reader 2  ) waiting to synchronize
+2025-03-02 11:47:20,791 (Writer 1  ) waiting to synchronize
+2025-03-02 11:47:21,792 (MainThread) setting ready
+2025-03-02 11:47:21,793 (Reader 1  ) wait over
+2025-03-02 11:47:21,793 (Reader 2  ) wait over
+2025-03-02 11:47:21,793 (Writer 1  ) PAUSING
+2025-03-02 11:47:21,794 (Reader 2  ) SELECT EXECUTED
+2025-03-02 11:47:21,794 (Reader 2  ) results fetched
+2025-03-02 11:47:21,794 (Reader 1  ) SELECT EXECUTED
+2025-03-02 11:47:21,795 (Reader 1  ) results fetched
+2025-03-02 11:47:22,906 (Writer 1  ) CHANGES COMMITTED
+2025-03-02 11:47:22,923 (Writer 2  ) waiting to synchronize
+2025-03-02 11:47:22,923 (Writer 2  ) PAUSING
+2025-03-02 11:47:23,989 (Writer 2  ) CHANGES COMMITTED
+```
+
