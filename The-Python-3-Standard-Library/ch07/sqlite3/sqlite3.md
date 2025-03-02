@@ -867,3 +867,71 @@ After rollback:
    pymotw
    virtualenvwrapper
 ```
+
+### 7.4.10 Isolation Levels
+
+sqlite3 supports three locking modes, called isolation levels, that control the technique used to prevent incompatible changes between connections. The isolation level is set by passing a string as the isolation_level argument when a connection is opened, so different connections can use different values.
+
+This program demonstrates the effect of different isolation levels on the order of events in threads using separate connections to the same database. Four threads are created. Two threads write changes to the database by updating existing rows. The other two threads attempt to read all of the rows from the task table.
+
+```
+# sqlite3_isolation_levels.py
+import logging
+import sqlite3
+import sys
+import threading
+import time
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s (%(threadName)-10s) %(message)s",
+)
+
+db_filename = "todo.db"
+isolation_level = sys.argv[1]
+
+
+def writer():
+    with sqlite3.connect(db_filename, isolation_level=isolation_level) as conn:
+        cursor = conn.cursor()
+        cursor.execute("update task set priority = priority + 1")
+        logging.debug("waiting to synchronize")
+        ready.wait()  # synchronize threads
+        logging.debug("PAUSING")
+        time.sleep(1)
+        conn.commit()
+        logging.debug("CHANGES COMMITTED")
+
+
+def reader():
+    with sqlite3.connect(db_filename, isolation_level=isolation_level) as conn:
+        cursor = conn.cursor()
+        logging.debug("waiting to synchronize")
+        ready.wait()  # synchronize threads
+        logging.debug("wait over")
+        cursor.execute("select * from task")
+        logging.debug("SELECT EXECUTED")
+        cursor.fetchall()
+        logging.debug("results fetched")
+
+
+if __name__ == "__main__":
+    ready = threading.Event()
+
+    threads = [
+        threading.Thread(name="Reader 1", target=reader),
+        threading.Thread(name="Reader 2", target=reader),
+        threading.Thread(name="Writer 1", target=writer),
+        threading.Thread(name="Writer 2", target=writer),
+    ]
+
+    [t.start() for t in threads]
+
+    time.sleep(1)
+    logging.debug("setting ready")
+    ready.set()
+
+    [t.join() for t in threads]
+```
+
+The threads are synchronized using an Event object from the [threading](https://pymotw.com/3/threading/index.html) module. The writer() function connects and make changes to the database, but does not commit before the event fires. The reader() function connects, then waits to query the database until after the synchronization event occurs.
