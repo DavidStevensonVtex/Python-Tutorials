@@ -1108,3 +1108,110 @@ INSERT INTO "task" VALUES(2,1,'write about random','waiting','2010-10-10',NULL,'
 INSERT INTO "task" VALUES(3,1,'write about sqlite3','active','2010-10-17',NULL,'pymotw');
 COMMIT;
 ```
+
+### 7.4.13 Using Python Functions in SQL
+
+SQL syntax supports calling functions during queries, either in the column list or where clause of the select statement. This feature makes it possible to process data before returning it from the query, and can be used to convert between different formats, perform calculations that would be clumsy in pure SQL, and reuse application code.
+
+```
+# sqlite3_create_function.py
+import codecs
+import sqlite3
+
+db_filename = "todo.db"
+
+
+def encrypt(s):
+    print("Encrypting {!r}".format(s))
+    return codecs.encode(s, "rot-13")
+
+
+def decrypt(s):
+    print("Decrypting {!r}".format(s))
+    return codecs.encode(s, "rot-13")
+
+
+with sqlite3.connect(db_filename) as conn:
+
+    conn.create_function("encrypt", 1, encrypt)
+    conn.create_function("decrypt", 1, decrypt)
+    cursor = conn.cursor()
+
+    # Raw values
+    print("Original values:")
+    query = "select id, details from task"
+    cursor.execute(query)
+    for row in cursor.fetchall():
+        print(row)
+
+    print("\nEncrypting...")
+    query = "update task set details = encrypt(details)"
+    cursor.execute(query)
+
+    print("\nRaw encrypted values:")
+    query = "select id, details from task"
+    cursor.execute(query)
+    for row in cursor.fetchall():
+        print(row)
+
+    print("\nDecrypting in query...")
+    query = "select id, decrypt(details) from task"
+    cursor.execute(query)
+    for row in cursor.fetchall():
+        print(row)
+
+    print("\nDecrypting...")
+    query = "update task set details = decrypt(details)"
+    cursor.execute(query)
+```
+
+Functions are exposed using the create_function() method of the Connection. The parameters are the name of the function (as it should be used from within SQL), the number of arguments the function takes, and the Python function to expose.
+
+```
+$ python3 sqlite3_create_function.py
+Original values:
+(1, 'write about select')
+(2, 'write about random')
+(3, 'write about sqlite3')
+(4, 'finish reviewing markup')
+(5, 'revise chapter intros')
+(6, 'subtitle')
+
+Encrypting...
+Encrypting 'write about select'
+Encrypting 'write about random'
+Encrypting 'write about sqlite3'
+Encrypting 'finish reviewing markup'
+Encrypting 'revise chapter intros'
+Encrypting 'subtitle'
+
+Raw encrypted values:
+(1, 'jevgr nobhg fryrpg')
+(2, 'jevgr nobhg enaqbz')
+(3, 'jevgr nobhg fdyvgr3')
+(4, 'svavfu erivrjvat znexhc')
+(5, 'erivfr puncgre vagebf')
+(6, 'fhogvgyr')
+
+Decrypting in query...
+Decrypting 'jevgr nobhg fryrpg'
+Decrypting 'jevgr nobhg enaqbz'
+Decrypting 'jevgr nobhg fdyvgr3'
+Decrypting 'svavfu erivrjvat znexhc'
+Decrypting 'erivfr puncgre vagebf'
+Decrypting 'fhogvgyr'
+(1, 'write about select')
+(2, 'write about random')
+(3, 'write about sqlite3')
+(4, 'finish reviewing markup')
+(5, 'revise chapter intros')
+(6, 'subtitle')
+
+Decrypting...
+Decrypting 'jevgr nobhg fryrpg'
+Decrypting 'jevgr nobhg enaqbz'
+Decrypting 'jevgr nobhg fdyvgr3'
+Decrypting 'svavfu erivrjvat znexhc'
+Decrypting 'erivfr puncgre vagebf'
+Decrypting 'fhogvgyr'
+```
