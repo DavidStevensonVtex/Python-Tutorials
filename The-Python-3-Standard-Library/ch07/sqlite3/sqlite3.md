@@ -1377,3 +1377,118 @@ Starting thread
 ERROR: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140715388237632 and this is thread id 140715378292480.
 ```
 
+### 7.4.17 Restricting Access to Data
+
+Although SQLite does not have user access controls found in other, larger, relational databases, it does have a mechanism for limiting access to columns. Each connection can install an authorizer function to grant or deny access to columns at runtime based on any desired criteria. The authorizer function is invoked during the parsing of SQL statements, and is passed five arguments. The first is an action code indicating the type of operation being performed (reading, writing, deleting, etc.). The rest of the arguments depend on the action code. For SQLITE_READ operations, the arguments are the name of the table, the name of the column, the location in the SQL where the access is occurring (main query, trigger, etc.), and None.
+
+```
+# sqlite3_set_authorizer.py
+import sqlite3
+
+db_filename = "todo.db"
+
+
+def authorizer_func(action, table, column, sql_location, ignore):
+    print(
+        "\nauthorizer_func({}, {}, {}, {}, {})".format(
+            action, table, column, sql_location, ignore
+        )
+    )
+
+    response = sqlite3.SQLITE_OK  # be permissive by default
+
+    if action == sqlite3.SQLITE_SELECT:
+        print("requesting permission to run a select statement")
+        response = sqlite3.SQLITE_OK
+
+    elif action == sqlite3.SQLITE_READ:
+        print(
+            "requesting access to column {}.{} from {}".format(
+                table, column, sql_location
+            )
+        )
+        if column == "details":
+            print("  ignoring details column")
+            response = sqlite3.SQLITE_IGNORE
+        elif column == "priority":
+            print("  preventing access to priority column")
+            response = sqlite3.SQLITE_DENY
+
+    return response
+
+
+with sqlite3.connect(db_filename) as conn:
+    conn.row_factory = sqlite3.Row
+    conn.set_authorizer(authorizer_func)
+
+    print("Using SQLITE_IGNORE to mask a column value:")
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+    select id, details from task where project = 'pymotw'
+    """
+    )
+    for row in cursor.fetchall():
+        print(row["id"], row["details"])
+
+    print("\nUsing SQLITE_DENY to deny access to a column:")
+    cursor.execute(
+        """
+    select id, priority from task where project = 'pymotw'
+    """
+    )
+    for row in cursor.fetchall():
+        print(row["id"], row["details"])
+```
+
+This example uses SQLITE_IGNORE to cause the strings from the task.details column to be replaced with null values in the query results. It also prevents all access to the task.priority column by returning SQLITE_DENY, which in turn causes SQLite to raise an exception.
+
+```
+$ python3 sqlite3_set_authorizer.py
+Using SQLITE_IGNORE to mask a column value:
+
+authorizer_func(21, None, None, None, None)
+requesting permission to run a select statement
+
+authorizer_func(20, task, id, main, None)
+requesting access to column task.id from main
+
+authorizer_func(20, task, details, main, None)
+requesting access to column task.details from main
+  ignoring details column
+
+authorizer_func(20, task, project, main, None)
+requesting access to column task.project from main
+1 None
+2 None
+3 None
+4 None
+5 None
+6 None
+
+Using SQLITE_DENY to deny access to a column:
+
+authorizer_func(21, None, None, None, None)
+requesting permission to run a select statement
+
+authorizer_func(20, task, id, main, None)
+requesting access to column task.id from main
+
+authorizer_func(20, task, priority, main, None)
+requesting access to column task.priority from main
+  preventing access to priority column
+Traceback (most recent call last):
+  File "sqlite3_set_authorizer.py", line 51, in <module>
+    cursor.execute(
+sqlite3.DatabaseError: access to task.priority is prohibited
+```
+
+The possible action codes are available as constants in sqlite3, with names prefixed SQLITE_. Each type of SQL statement can be flagged, and access to individual columns can be controlled as well.
+
+### See also
+
+* [Standard library documentation for sqlite3](https://docs.python.org/3/library/sqlite3.html)
+* [PEP 249](https://peps.python.org/pep-0249/) – DB API 2.0 Specification (A standard interface for modules that provide access to relational databases.)
+* [SQLite](https://www.sqlite.org/) – The official site of the SQLite library.
+* [shelve](https://pymotw.com/3/shelve/index.html) – Key-value store for saving arbitrary Python objects.
+* [SQLAlchemy](https://www.sqlalchemy.org/) – A popular object-relational mapper that supports SQLite among many other relational databases.
