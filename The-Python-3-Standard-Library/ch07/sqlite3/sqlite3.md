@@ -982,3 +982,28 @@ $ python3 sqlite3_isolation_levels.py IMMEDIATE
 2025-03-02 11:47:23,989 (Writer 2  ) CHANGES COMMITTED
 ```
 
+#### 7.4.10.3 Exclusive
+
+Exclusive mode locks the database to all readers and writers. Its use should be limited in situations where database performance is important, since each exclusive connection blocks all other users.
+
+```
+$ python3 sqlite3_isolation_levels.py EXCLUSIVE
+2025-03-02 11:49:25,414 (Reader 1  ) waiting to synchronize
+2025-03-02 11:49:25,414 (Reader 2  ) waiting to synchronize
+2025-03-02 11:49:25,416 (Writer 1  ) waiting to synchronize
+2025-03-02 11:49:26,416 (MainThread) setting ready
+2025-03-02 11:49:26,416 (Reader 1  ) wait over
+2025-03-02 11:49:26,416 (Reader 2  ) wait over
+2025-03-02 11:49:26,416 (Writer 1  ) PAUSING
+2025-03-02 11:49:27,502 (Writer 1  ) CHANGES COMMITTED
+2025-03-02 11:49:27,546 (Writer 2  ) waiting to synchronize
+2025-03-02 11:49:27,546 (Writer 2  ) PAUSING
+2025-03-02 11:49:28,610 (Writer 2  ) CHANGES COMMITTED
+2025-03-02 11:49:28,648 (Reader 1  ) SELECT EXECUTED
+2025-03-02 11:49:28,648 (Reader 2  ) SELECT EXECUTED
+2025-03-02 11:49:28,648 (Reader 2  ) results fetched
+2025-03-02 11:49:28,648 (Reader 1  ) results fetched
+```
+
+Because the first writer has started making changes, the readers and second writer block until it commits. The sleep() call introduces an artificial delay in the writer thread to highlight the fact that the other connections are blocking.
+
