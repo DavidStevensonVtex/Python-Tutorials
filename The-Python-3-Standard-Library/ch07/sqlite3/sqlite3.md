@@ -1215,3 +1215,61 @@ Decrypting 'svavfu erivrjvat znexhc'
 Decrypting 'erivfr puncgre vagebf'
 Decrypting 'fhogvgyr'
 ```
+
+### 7.4.14 Querying with Regular Expressions
+
+Sqlite supports several special user functions that are associated with SQL syntax. For example, a function regexp can be used in a query to check if a column’s string value matches a regular expression using the following syntax.
+
+```
+SELECT * FROM table
+WHERE column REGEXP '.*pattern.*'
+```
+
+This examples associates a function with regexp() to test values using Python’s [re](https://pymotw.com/3/re/index.html) module.
+
+```
+# sqlite3_regex.py
+import re
+import sqlite3
+
+db_filename = "todo.db"
+
+
+def regexp(pattern, input):
+    return bool(re.match(pattern, input))
+
+
+with sqlite3.connect(db_filename) as conn:
+    conn.row_factory = sqlite3.Row
+    conn.create_function("regexp", 2, regexp)
+    cursor = conn.cursor()
+
+    pattern = ".*[wW]rite [aA]bout.*"
+
+    cursor.execute(
+        """
+        select id, priority, details, status, deadline from task
+        where details regexp :pattern
+        order by deadline, priority
+        """,
+        {"pattern": pattern},
+    )
+
+    for row in cursor.fetchall():
+        task_id, priority, details, status, deadline = row
+        print(
+            "{:2d} [{:d}] {:<25} [{:<8}] ({})".format(
+                task_id, priority, details, status, deadline
+            )
+        )
+```
+
+The output is all of the tasks where the details column matches the pattern.
+
+```
+$ python3 sqlite3_regex.py
+ 1 [9] write about select        [done    ] (2016-04-25)
+ 2 [9] write about random        [done    ] (2016-08-22)
+ 3 [9] write about sqlite3       [active  ] (2017-07-31)
+```
+
