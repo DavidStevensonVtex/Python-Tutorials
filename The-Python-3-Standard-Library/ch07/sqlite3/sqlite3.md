@@ -1007,3 +1007,25 @@ $ python3 sqlite3_isolation_levels.py EXCLUSIVE
 
 Because the first writer has started making changes, the readers and second writer block until it commits. The sleep() call introduces an artificial delay in the writer thread to highlight the fact that the other connections are blocking.
 
+#### 7.4.10.4 Autocommit
+
+The isolation_level parameter for the connection can also be set to None to enable autocommit mode. With autocommit enabled, each execute() call is committed immediately when the statement finishes. Autocommit mode is suited for short transactions, such as those that insert a small amount of data into a single table. The database is locked for as little time as possible, so there is less chance of contention between threads.
+
+In sqlite3_autocommit.py, the explicit call to commit() has been removed and the isolation level is set to None, but otherwise is the same as sqlite3_isolation_levels.py. The output is different, however, since both writer threads finish their work before either reader starts querying.
+
+```
+$ python3 sqlite3_autocommit.py
+2025-03-02 11:55:09,615 (Reader 1  ) waiting to synchronize
+2025-03-02 11:55:09,616 (Reader 2  ) waiting to synchronize
+2025-03-02 11:55:09,699 (Writer 1  ) waiting to synchronize
+2025-03-02 11:55:09,790 (Writer 2  ) waiting to synchronize
+2025-03-02 11:55:10,617 (MainThread) setting ready
+2025-03-02 11:55:10,618 (Reader 1  ) wait over
+2025-03-02 11:55:10,618 (Reader 2  ) wait over
+2025-03-02 11:55:10,618 (Writer 1  ) PAUSING
+2025-03-02 11:55:10,618 (Writer 2  ) PAUSING
+2025-03-02 11:55:10,619 (Reader 1  ) SELECT EXECUTED
+2025-03-02 11:55:10,619 (Reader 2  ) SELECT EXECUTED
+2025-03-02 11:55:10,619 (Reader 1  ) results fetched
+2025-03-02 11:55:10,620 (Reader 2  ) results fetched
+```
