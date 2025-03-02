@@ -1029,3 +1029,7 @@ $ python3 sqlite3_autocommit.py
 2025-03-02 11:55:10,619 (Reader 1  ) results fetched
 2025-03-02 11:55:10,620 (Reader 2  ) results fetched
 ```
+
+### 7.4.11 In-Memory Databases
+
+SQLite supports managing an entire database in RAM, instead of relying on a disk file. In-memory databases are useful for automated testing, where the database does not need to be preserved between test runs, or when experimenting with a schema or other database features. To open an in-memory database, use the string ':memory:' instead of a filename when creating the Connection. Each ':memory:' connection creates a separate database instance, so changes made by a cursor in one do not effect other connections.
