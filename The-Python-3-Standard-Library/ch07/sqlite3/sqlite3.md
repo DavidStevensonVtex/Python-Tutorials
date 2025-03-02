@@ -1329,3 +1329,51 @@ finalize() -> '2016-04-25' (1 times)
 mode(deadline) is: 2016-04-25
 ```
 
+### 7.4.16 Threading and Connection Sharing
+
+For historical reasons having to do with old versions of SQLite, Connection objects cannot be shared between threads. Each thread must create its own connection to the database.
+
+```
+# sqlite3_threading.py
+import sqlite3
+import sys
+import threading
+import time
+
+db_filename = "todo.db"
+isolation_level = None  # autocommit mode
+
+
+def reader(conn):
+    print("Starting thread")
+    try:
+        cursor = conn.cursor()
+        cursor.execute("select * from task")
+        cursor.fetchall()
+        print("results fetched")
+    except Exception as err:
+        print("ERROR:", err)
+
+
+if __name__ == "__main__":
+    with sqlite3.connect(
+        db_filename,
+        isolation_level=isolation_level,
+    ) as conn:
+        t = threading.Thread(
+            name="Reader 1",
+            target=reader,
+            args=(conn,),
+        )
+        t.start()
+        t.join()
+```
+
+Attempts to share a connection between threads result in an exception.
+
+```
+$ python3 sqlite3_threading.py
+Starting thread
+ERROR: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140715388237632 and this is thread id 140715378292480.
+```
+
