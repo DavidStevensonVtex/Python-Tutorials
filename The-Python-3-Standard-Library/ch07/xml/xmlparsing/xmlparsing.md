@@ -273,3 +273,128 @@ entity_expansion
   in attribute: This & That
   in text     : That & This
 ```
+
+### 7.5.5 Watching Events While Parsing
+
+The other API for processing XML documents is event-based. The parser generates start events for opening tags and end events for closing tags. Data can be extracted from the document during the parsing phase by iterating over the event stream, which is convenient if it is not necessary to manipulate the entire document afterwards and there is no need to hold the entire parsed document in memory.
+
+Events can be one of:
+
+```
+start      A new tag has been encountered. The closing angle bracket of the tag was processed, but not the contents.
+end        The closing angle bracket of a closing tag has been processed. All of the children were already processed.
+start-ns   Start a namespace declaration.
+end-ns     End a namespace declaration.
+```
+iterparse() returns an iterable that produces tuples containing the name of the event and the node triggering the event.
+
+```
+# ElementTree_show_all_events.py
+from xml.etree.ElementTree import iterparse
+
+depth = 0
+prefix_width = 8
+prefix_dots = "." * prefix_width
+line_template = "".join(
+    [
+        "{prefix:<0.{prefix_len}}",
+        "{event:<8}",
+        "{suffix:<{suffix_len}} ",
+        "{node.tag:<12} ",
+        "{node_id}",
+    ]
+)
+
+EVENT_NAMES = ["start", "end", "start-ns", "end-ns"]
+
+for event, node in iterparse("podcasts.opml", EVENT_NAMES):
+    if event == "end":
+        depth -= 1
+
+    prefix_len = depth * 2
+
+    print(
+        line_template.format(
+            prefix=prefix_dots,
+            prefix_len=prefix_len,
+            suffix="",
+            suffix_len=(prefix_width - prefix_len),
+            node=node,
+            node_id=id(node),
+            event=event,
+        )
+    )
+
+    if event == "start":
+        depth += 1
+```
+
+By default, only end events are generated. To see other events, pass the list of desired event names to iterparse(), as in this example.
+
+```
+$ python3 ElementTree_show_all_events.py
+start            opml         139801358361760
+..start          head         139801358361840
+....start        title        139801358361920
+....end          title        139801358361920
+....start        dateCreated  139801358362000
+....end          dateCreated  139801358362000
+....start        dateModified 139801358362160
+....end          dateModified 139801358362160
+..end            head         139801358361840
+..start          body         139801358362320
+....start        outline      139801358362400
+......start      outline      139801358362560
+......end        outline      139801358362560
+....end          outline      139801358362400
+....start        outline      139801358362640
+......start      outline      139801358362880
+......end        outline      139801358362880
+......start      outline      139801358363120
+......end        outline      139801358363120
+....end          outline      139801358362640
+..end            body         139801358362320
+end              opml         139801358361760
+```
+
+The event-style of processing is more natural for some operations, such as converting XML input to some other format. This technique can be used to convert list of podcasts from the earlier examples from an XML file to a CSV file, so they can be loaded into a spreadsheet or database application.
+
+```
+# ElementTree_write_podcast_csv.py
+import csv
+from xml.etree.ElementTree import iterparse
+import sys
+
+writer = csv.writer(sys.stdout, quoting=csv.QUOTE_NONNUMERIC)
+
+group_name = ""
+
+parsing = iterparse("podcasts.opml", events=["start"])
+
+for event, node in parsing:
+    if node.tag != "outline":
+        # Ignore anything not part of the outline
+        continue
+    if not node.attrib.get("xmlUrl"):
+        # Remember the current group
+        group_name = node.attrib["text"]
+    else:
+        # Output a podcast entry
+        writer.writerow(
+            (
+                group_name,
+                node.attrib["text"],
+                node.attrib["xmlUrl"],
+                node.attrib.get("htmlUrl", ""),
+            )
+        )
+```
+
+This conversion program does not need to hold the entire parsed input file in memory, and processing each node as it is encountered in the input is more efficient.
+
+```
+$ python3 ElementTree_write_podcast_csv.py
+"Non-tech","99% Invisible","http://feeds.99percentinvisible.org/99percentinvisible","http://99percentinvisible.org"
+"Python","Talk Python to Me","https://talkpython.fm/episodes/rss","https://talkpython.fm"
+"Python","Podcast.__init__","http://podcastinit.podbean.com/feed/","http://podcastinit.com"
+```
