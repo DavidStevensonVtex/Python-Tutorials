@@ -59,3 +59,69 @@ It will read the data, parse the XML, and return an ElementTree object.
 $ python3 ElementTree_parse_opml.py
 <xml.etree.ElementTree.ElementTree object at 0x7fe9f401cfd0>
 ```
+
+### 7.5.2 Traversing the Parsed Tree
+
+To visit all of the children in order, use iter() to create a generator that iterates over the ElementTree instance.
+
+```
+# ElementTree_dump_opml.py
+from xml.etree import ElementTree
+import pprint
+
+with open("podcasts.opml", "rt") as f:
+    tree = ElementTree.parse(f)
+
+for node in tree.iter():
+    print(node.tag)
+```
+
+This example prints the entire tree, one tag at a time.
+
+```
+$ python3 ElementTree_dump_opml.py
+opml
+head
+title
+dateCreated
+dateModified
+body
+outline
+outline
+outline
+outline
+outline
+```
+
+To print only the groups of names and feed URLs for the podcasts, leaving out of all of the data in the header section by iterating over only the outline nodes and print the text and xmlUrl attributes by looking up the values in the attrib dictionary.
+
+```
+# ElementTree_show_feed_urls.py
+from xml.etree import ElementTree
+
+with open("podcasts.opml", "rt") as f:
+    tree = ElementTree.parse(f)
+
+for node in tree.iter("outline"):
+    name = node.attrib.get("text")
+    url = node.attrib.get("xmlUrl")
+    if name and url:
+        print("  %s" % name)
+        print("    %s" % url)
+    else:
+        print(name)
+```
+
+The 'outline' argument to iter() means processing is limited to only nodes with the tag 'outline'.
+
+```
+$ python3 ElementTree_show_feed_urls.py
+Non-tech
+  99% Invisible
+    http://feeds.99percentinvisible.org/99percentinvisible
+Python
+  Talk Python to Me
+    https://talkpython.fm/episodes/rss
+  Podcast.__init__
+    http://podcastinit.podbean.com/feed/
+```
