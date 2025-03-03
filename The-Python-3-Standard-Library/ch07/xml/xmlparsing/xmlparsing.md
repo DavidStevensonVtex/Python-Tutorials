@@ -466,3 +466,95 @@ $ python3 ElementTree_podcast_csv_treebuilder.py
 "Python","Talk Python to Me","https://talkpython.fm/episodes/rss","https://talkpython.fm"
 "Python","Podcast.__init__","http://podcastinit.podbean.com/feed/","http://podcastinit.com"
 ```
+
+### 7.5.7 Parsing Strings
+
+To work with smaller bits of XML text, especially string literals that might be embedded in the source of a program, use XML() and the string containing the XML to be parsed as the only argument.
+
+```
+# ElementTree_XML.py
+from xml.etree.ElementTree import XML
+
+
+def show_node(node):
+    print(node.tag)
+    if node.text is not None and node.text.strip():
+        print('  text: "%s"' % node.text)
+    if node.tail is not None and node.tail.strip():
+        print('  tail: "%s"' % node.tail)
+    for name, value in sorted(node.attrib.items()):
+        print('  %-4s = "%s"' % (name, value))
+    for child in node:
+        show_node(child)
+
+
+parsed = XML(
+    """
+<root>
+  <group>
+    <child id="a">This is child "a".</child>
+    <child id="b">This is child "b".</child>
+  </group>
+  <group>
+    <child id="c">This is child "c".</child>
+  </group>
+</root>
+"""
+)
+
+print("parsed =", parsed)
+
+for elem in parsed:
+    show_node(elem)
+```
+
+Unlike with parse(), the return value is an Element instance instead of an ElementTree. An Element supports the iterator protocol directly, so there is no need to call getiterator().
+
+```
+$ python3 ElementTree_XML.py
+parsed = <Element 'root' at 0x7f4672ab31d0>
+group
+child
+  text: "This is child "a"."
+  id   = "a"
+child
+  text: "This is child "b"."
+  id   = "b"
+group
+child
+  text: "This is child "c"."
+  id   = "c"
+```
+
+For structured XML that uses the id attribute to identify unique nodes of interest, XMLID() is a convenient way to access the parse results.
+
+```
+# ElementTree_XMLID.py
+from xml.etree.ElementTree import XMLID
+
+tree, id_map = XMLID(
+    """
+<root>
+  <group>
+    <child id="a">This is child "a".</child>
+    <child id="b">This is child "b".</child>
+  </group>
+  <group>
+    <child id="c">This is child "c".</child>
+  </group>
+</root>
+"""
+)
+
+for key, value in sorted(id_map.items()):
+    print("%s = %s" % (key, value))
+```
+
+XMLID() returns the parsed tree as an Element object, along with a dictionary mapping the id attribute strings to the individual nodes in the tree.
+
+```
+$ python3 ElementTree_XMLID.py
+a = <Element 'child' at 0x7f7be48403b0>
+b = <Element 'child' at 0x7f7be4869450>
+c = <Element 'child' at 0x7f7be4869540>
+```
