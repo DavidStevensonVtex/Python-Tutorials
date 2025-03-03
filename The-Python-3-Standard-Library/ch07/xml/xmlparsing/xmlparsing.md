@@ -125,3 +125,54 @@ Python
   Podcast.__init__
     http://podcastinit.podbean.com/feed/
 ```
+
+### 7.5.3 Finding Nodes in a Document
+
+Walking the entire tree like this, searching for relevant nodes, can be error prone. The previous example had to look at each outline node to determine if it was a group (nodes with only a text attribute) or podcast (with both text and xmlUrl). To produce a simple list of the podcast feed URLs, without names or groups, the logic could be simplified using findall() to look for nodes with more descriptive search characteristics.
+
+As a first pass at converting the first version, an XPath argument can be used to look for all outline nodes.
+
+```
+# ElementTree_find_feeds_by_tag.py
+from xml.etree import ElementTree
+
+with open("podcasts.opml", "rt") as f:
+    tree = ElementTree.parse(f)
+
+for node in tree.findall(".//outline"):
+    url = node.attrib.get("xmlUrl")
+    if url:
+        print(url)
+```
+
+The logic in this version is not substantially different than the version using getiterator(). It still has to check for the presence of the URL, except that it does not print the group name when the URL is not found.
+
+```
+$ python3 ElementTree_find_feeds_by_tag.py
+http://feeds.99percentinvisible.org/99percentinvisible
+https://talkpython.fm/episodes/rss
+http://podcastinit.podbean.com/feed/
+```
+
+It is possible to take advantage of the fact that the outline nodes are only nested two levels deep. Changing the search path to .//outline/outline means the loop will process only the second level of outline nodes.
+
+```
+# ElementTree_find_feeds_by_structure.py
+from xml.etree import ElementTree
+
+with open("podcasts.opml", "rt") as f:
+    tree = ElementTree.parse(f)
+
+for node in tree.findall(".//outline/outline"):
+    url = node.attrib.get("xmlUrl")
+    print(url)
+```
+
+All of the outline nodes nested two levels deep in the input are expected to have the xmlURL attribute referring to the podcast feed, so the loop can skip checking for the attribute before using it.
+
+```
+$ python3 ElementTree_find_feeds_by_structure.py
+http://feeds.99percentinvisible.org/99percentinvisible
+https://talkpython.fm/episodes/rss
+http://podcastinit.podbean.com/feed/
+```
