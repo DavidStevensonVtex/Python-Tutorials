@@ -176,3 +176,100 @@ http://feeds.99percentinvisible.org/99percentinvisible
 https://talkpython.fm/episodes/rss
 http://podcastinit.podbean.com/feed/
 ```
+
+This version is limited to the existing structure, though, so if the outline nodes are ever rearranged into a deeper tree, it will stop working.
+
+### 7.5.4 Parsed Node Attributes
+
+The items returned by findall() and iter() are Element objects, each representing a node in the XML parse tree. Each Element has attributes for accessing data pulled out of the XML. This can be illustrated with a somewhat more contrived example input file, data.xml.
+
+**data.xml**
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<top>
+  <child>Regular text.</child>
+  <child_with_tail>Regular text.</child_with_tail>"Tail" text.
+  <with_attributes name="value" foo="bar" />
+  <entity_expansion attribute="This &#38; That">
+    That &#38; This
+  </entity_expansion>
+</top>
+```
+
+The XML attributes of a node are available in the attrib property, which acts like a dictionary.
+
+```
+# ElementTree_node_attributes.py
+from xml.etree import ElementTree
+
+with open("data.xml", "rt") as f:
+    tree = ElementTree.parse(f)
+
+node = tree.find("./with_attributes")
+print(node.tag)
+for name, value in sorted(node.attrib.items()):
+    print('  %-4s = "%s"' % (name, value))
+```
+
+The node on line five of the input file has two attributes, name and foo.
+
+```
+$ python3 ElementTree_node_attributes.py
+with_attributes
+  foo  = "bar"
+  name = "value"
+```
+
+The text content of the nodes is available, along with the tail text, which comes after the end of a close tag.
+
+```
+# ElementTree_node_text.py
+from xml.etree import ElementTree
+
+with open("data.xml", "rt") as f:
+    tree = ElementTree.parse(f)
+
+for path in ["./child", "./child_with_tail"]:
+    node = tree.find(path)
+    print(node.tag)
+    print("  child node text:", node.text)
+    print("  and tail text  :", node.tail)
+```
+
+The child node on line three contains embedded text, and the node on line four has text with a tail (including whitespace).
+
+```
+$ python3 ElementTree_node_text.py
+child
+  child node text: Regular text.
+  and tail text  : 
+  
+child_with_tail
+  child node text: Regular text.
+  and tail text  : "Tail" text.
+```
+
+XML entity references embedded in the document are converted to the appropriate characters before values are returned.
+
+```
+# ElementTree_entity_references.py
+from xml.etree import ElementTree
+
+with open("data.xml", "rt") as f:
+    tree = ElementTree.parse(f)
+
+node = tree.find("entity_expansion")
+print(node.tag)
+print("  in attribute:", node.attrib["attribute"])
+print("  in text     :", node.text.strip())
+```
+
+The automatic conversion means the implementation detail of representing certain characters in an XML document can be ignored.
+
+```
+$ python3 ElementTree_entity_references.py
+entity_expansion
+  in attribute: This & That
+  in text     : That & This
+```
