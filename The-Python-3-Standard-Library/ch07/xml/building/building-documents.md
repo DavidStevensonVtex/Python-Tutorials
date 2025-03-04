@@ -420,3 +420,14 @@ text
 Contains text.
 ```
 
+### See also
+
+* [Standard library documentation for xml.etree.ElementTree](https://docs.python.org/3/library/xml.etree.elementtree.html) – The standard library documentation for this module.
+* [csv](https://pymotw.com/3/csv/index.html) – Read and write comma-separated-value files
+* [defusedxml](https://pypi.org/project/defusedxml/) – A package with fixes for various entity-expansion denial of service vulnerabilities useful for working with untrusted XML data.
+* [Pretty print xml with python](https://renesd.blogspot.com/2007/05/pretty-print-xml-with-python.html) - indenting xml – A tip from Rene Dudfield for pretty-printing XML in Python.
+* ElementTree Overview – Fredrick Lundh’s original documentation and links to the development versions of the ElementTree library.
+* Process XML in Python with ElementTree – IBM DeveloperWorks article by David Mertz.
+* [Outline Processor Markup Language (OPML)](https://opml.org/spec2.opml) – Dave Winer’s OPML specification and documentation.
+* [XML Path Language (XPath)](https://www.w3.org/TR/xpath/) – A syntax for identifying parts of an XML document.
+* [XPath Support in ElementTree](https://docs.python.org/3/library/xml.etree.elementtree.html#xpath-support) – Part of Fredrick Lundh’s original documentation for ElementTree.
