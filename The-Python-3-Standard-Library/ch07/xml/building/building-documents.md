@@ -186,3 +186,151 @@ $ python3 ElementTree_csv_to_xml.py
 </opml>
 ```
 
+### 7.5.11 Building Trees from Lists of Nodes
+
+Multiple children can be added to an Element instance together with the extend() method. The argument to extend() is any iterable, including a list or another Element instance.
+
+```
+# ElementTree_extend.py
+from xml.etree.ElementTree import Element, tostring
+from ElementTree_pretty import prettify
+
+top = Element("top")
+
+children = [Element("child", num=str(i)) for i in range(3)]
+
+top.extend(children)
+
+print(prettify(top))
+```
+
+When a list is given, the nodes in the list are added directly to the new parent.
+
+```
+$ python3 ElementTree_extend.py
+<?xml version="1.0" ?>
+<top>
+  <child num="0"/>
+  <child num="1"/>
+  <child num="2"/>
+</top>
+```
+
+When another Element instance is given, the children of that node are added to the new parent.
+
+```
+# ElementTree_extend_node.py
+from xml.etree.ElementTree import (
+    Element,
+    SubElement,
+    tostring,
+    XML,
+)
+from ElementTree_pretty import prettify
+
+top = Element("top")
+
+parent = SubElement(top, "parent")
+
+children = XML('<root><child num="0" /><child num="1" />' '<child num="2" /></root>')
+parent.extend(children)
+
+print(prettify(top))
+```
+
+In this case, the node with tag root created by parsing the XML string has three children, which are added to the parent node. The root node is not part of the output tree.
+
+```
+$ python3 ElementTree_extend_node.py
+<?xml version="1.0" ?>
+<top>
+  <parent>
+    <child num="0"/>
+    <child num="1"/>
+    <child num="2"/>
+  </parent>
+</top>
+```
+
+It is important to understand that extend() does not modify any existing parent-child relationships with the nodes. If the values passed to extend() exist somewhere in the tree already, they will still be there, and will be repeated in the output.
+
+```
+# ElementTree_extend_node_copy.py
+from xml.etree.ElementTree import (
+    Element,
+    SubElement,
+    tostring,
+    XML,
+)
+from ElementTree_pretty import prettify
+
+top = Element("top")
+
+parent_a = SubElement(top, "parent", id="A")
+parent_b = SubElement(top, "parent", id="B")
+
+# Create children
+children = XML('<root><child num="0" /><child num="1" />' '<child num="2" /></root>')
+
+# Set the id to the Python object id of the node
+# to make duplicates easier to spot.
+for c in children:
+    c.set("id", str(id(c)))
+
+# Add to first parent
+parent_a.extend(children)
+
+print("A:")
+print(prettify(top))
+print()
+
+# Copy nodes to second parent
+parent_b.extend(children)
+
+print("B:")
+print(prettify(top))
+print()
+```
+
+Setting the id attribute of these children to the Python unique object identifier highlights the fact that the same node objects appear in the output tree more than once.
+
+```
+$ python3 ElementTree_extend_node.py
+<?xml version="1.0" ?>
+<top>
+  <parent>
+    <child num="0"/>
+    <child num="1"/>
+    <child num="2"/>
+  </parent>
+</top>
+
+$ python3 ElementTree_extend_node_copy.py
+A:
+<?xml version="1.0" ?>
+<top>
+  <parent id="A">
+    <child num="0" id="140708760950160"/>
+    <child num="1" id="140708761126688"/>
+    <child num="2" id="140708761126768"/>
+  </parent>
+  <parent id="B"/>
+</top>
+
+
+B:
+<?xml version="1.0" ?>
+<top>
+  <parent id="A">
+    <child num="0" id="140708760950160"/>
+    <child num="1" id="140708761126688"/>
+    <child num="2" id="140708761126768"/>
+  </parent>
+  <parent id="B">
+    <child num="0" id="140708760950160"/>
+    <child num="1" id="140708761126688"/>
+    <child num="2" id="140708761126768"/>
+  </parent>
+</top>
+```
+
