@@ -334,3 +334,89 @@ B:
 </top>
 ```
 
+### 7.5.12 Serializing XML to a Stream
+
+tostring() is implemented by writing to an in-memory file-like object, then returning a string representing the entire element tree. When working with large amounts of data, it will take less memory and make more efficient use of the I/O libraries to write directly to a file handle using the write() method of ElementTree.
+
+```
+# ElementTree_write.py
+import io
+import sys
+from xml.etree.ElementTree import (
+    Element,
+    SubElement,
+    Comment,
+    ElementTree,
+)
+
+top = Element("top")
+
+comment = Comment("Generated for PyMOTW")
+top.append(comment)
+
+child = SubElement(top, "child")
+child.text = "This child contains text."
+
+child_with_tail = SubElement(top, "child_with_tail")
+child_with_tail.text = "This child has regular text."
+child_with_tail.tail = 'And "tail" text.'
+
+child_with_entity_ref = SubElement(top, "child_with_entity_ref")
+child_with_entity_ref.text = "This & that"
+
+empty_child = SubElement(top, "empty_child")
+
+ElementTree(top).write(sys.stdout.buffer)
+```
+
+The example uses sys.stdout.buffer to write to the console instead of sys.stdout because ElementTree produces encoded bytes instead of a Unicode string. It could also write to a file opened in binary mode or socket.
+
+```
+$ python3 ElementTree_write.py
+<top><!--Generated for PyMOTW--><child>This child contains text.</child><child_with_tail>This child has regular text.</child_with_tail>And "tail" text.<child_with_entity_ref>This &amp; that</child_with_entity_ref><empty_child /></top>
+```
+
+The last node in the tree contains no text or sub-nodes, so it is written as an empty tag, `<empty_child />`. write() takes a method argument to control the handling for empty nodes.
+
+```
+# ElementTree_write_method.py
+import io
+import sys
+from xml.etree.ElementTree import (
+    Element,
+    SubElement,
+    ElementTree,
+)
+
+top = Element("top")
+
+child = SubElement(top, "child")
+child.text = "Contains text."
+
+empty_child = SubElement(top, "empty_child")
+
+for method in ["xml", "html", "text"]:
+    print(method)
+    sys.stdout.flush()
+    ElementTree(top).write(sys.stdout.buffer, method=method)
+    print("\n")
+```
+
+Three methods are supported:
+
+* xml The default method, produces <empty_child />.
+* html Produce the tag pair, as is required in HTML documents (<empty_child></empty_child>).
+* text Prints only the text of nodes, and skips empty tags entirely.
+
+```
+$ python3 ElementTree_write_method.py
+xml
+<top><child>Contains text.</child><empty_child /></top>
+
+html
+<top><child>Contains text.</child><empty_child></empty_child></top>
+
+text
+Contains text.
+```
+
