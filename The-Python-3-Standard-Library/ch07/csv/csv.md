@@ -91,3 +91,44 @@ Title 1,Title 2,Title 3,Title 4
 2,b,08/02/07,∫
 3,c,08/03/07,ç
 ```
+
+#### 7.6.2.1 Quoting
+
+The default quoting behavior is different for the writer, so the second and third columns in the previous example are not quoted. To add quoting, set the quoting argument to one of the other quoting modes.
+
+```
+writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
+```
+
+In this case, QUOTE_NONNUMERIC adds quotes around all columns that contain values that are not numbers.
+
+```
+# csv_writer_quoted.py
+import csv
+import sys
+
+unicode_chars = 'å∫ç'
+
+with open(sys.argv[1], 'wt') as f:
+    writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
+    writer.writerow(('Title 1', 'Title 2', 'Title 3', 'Title 4'))
+    for i in range(3):
+        row = (
+            i + 1,
+            chr(ord('a') + i),
+            '08/{:02d}/07'.format(i + 1),
+            unicode_chars[i],
+        )
+        writer.writerow(row)
+
+print(open(sys.argv[1], 'rt').read())
+```
+
+There are four different quoting options, defined as constants in the csv module.
+
+```
+QUOTE_ALL          Quote everything, regardless of type.
+QUOTE_MINIMAL      Quote fields with special characters (anything that would confuse a parser configured with the same dialect and options). This is the default
+QUOTE_NONNUMERIC   Quote all fields that are not integers or floats. When used with the reader, input fields that are not quoted are converted to floats.
+QUOTE_NONE         Do not quote anything on output. When used with the reader, quote characters are included in the field values (normally, they are treated as delimiters and stripped).
+```
