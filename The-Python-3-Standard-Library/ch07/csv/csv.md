@@ -55,3 +55,39 @@ $ python3 csv_reader.py testlinebreak.csv
 ['Title 1', 'Title 2', 'Title 3']
 ['1', 'first line\nsecond line', '08/18/07']
 ```
+
+### 7.6.2 Writing
+
+Writing CSV files is just as easy as reading them. Use writer() to create an object for writing, then iterate over the rows, using writerow() to print them.
+
+```
+# csv_writer.py
+import csv
+import sys
+
+unicode_chars = 'å∫ç'
+
+with open(sys.argv[1], 'wt') as f:
+    writer = csv.writer(f)
+    writer.writerow(('Title 1', 'Title 2', 'Title 3', 'Title 4'))
+    for i in range(3):
+        row = (
+            i + 1,
+            chr(ord('a') + i),
+            '08/{:02d}/07'.format(i + 1),
+            unicode_chars[i],
+        )
+        writer.writerow(row)
+
+print(open(sys.argv[1], 'rt').read())
+```
+
+The output does not look exactly like the exported data used in the reader example because it lacks quotes around some of the values.
+
+```
+$ python3 csv_writer.py testout.csv
+Title 1,Title 2,Title 3,Title 4
+1,a,08/01/07,å
+2,b,08/02/07,∫
+3,c,08/03/07,ç
+```
