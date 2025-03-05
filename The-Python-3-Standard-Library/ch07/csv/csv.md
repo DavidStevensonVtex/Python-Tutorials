@@ -184,3 +184,125 @@ $ python3 csv_dialect.py
 ['Title 1', 'Title 2', 'Title 3']
 ['1', 'first line\nsecond line', '08/18/07']
 ```
+
+#### 7.6.3.2 Dialect Parameters
+
+A dialect specifies all of the tokens used when parsing or writing a data file. the table below lists the aspects of the file format that can be specified, from the way columns are delimited to the character used to escape a token.
+
+```
+# csv_dialect_variations.py
+import csv
+import sys
+
+csv.register_dialect('escaped',
+                     escapechar='\\',
+                     doublequote=False,
+                     quoting=csv.QUOTE_NONE,
+                     )
+csv.register_dialect('singlequote',
+                     quotechar="'",
+                     quoting=csv.QUOTE_ALL,
+                     )
+
+quoting_modes = {
+    getattr(csv, n): n
+    for n in dir(csv)
+    if n.startswith('QUOTE_')
+}
+
+TEMPLATE = '''\
+Dialect: "{name}"
+
+  delimiter   = {dl!r:<6}    skipinitialspace = {si!r}
+  doublequote = {dq!r:<6}    quoting          = {qu}
+  quotechar   = {qc!r:<6}    lineterminator   = {lt!r}
+  escapechar  = {ec!r:<6}
+'''
+
+for name in sorted(csv.list_dialects()):
+    dialect = csv.get_dialect(name)
+
+    print(TEMPLATE.format(
+        name=name,
+        dl=dialect.delimiter,
+        si=dialect.skipinitialspace,
+        dq=dialect.doublequote,
+        qu=quoting_modes[dialect.quoting],
+        qc=dialect.quotechar,
+        lt=dialect.lineterminator,
+        ec=dialect.escapechar,
+    ))
+
+    writer = csv.writer(sys.stdout, dialect=dialect)
+    writer.writerow(
+        ('col1', 1, '10/01/2010',
+         'Special chars: " \' {} to parse'.format(
+             dialect.delimiter))
+    )
+    print()
+```
+
+**CSV Dialect Parameters**
+
+```
+Attribute	        Default	        Meaning
+
+delimiter	        ,	            Field separator (one character)
+doublequote	        True	        Flag controlling whether quotechar instances are doubled
+escapechar	        None	        Character used to indicate an escape sequence
+lineterminator	    \r\n	        String used by writer to terminate a line
+quotechar	        "               String to surround fields containing special values (one character)
+quoting	            QUOTE_MINIMAL	Controls quoting behavior described earlier
+skipinitialspace	False	        Ignore whitespace after the field delimiter
+```
+
+This program shows how the same data appears when formatted using several different dialects.
+
+```
+python3 csv_dialect_variations.py
+Dialect: "escaped"
+
+  delimiter   = ','       skipinitialspace = False
+  doublequote = False     quoting          = QUOTE_NONE
+  quotechar   = '"'       lineterminator   = '\r\n'
+  escapechar  = '\\'  
+
+col1,1,10/01/2010,Special chars: \" ' \, to parse
+
+Dialect: "excel"
+
+  delimiter   = ','       skipinitialspace = False
+  doublequote = True      quoting          = QUOTE_MINIMAL
+  quotechar   = '"'       lineterminator   = '\r\n'
+  escapechar  = None  
+
+col1,1,10/01/2010,"Special chars: "" ' , to parse"
+
+Dialect: "excel-tab"
+
+  delimiter   = '\t'      skipinitialspace = False
+  doublequote = True      quoting          = QUOTE_MINIMAL
+  quotechar   = '"'       lineterminator   = '\r\n'
+  escapechar  = None  
+
+col1    1       10/01/2010      "Special chars: "" '     to parse"
+
+Dialect: "singlequote"
+
+  delimiter   = ','       skipinitialspace = False
+  doublequote = True      quoting          = QUOTE_ALL
+  quotechar   = "'"       lineterminator   = '\r\n'
+  escapechar  = None  
+
+'col1','1','10/01/2010','Special chars: " '' , to parse'
+
+Dialect: "unix"
+
+  delimiter   = ','       skipinitialspace = False
+  doublequote = True      quoting          = QUOTE_ALL
+  quotechar   = '"'       lineterminator   = '\n'
+  escapechar  = None  
+
+"col1","1","10/01/2010","Special chars: "" ' , to parse"
+
+```
