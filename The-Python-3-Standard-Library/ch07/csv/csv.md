@@ -396,3 +396,66 @@ Parsed:
   'Special chars " \' , to parse'
 ```
 
+### 7.6.4 Using Field Names
+
+In addition to working with sequences of data, the csv module includes classes for working with rows as dictionaries so that the fields can be named. The DictReader and DictWriter classes translate rows to dictionaries instead of lists. Keys for the dictionary can be passed in, or inferred from the first row in the input (when the row contains headers).
+
+```
+# csv_dictreader.py
+import csv
+import sys
+
+with open(sys.argv[1], 'rt') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        print(row)
+```
+
+The dictionary-based reader and writer are implemented as wrappers around the sequence-based classes, and use the same methods and arguments. The only difference in the reader API is that rows are returned as OrderedDict instances instead of lists or tuples (under earlier version of Python, the rows were returned as regular dict instances).
+
+```
+$ python3 csv_dictreader.py testdata.csv
+{'Title 1': '1', 'Title 2': 'a', 'Title 3': '08/18/07', 'Title 4': 'å'}
+{'Title 1': '2', 'Title 2': 'b', 'Title 3': '08/19/07', 'Title 4': '∫'}
+{'Title 1': '3', 'Title 2': 'c', 'Title 3': '08/20/07', 'Title 4': 'ç'}
+```
+
+The DictWriter must be given a list of field names so it knows how to order the columns in the output.
+
+```
+# csv_dictwriter.py
+import csv
+import sys
+
+fieldnames = ('Title 1', 'Title 2', 'Title 3', 'Title 4')
+headers = {
+    n: n
+    for n in fieldnames
+}
+unicode_chars = 'å∫ç'
+
+with open(sys.argv[1], 'wt') as f:
+
+    writer = csv.DictWriter(f, fieldnames=fieldnames)
+    writer.writeheader()
+
+    for i in range(3):
+        writer.writerow({
+            'Title 1': i + 1,
+            'Title 2': chr(ord('a') + i),
+            'Title 3': '08/{:02d}/07'.format(i + 1),
+            'Title 4': unicode_chars[i],
+        })
+
+print(open(sys.argv[1], 'rt').read())
+```
+
+The field names are not written to the file automatically, but they can be written explicitly using the writeheader() method.
+
+```
+$ python3 csv_dictwriter.py testout.csv
+Title 1,Title 2,Title 3,Title 4
+1,a,08/01/07,å
+2,b,08/02/07,∫
+3,c,08/03/07,ç
+```
