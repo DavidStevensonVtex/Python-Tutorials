@@ -132,3 +132,24 @@ QUOTE_MINIMAL      Quote fields with special characters (anything that would con
 QUOTE_NONNUMERIC   Quote all fields that are not integers or floats. When used with the reader, input fields that are not quoted are converted to floats.
 QUOTE_NONE         Do not quote anything on output. When used with the reader, quote characters are included in the field values (normally, they are treated as delimiters and stripped).
 ```
+
+### 7.6.3 Dialects
+
+There is no well-defined standard for comma-separated value files, so the parser needs to be flexible. This flexibility means there are many parameters to control how csv parses or writes data. Rather than passing each of these parameters to the reader and writer separately, they are grouped together into a dialect object.
+
+Dialect classes can be registered by name, so that callers of the csv module do not need to know the parameter settings in advance. The complete list of registered dialects can be retrieved with list_dialects().
+
+```
+# csv_list_dialects.py
+import csv
+
+print(csv.list_dialects())
+```
+
+The standard library includes three dialects: excel, excel-tabs, and unix. The excel dialect is for working with data in the default export format for Microsoft Excel, and also works with LibreOffice. The unix dialect quotes all fields with double-quotes and uses \n as the record separator.
+
+```
+$ python3 csv_list_dialects.py
+['excel', 'excel-tab', 'unix']
+```
+
