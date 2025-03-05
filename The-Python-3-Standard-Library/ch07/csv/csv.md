@@ -459,3 +459,9 @@ Title 1,Title 2,Title 3,Title 4
 2,b,08/02/07,∫
 3,c,08/03/07,ç
 ```
+
+### See also
+
+* [Standard library documentation for csv](https://docs.python.org/3/library/csv.html)
+* [PEP 305](https://peps.python.org/pep-0305/) – CSV File API
+* [Python 2 to 3 porting notes for csv](https://pymotw.com/3/porting_notes.html#porting-csv)
