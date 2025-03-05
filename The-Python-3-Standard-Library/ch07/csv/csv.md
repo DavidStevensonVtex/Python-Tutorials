@@ -153,3 +153,34 @@ $ python3 csv_list_dialects.py
 ['excel', 'excel-tab', 'unix']
 ```
 
+#### 7.6.3.1 Creating a Dialect
+
+If, instead of using commas to delimit fields, the input file uses pipes (|), like this
+
+```
+"Title 1"|"Title 2"|"Title 3"
+1|"first line
+second line"|08/18/07
+```
+
+a new dialect can be registered using the appropriate delimiter.
+
+```
+# csv_dialect.py
+import csv
+
+csv.register_dialect('pipes', delimiter='|')
+
+with open('testdata.pipes', 'r') as f:
+    reader = csv.reader(f, dialect='pipes')
+    for row in reader:
+        print(row)
+```
+
+Using the “pipes” dialect, the file can be read just as with the comma-delimited file.
+
+```
+$ python3 csv_dialect.py
+['Title 1', 'Title 2', 'Title 3']
+['1', 'first line\nsecond line', '08/18/07']
+```
