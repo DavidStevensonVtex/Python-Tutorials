@@ -306,3 +306,93 @@ Dialect: "unix"
 "col1","1","10/01/2010","Special chars: "" ' , to parse"
 
 ```
+
+#### 7.6.3.3 Automatically Detecting Dialects
+
+The best way to configure a dialect for parsing an input file is to know the correct settings in advance. For data where the dialect parameters are unknown, the Sniffer class can be used to make an educated guess. The sniff() method takes a sample of the input data and an optional argument giving the possible delimiter characters.
+
+```
+# csv_dialect_sniffer.py
+import csv
+from io import StringIO
+import textwrap
+
+csv.register_dialect('escaped',
+                     escapechar='\\',
+                     doublequote=False,
+                     quoting=csv.QUOTE_NONE)
+csv.register_dialect('singlequote',
+                     quotechar="'",
+                     quoting=csv.QUOTE_ALL)
+
+# Generate sample data for all known dialects
+samples = []
+for name in sorted(csv.list_dialects()):
+    buffer = StringIO()
+    dialect = csv.get_dialect(name)
+    writer = csv.writer(buffer, dialect=dialect)
+    writer.writerow(
+        ('col1', 1, '10/01/2010',
+         'Special chars " \' {} to parse'.format(
+             dialect.delimiter))
+    )
+    samples.append((name, dialect, buffer.getvalue()))
+
+# Guess the dialect for a given sample, and then use the results
+# to parse the data.
+sniffer = csv.Sniffer()
+for name, expected, sample in samples:
+    print('Dialect: "{}"'.format(name))
+    print('In: {}'.format(sample.rstrip()))
+    dialect = sniffer.sniff(sample, delimiters=',\t')
+    reader = csv.reader(StringIO(sample), dialect=dialect)
+    print('Parsed:\n  {}\n'.format(
+          '\n  '.join(repr(r) for r in next(reader))))
+```
+
+sniff() returns a Dialect instance with the settings to be used for parsing the data. The results are not always perfect, as demonstrated by the “escaped” dialect in the example.
+
+```
+$ python3 csv_dialect_sniffer.py
+Dialect: "escaped"
+In: col1,1,10/01/2010,Special chars \" ' \, to parse
+Parsed:
+  'col1'
+  '1'
+  '10/01/2010'
+  'Special chars \\" \' \\'
+  ' to parse'
+
+Dialect: "excel"
+In: col1,1,10/01/2010,"Special chars "" ' , to parse"
+Parsed:
+  'col1'
+  '1'
+  '10/01/2010'
+  'Special chars " \' , to parse'
+
+Dialect: "excel-tab"
+In: col1        1       10/01/2010      "Special chars "" '      to parse"
+Parsed:
+  'col1'
+  '1'
+  '10/01/2010'
+  'Special chars " \' \t to parse'
+
+Dialect: "singlequote"
+In: 'col1','1','10/01/2010','Special chars " '' , to parse'
+Parsed:
+  'col1'
+  '1'
+  '10/01/2010'
+  'Special chars " \' , to parse'
+
+Dialect: "unix"
+In: "col1","1","10/01/2010","Special chars "" ' , to parse"
+Parsed:
+  'col1'
+  '1'
+  '10/01/2010'
+  'Special chars " \' , to parse'
+```
+
