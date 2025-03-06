@@ -176,3 +176,32 @@ $ python3 zlib_mixed.py
 Decompressed matches lorem: True
 Unused data matches lorem : True
 ```
+
+### 8.1.4 Checksums
+
+In addition to compression and decompression functions, zlib includes two functions for computing checksums of data, adler32() and crc32(). Neither checksum is cryptographically secure, and they are only intended for use for data integrity verification.
+
+```
+# zlib_checksums.py
+import zlib
+
+data = open('lorem.txt', 'rb').read()
+
+cksum = zlib.adler32(data)
+print('Adler32: {:12d}'.format(cksum))
+print('       : {:12d}'.format(zlib.adler32(data, cksum)))
+
+cksum = zlib.crc32(data)
+print('CRC-32 : {:12d}'.format(cksum))
+print('       : {:12d}'.format(zlib.crc32(data, cksum)))
+```
+
+Both functions take the same arguments, a byte string containing the data and an optional value to be used as a starting point for the checksum. They return a 32-bit signed integer value which can also be passed back on subsequent calls as a new starting point argument to produce a running checksum.
+
+```
+$ python3 zlib_checksums.py
+Adler32:   1559629467
+       :   3072466229
+CRC-32 :   1880370372
+       :   3995978981
+```
