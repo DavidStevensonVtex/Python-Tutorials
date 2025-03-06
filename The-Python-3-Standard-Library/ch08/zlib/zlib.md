@@ -391,3 +391,11 @@ Client: READ b'9b69d1c85ddb13e8a215bbb62bfaffa447dfde015cf60e9b'
 Client: DECOMPRESSED b'ollicitudin. Suspendisse\nimperdiet justo.'
 Client: response matches file contents: True
 ```
+
+### See also
+
+* [Standard library documentation for zlib](https://docs.python.org/3/library/zlib.html)
+* [gzip](https://pymotw.com/3/gzip/index.html) – The gzip module includes a higher level (file-based) interface to the zlib library.
+* [http://www.zlib.net/](https://www.zlib.net/) – Home page for zlib library.
+* [http://www.zlib.net/manual.html](https://www.zlib.net/manual.html) – Complete zlib documentation.
+* [bz2](https://pymotw.com/3/bz2/index.html) – The bz2 module provides a similar interface to the bzip2 compression library.
