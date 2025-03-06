@@ -205,3 +205,189 @@ Adler32:   1559629467
 CRC-32 :   1880370372
        :   3995978981
 ```
+
+### 8.1.5 Compressing Network Data
+
+The server in the next listing uses the stream compressor to respond to requests consisting of filenames by writing a compressed version of the file to the socket used to communicate with the client.
+
+```
+# zlib_server.py
+import zlib
+import logging
+import socketserver
+import binascii
+
+BLOCK_SIZE = 64
+
+
+class ZlibRequestHandler(socketserver.BaseRequestHandler):
+
+    logger = logging.getLogger('Server')
+
+    def handle(self):
+        compressor = zlib.compressobj(1)
+
+        # Find out what file the client wants
+        filename = self.request.recv(1024).decode('utf-8')
+        self.logger.debug('client asked for: %r', filename)
+
+        # Send chunks of the file as they are compressed
+        with open(filename, 'rb') as input:
+            while True:
+                block = input.read(BLOCK_SIZE)
+                if not block:
+                    break
+                self.logger.debug('RAW %r', block)
+                compressed = compressor.compress(block)
+                if compressed:
+                    self.logger.debug(
+                        'SENDING %r',
+                        binascii.hexlify(compressed))
+                    self.request.send(compressed)
+                else:
+                    self.logger.debug('BUFFERING')
+
+        # Send any data being buffered by the compressor
+        remaining = compressor.flush()
+        while remaining:
+            to_send = remaining[:BLOCK_SIZE]
+            remaining = remaining[BLOCK_SIZE:]
+            self.logger.debug('FLUSHING %r',
+                              binascii.hexlify(to_send))
+            self.request.send(to_send)
+        return
+
+
+if __name__ == '__main__':
+    import socket
+    import threading
+    from io import BytesIO
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(name)s: %(message)s',
+    )
+    logger = logging.getLogger('Client')
+
+    # Set up a server, running in a separate thread
+    address = ('localhost', 0)  # let the kernel assign a port
+    server = socketserver.TCPServer(address, ZlibRequestHandler)
+    ip, port = server.server_address  # what port was assigned?
+
+    t = threading.Thread(target=server.serve_forever)
+    t.setDaemon(True)
+    t.start()
+
+    # Connect to the server as a client
+    logger.info('Contacting server on %s:%s', ip, port)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((ip, port))
+
+    # Ask for a file
+    requested_file = 'lorem.txt'
+    logger.debug('sending filename: %r', requested_file)
+    len_sent = s.send(requested_file.encode('utf-8'))
+
+    # Receive a response
+    buffer = BytesIO()
+    decompressor = zlib.decompressobj()
+    while True:
+        response = s.recv(BLOCK_SIZE)
+        if not response:
+            break
+        logger.debug('READ %r', binascii.hexlify(response))
+
+        # Include any unconsumed data when
+        # feeding the decompressor.
+        to_decompress = decompressor.unconsumed_tail + response
+        while to_decompress:
+            decompressed = decompressor.decompress(to_decompress)
+            if decompressed:
+                logger.debug('DECOMPRESSED %r', decompressed)
+                buffer.write(decompressed)
+                # Look for unconsumed data due to buffer overflow
+                to_decompress = decompressor.unconsumed_tail
+            else:
+                logger.debug('BUFFERING')
+                to_decompress = None
+
+    # deal with data reamining inside the decompressor buffer
+    remainder = decompressor.flush()
+    if remainder:
+        logger.debug('FLUSHED %r', remainder)
+        buffer.write(remainder)
+
+    full_response = buffer.getvalue()
+    lorem = open('lorem.txt', 'rb').read()
+    logger.debug('response matches file contents: %s',
+                 full_response == lorem)
+
+    # Clean up
+    s.close()
+    server.socket.close()
+```
+
+It has some artificial chunking in place to illustrate the buffering behavior that happens when the data passed to compress() or decompress() does not result in a complete block of compressed or uncompressed output.
+
+The client connects to the socket and requests a file. Then it loops, receiving blocks of compressed data. Since a block may not contain enough information to decompress it entirely, the remainder of any data received earlier is combined with the new data and passed to the decompressor. As the data is decompressed, it is appended to a buffer, which is compared against the file contents at the end of the processing loop.
+
+<div style="color: black; background-color: pink;">
+<b>Warning</b>
+
+This server has obvious security implications. Do not run it on a system on the open Internet or in any environment where security might be an issue.
+</div>
+
+```
+$ python3 zlib_server.py
+Client: Contacting server on 127.0.0.1:41025
+Client: sending filename: 'lorem.txt'
+Server: client asked for: 'lorem.txt'
+Server: RAW b'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\nDonec '
+Server: SENDING b'7801'
+Client: READ b'7801'
+Server: RAW b'egestas, enim et consectetuer ullamcorper, lectus ligula rutrum '
+Client: BUFFERING
+Server: BUFFERING
+Server: RAW b'leo,\na elementum elit tortor eu quam. Duis tincidunt nisi ut ant'
+Server: BUFFERING
+Server: RAW b'e. Nulla\nfacilisi. Sed tristique eros eu libero. Pellentesque ve'
+Server: BUFFERING
+Server: RAW b'l\narcu. Vivamus purus orci, iaculis ac, suscipit sit amet, pulvi'
+Server: BUFFERING
+Server: RAW b'nar eu,\nlacus. Praesent placerat tortor sed nisl. Nunc blandit d'
+Server: BUFFERING
+Server: RAW b'iam egestas\ndui. Pellentesque habitant morbi tristique senectus '
+Server: BUFFERING
+Server: RAW b'et netus et\nmalesuada fames ac turpis egestas. Aliquam viverra f'
+Server: BUFFERING
+Server: RAW b'ringilla\nleo. Nulla feugiat augue eleifend nulla. Vivamus mauris'
+Server: BUFFERING
+Server: RAW b'. Vivamus sed\nmauris in nibh placerat egestas. Suspendisse poten'
+Server: BUFFERING
+Server: RAW b'ti. Mauris\nmassa. Ut eget velit auctor tortor blandit sollicitud'
+Server: BUFFERING
+Server: RAW b'in. Suspendisse\nimperdiet justo.'
+Server: BUFFERING
+Server: FLUSHING b'55525b8edb300cfcf7297800c37728b09f6d51a068ff1999c9b2a024af48fafc3bea669b06300c8b1687f3e0d73ea4921e9e95f66e7d906b105789954a6f2e25'
+Client: READ b'55525b8edb300cfcf7297800c37728b09f6d51a068ff1999c9b2a024af48fafc3bea669b06300c8b1687f3e0d73ea4921e9e95f66e7d906b105789954a6f2e25'
+Server: FLUSHING b'245206f1ae877ad17623318d6d79e94d0ac94d3cd85792a695249e9bd28c6be9e390b192012b9d4c6f694c236360a6495f1706a4546981c204a7e8030f49d25b'
+Client: DECOMPRESSED b'Lorem ipsum dolor sit amet, consec'
+Server: FLUSHING b'72dde825d529b415ddb3053575a504cd16b2d1f73965b97251437da39fb2530cf5d0b71492d17d02995ef0b9d10f31c324f1f9f3145b7894dce8b79e5cc1eec8'
+Client: READ b'245206f1ae877ad17623318d6d79e94d0ac94d3cd85792a695249e9bd28c6be9e390b192012b9d4c6f694c236360a6495f1706a4546981c204a7e8030f49d25b'
+Server: FLUSHING b'81771f4557522e0948e2b29227b41fa0f6b0e7483bb5f1a4b92e86bb0ef4c1e280a7030519fc4f8a831468dba4db0a5d8cdb0eb45d19923f3c5cf604fb277eaf'
+Client: DECOMPRESSED b'tetuer adipiscing elit.\nDonec egestas, enim et consectetuer ullamcorper, lectus ligula rutrum leo,\na elementum elit tortor eu q'
+Server: FLUSHING b'7cd1804aaa7d5cf43f5598f1e1261c6f08081263a96ce2c93bd315014ede143990dae7848dbe184cc1c8534f1903170702d5e91f82b85b4957c99b823ae76d1a'
+Client: READ b'72dde825d529b415ddb3053575a504cd16b2d1f73965b97251437da39fb2530cf5d0b71492d17d02995ef0b9d10f31c324f1f9f3145b7894dce8b79e5cc1eec8'
+Server: FLUSHING b'68a25769a03f7d7e38553961f2e30c8560306ba40d5a2faf0f13ee0a914dfa012c75173a7ac02948fef6b70bcdeec0ff15936ecc6ce62666999b705f884fdbbc'
+Client: DECOMPRESSED b'uam. Duis tincidunt nisi ut ante. Nulla\nfacilisi. Sed tristique eros eu libero. Pellentesque vel\narcu. Vivamus pu'
+Server: FLUSHING b'9b69d1c85ddb13e8a215bbb62bfaffa447dfde015cf60e9b'
+Client: READ b'81771f4557522e0948e2b29227b41fa0f6b0e7483bb5f1a4b92e86bb0ef4c1e280a7030519fc4f8a831468dba4db0a5d8cdb0eb45d19923f3c5cf604fb277eaf'
+Client: DECOMPRESSED b'rus orci, iaculis ac, suscipit sit amet, pulvinar eu,\nlacus. Praesent placerat tortor sed nisl. Nunc blandit diam egestas\ndui. Pellentesque h'
+Client: READ b'7cd1804aaa7d5cf43f5598f1e1261c6f08081263a96ce2c93bd315014ede143990dae7848dbe184cc1c8534f1903170702d5e91f82b85b4957c99b823ae76d1a'
+Client: DECOMPRESSED b'abitant morbi tristique senectus et netus et\nmalesuada fames ac turpis egestas. Aliquam viverra fringilla\nleo. Nulla feugiat aug'
+Client: READ b'68a25769a03f7d7e38553961f2e30c8560306ba40d5a2faf0f13ee0a914dfa012c75173a7ac02948fef6b70bcdeec0ff15936ecc6ce62666999b705f884fdbbc'
+Client: DECOMPRESSED b'ue eleifend nulla. Vivamus mauris. Vivamus sed\nmauris in nibh placerat egestas. Suspendisse potenti. Mauris\nmassa. Ut eget velit auctor tortor blandit s'
+Client: READ b'9b69d1c85ddb13e8a215bbb62bfaffa447dfde015cf60e9b'
+Client: DECOMPRESSED b'ollicitudin. Suspendisse\nimperdiet justo.'
+Client: response matches file contents: True
+```
