@@ -119,3 +119,63 @@ The same line, over and over.
 The same line, over and over.
 The same line, over and over.
 ```
+
+### 8.2.2 Reading Compressed Data
+
+To read data back from previously compressed files, open the file with binary read mode ('rb') so no text-based translation of line endings or Unicode decoding is performed.
+
+```
+# gzip_read.py
+import gzip
+import io
+
+with gzip.open('example.txt.gz', 'rb') as input_file:
+    with io.TextIOWrapper(input_file, encoding='utf-8') as dec:
+        print(dec.read())
+```
+
+This example reads the file written by gzip_write.py from the previous section, using a TextIOWrapper to decode the text after it is decompressed.
+
+```
+$ python3 gzip_read.py
+Contents of the example file go here.
+
+```
+
+While reading a file, it is also possible to seek and read only part of the data.
+
+```
+# gzip_seek.py
+import gzip
+
+with gzip.open('example.txt.gz', 'rb') as input_file:
+    print('Entire file:')
+    all_data = input_file.read()
+    print(all_data)
+
+    expected = all_data[5:15]
+
+    # rewind to beginning
+    input_file.seek(0)
+
+    # move ahead 5 bytes
+    input_file.seek(5)
+    print('Starting at position 5 for 10 bytes:')
+    partial = input_file.read(10)
+    print(partial)
+
+    print()
+    print(expected == partial)
+```
+
+The seek() position is relative to the uncompressed data, so the caller does not need to know that the data file is compressed.
+
+```
+$ python3 gzip_seek.py
+Entire file:
+b'Contents of the example file go here.\n'
+Starting at position 5 for 10 bytes:
+b'nts of the'
+
+True
+```
