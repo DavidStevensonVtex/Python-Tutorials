@@ -179,3 +179,55 @@ b'nts of the'
 
 True
 ```
+
+### 8.2.3 Working with Streams
+
+The GzipFile class can be used to wrap other types of data streams so they can use compression as well. This is useful when the data is being transmitted over a socket or an existing (already open) file handle. A BytesIO buffer can also be used.
+
+```
+# gzip_BytesIO.py
+import gzip
+from io import BytesIO
+import binascii
+
+uncompressed_data = b"The same line, over and over.\n" * 10
+print("UNCOMPRESSED:", len(uncompressed_data))
+print(uncompressed_data)
+
+buf = BytesIO()
+with gzip.GzipFile(mode="wb", fileobj=buf) as f:
+    f.write(uncompressed_data)
+
+compressed_data = buf.getvalue()
+print("COMPRESSED:", len(compressed_data))
+print(binascii.hexlify(compressed_data))
+
+inbuffer = BytesIO(compressed_data)
+with gzip.GzipFile(mode="rb", fileobj=inbuffer) as f:
+    reread_data = f.read(len(uncompressed_data))
+
+print("\nREREAD:", len(reread_data))
+print(reread_data)
+```
+
+One benefit of using GzipFile over [zlib](https://pymotw.com/3/zlib/index.html) is that it supports the file API. However, when re-reading the previously compressed data, an explicit length is passed to read(). Leaving the length off resulted in a CRC error, possibly because BytesIO returned an empty string before reporting EOF. When working with streams of compressed data, either prefix the data with an integer representing the actual amount of data to be read or use the incremental decompression API in [zlib](https://pymotw.com/3/zlib/index.html).
+
+```
+$ python3 gzip_BytesIO.py
+UNCOMPRESSED: 300
+b'The same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\n'
+COMPRESSED: 51
+b'1f8b08002e3bcb6702ff0bc94855284ecc4d55c8c9cc4bd551c82f4b2d5248cc4b0133f4b8424665916401d3e717802c010000'
+
+REREAD: 300
+b'The same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\nThe same line, over and over.\n'
+```
+
+### See also
+
+* [Standard library documentation for gzip](https://docs.python.org/3/library/gzip.html)
+* [zlib](https://pymotw.com/3/zlib/index.html) – The zlib module is a lower-level interface to gzip compression.
+* [zipfile](https://pymotw.com/3/zipfile/index.html) – The zipfile module gives access to ZIP archives.
+* [bz2](https://pymotw.com/3/bz2/index.html) – The bz2 module uses the bzip2 compression format.
+* [tarfile](https://pymotw.com/3/tarfile/index.html) – The tarfile module includes built-in support for reading compressed tar archives.
+* [io](https://pymotw.com/3/io/index.html) – Building-blocks for creating input and output pipelines.
