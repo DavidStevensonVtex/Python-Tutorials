@@ -130,3 +130,34 @@ buffering...
 buffering...
 Flushed: b'425a6839314159265359cb07c9da000042d7800010400524074b003ff7ff004001d2e34183423129ed53d353ca34068341aa78d26446a34d0068c818d311846980000129910453d3265234f53689ea0cddf6e3ccaee7a400028dce03aac30d417615abf883428245302e5e197e9047c4c836ad3262ab674a0a16613eee561f2db16ad21a50bad29ca48a9a258422e72793045c04ae97373c3041eec9137bacc2b5cff449ccf7ed21a69a973c514573633d4854be0bdcc60dd19c0cca77ab4d82bdb3a5e123daf22d99e7304eec48f26d5dffa66ea8d7bb362ff02f59db1ce87ec35b9ca9b9639a8dfa78457bc1c355d9d33ced467ed7e164938b33be5119e31a157ab875d16e8b629208b83364cdf5f51b6dc6988d96a6ef53182475eee579cf5886d433e46615539331874a1d9c28b2a892eed426892ad4d0523bf5db9fae8a8dd7c69f76a8d3ad4785c1984849525b706ea197f0c929bf1cc6c5152dc4ceb7d6e8a2edc0a869eaa59fa3118b0c4ac497a18225f6b3a295a5bf53848a8a986642b44702d2a3429c8855e81e68a0c8df715b7990081a7aead4fc2231c62ed5829b19746315a6c3786c1203ee9fc5dc914e142432c1f27680'
 ```
+
+### 8.3.3 Mixed Content Streams
+
+BZ2Decompressor can also be used in situations where compressed and uncompressed data is mixed together.
+
+```
+# bz2_mixed.py
+import bz2
+
+lorem = open("lorem.txt", "rt").read().encode("utf-8")
+compressed = bz2.compress(lorem)
+combined = compressed + lorem
+
+decompressor = bz2.BZ2Decompressor()
+decompressed = decompressor.decompress(combined)
+
+decompressed_matches = decompressed == lorem
+print("Decompressed matches lorem:", decompressed_matches)
+
+unused_matches = decompressor.unused_data == lorem
+print("Unused data matches lorem :", unused_matches)
+```
+
+After decompressing all of the data, the unused_data attribute contains any data not used.
+
+```
+$ python3 bz2_mixed.py
+Decompressed matches lorem: True
+Unused data matches lorem : True
+```
+
