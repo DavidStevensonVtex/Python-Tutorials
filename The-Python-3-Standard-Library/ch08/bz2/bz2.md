@@ -317,3 +317,42 @@ b'nts of the'
 True
 ```
 
+### 8.3.6 Reading and Writing Unicode Data
+
+The previous examples used BZ2File directly and managed the encoding and decoding of Unicode text strings inline with an io.TextIOWrapper, where necessary. These extra steps can be avoided by using bz2.open(), which sets up an io.TextIOWrapper to handle the encoding or decoding automatically.
+
+```
+# bz2_unicode.py
+import bz2
+import os
+
+data = "Character with an åccent."
+
+with bz2.open("example.bz2", "wt", encoding="utf-8") as output:
+    output.write(data)
+
+with bz2.open("example.bz2", "rt", encoding="utf-8") as input:
+    print("Full file: {}".format(input.read()))
+
+# Move to the beginning of the accented character.
+with bz2.open("example.bz2", "rt", encoding="utf-8") as input:
+    input.seek(18)
+    print("One character: {}".format(input.read(1)))
+
+# Move to the middle of the accented character.
+with bz2.open("example.bz2", "rt", encoding="utf-8") as input:
+    input.seek(19)
+    try:
+        print(input.read(1))
+    except UnicodeDecodeError:
+        print("ERROR: failed to decode")
+```
+
+The file handle returned by open() supports seek(), but use care because the file pointer moves by bytes not characters and may end up in the middle of an encoded character.
+
+```
+$ python3 bz2_unicode.py
+Full file: Character with an åccent.
+One character: å
+ERROR: failed to decode
+```
