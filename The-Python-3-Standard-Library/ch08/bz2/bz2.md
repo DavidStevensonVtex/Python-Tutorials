@@ -221,3 +221,37 @@ Input contains 753664 bytes
 612410620 1127 compress-level-8.bz2
 1817446238 1127 compress-level-9.bz2
 ```
+
+A BZ2File instance also includes a writelines() method that can be used to write a sequence of strings.
+
+```
+# bz2_file_writelines.py
+import bz2
+import io
+import itertools
+import os
+
+data = "The same line, over and over.\n"
+
+with bz2.BZ2File("lines.bz2", "wb") as output:
+    with io.TextIOWrapper(output, encoding="utf-8") as enc:
+        enc.writelines(itertools.repeat(data, 10))
+
+os.system("bzcat lines.bz2")
+```
+
+The lines should end in a newline character, as when writing to a regular file.
+
+```
+$ python3 bz2_file_writelines.py
+The same line, over and over.
+The same line, over and over.
+The same line, over and over.
+The same line, over and over.
+The same line, over and over.
+The same line, over and over.
+The same line, over and over.
+The same line, over and over.
+The same line, over and over.
+The same line, over and over.
+```
