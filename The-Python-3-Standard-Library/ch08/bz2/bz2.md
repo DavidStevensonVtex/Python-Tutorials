@@ -161,3 +161,63 @@ Decompressed matches lorem: True
 Unused data matches lorem : True
 ```
 
+### 8.3.4 Writing Compressed Files
+
+BZ2File can be used to write to and read from bzip2-compressed files using the usual methods for writing and reading data.
+
+```
+# bz2_file_write.py
+import bz2
+import io
+import os
+
+data = "Contents of the example file go here.\n"
+
+with bz2.BZ2File("example.bz2", "wb") as output:
+    with io.TextIOWrapper(output, encoding="utf-8") as enc:
+        enc.write(data)
+
+os.system("file example.bz2")
+```
+
+To write data into a compressed file, open the file with mode 'wb'. This example wraps the BZ2File with a TextIOWrapper from the io module to encode Unicode text to bytes suitable for compression.
+
+```
+$ python3 bz2_file_write.py
+example.bz2: bzip2 compressed data, block size = 900k
+```
+
+Different compression levels can be used by passing a compresslevel argument. Valid values range from 1 to 9, inclusive. Lower values are faster and result in less compression. Higher values are slower and compress more, up to a point.
+
+```
+# bz2_file_compresslevel.py
+import bz2
+import io
+import os
+
+data = open("lorem.txt", "r", encoding="utf-8").read() * 1024
+print("Input contains {} bytes".format(len(data.encode("utf-8"))))
+
+for i in range(1, 10):
+    filename = "compress-level-{}.bz2".format(i)
+    with bz2.BZ2File(filename, "wb", compresslevel=i) as output:
+        with io.TextIOWrapper(output, encoding="utf-8") as enc:
+            enc.write(data)
+    os.system("cksum {}".format(filename))
+```
+
+The center column of numbers in the output of the script is the size in bytes of the files produced. For this input data, the higher compression values do not always pay off in decreased storage space for the same input data. Results will vary for other inputs.
+
+```
+$ python3 bz2_file_compresslevel.py
+Input contains 753664 bytes
+624984808 8497 compress-level-1.bz2
+2810842557 4688 compress-level-2.bz2
+1257664293 3726 compress-level-3.bz2
+2864333220 2594 compress-level-4.bz2
+2583238201 2653 compress-level-5.bz2
+934209552 2512 compress-level-6.bz2
+632595249 2306 compress-level-7.bz2
+612410620 1127 compress-level-8.bz2
+1817446238 1127 compress-level-9.bz2
+```
