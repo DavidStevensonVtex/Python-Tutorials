@@ -356,3 +356,250 @@ Full file: Character with an åccent.
 One character: å
 ERROR: failed to decode
 ```
+
+### 8.3.7 Compressing Network Data
+
+The code in the next example responds to requests consisting of filenames by writing a compressed version of the file to the socket used to communicate with the client. It has some artificial chunking in place to illustrate the buffering that occurs when the data passed to compress() or decompress() does not result in a complete block of compressed or uncompressed output.
+
+```
+# bz2_server.py
+import bz2
+import logging
+import socketserver
+import binascii
+
+BLOCK_SIZE = 32
+
+
+class Bz2RequestHandler(socketserver.BaseRequestHandler):
+
+    logger = logging.getLogger('Server')
+
+    def handle(self):
+        compressor = bz2.BZ2Compressor()
+
+        # Find out what file the client wants
+        filename = self.request.recv(1024).decode('utf-8')
+        self.logger.debug('client asked for: "%s"', filename)
+
+        # Send chunks of the file as they are compressed
+        with open(filename, 'rb') as input:
+            while True:
+                block = input.read(BLOCK_SIZE)
+                if not block:
+                    break
+                self.logger.debug('RAW %r', block)
+                compressed = compressor.compress(block)
+                if compressed:
+                    self.logger.debug(
+                        'SENDING %r',
+                        binascii.hexlify(compressed))
+                    self.request.send(compressed)
+                else:
+                    self.logger.debug('BUFFERING')
+
+        # Send any data being buffered by the compressor
+        remaining = compressor.flush()
+        while remaining:
+            to_send = remaining[:BLOCK_SIZE]
+            remaining = remaining[BLOCK_SIZE:]
+            self.logger.debug('FLUSHING %r',
+                              binascii.hexlify(to_send))
+            self.request.send(to_send)
+        return
+```
+
+The main program starts a server in a thread, combining SocketServer and Bz2RequestHandler.
+
+```
+if __name__ == '__main__':
+    import socket
+    import sys
+    from io import StringIO
+    import threading
+
+    logging.basicConfig(level=logging.DEBUG,
+                        format='%(name)s: %(message)s',
+                        )
+
+    # Set up a server, running in a separate thread
+    address = ('localhost', 0)  # let the kernel assign a port
+    server = socketserver.TCPServer(address, Bz2RequestHandler)
+    ip, port = server.server_address  # what port was assigned?
+
+    t = threading.Thread(target=server.serve_forever)
+    t.setDaemon(True)
+    t.start()
+
+    logger = logging.getLogger('Client')
+
+    # Connect to the server
+    logger.info('Contacting server on %s:%s', ip, port)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((ip, port))
+
+    # Ask for a file
+    requested_file = (sys.argv[0]
+                      if len(sys.argv) > 1
+                      else 'lorem.txt')
+    logger.debug('sending filename: "%s"', requested_file)
+    len_sent = s.send(requested_file.encode('utf-8'))
+
+    # Receive a response
+    buffer = StringIO()
+    decompressor = bz2.BZ2Decompressor()
+    while True:
+        response = s.recv(BLOCK_SIZE)
+        if not response:
+            break
+        logger.debug('READ %r', binascii.hexlify(response))
+
+        # Include any unconsumed data when feeding the
+        # decompressor.
+        decompressed = decompressor.decompress(response)
+        if decompressed:
+            logger.debug('DECOMPRESSED %r', decompressed)
+            buffer.write(decompressed.decode('utf-8'))
+        else:
+            logger.debug('BUFFERING')
+
+    full_response = buffer.getvalue()
+    lorem = open(requested_file, 'rt').read()
+    logger.debug('response matches file contents: %s',
+                 full_response == lorem)
+
+    # Clean up
+    server.shutdown()
+    server.socket.close()
+    s.close()
+```
+
+It then opens a socket to communicate with the server as a client, and requests the file (defaulting to lorem.txt) which contains:
+
+```
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+Donec egestas, enim et consectetuer ullamcorper, lectus ligula rutrum leo,
+a elementum elit tortor eu quam. Duis tincidunt nisi ut ante. Nulla
+facilisi. Sed tristique eros eu libero. Pellentesque vel
+arcu. Vivamus purus orci, iaculis ac, suscipit sit amet, pulvinar eu,
+lacus. Praesent placerat tortor sed nisl. Nunc blandit diam egestas
+dui. Pellentesque habitant morbi tristique senectus et netus et
+malesuada fames ac turpis egestas. Aliquam viverra fringilla
+leo. Nulla feugiat augue eleifend nulla. Vivamus mauris. Vivamus sed
+mauris in nibh placerat egestas. Suspendisse potenti. Mauris
+massa. Ut eget velit auctor tortor blandit sollicitudin. Suspendisse
+imperdiet justo.
+```
+
+<div style="color: black; background-color: pink;">
+Warning
+
+This implementation has obvious security implications. Do not run it on a server on the open Internet or in any environment where security might be an issue.
+</div>
+
+Running bz2_server.py produces:
+
+```
+$ python3 bz2_server.py 
+Client: Contacting server on 127.0.0.1:57479
+Client: sending filename: "lorem.txt"
+Server: client asked for: "lorem.txt"
+Server: RAW b'Lorem ipsum dolor sit amet, cons'
+Server: BUFFERING
+Server: RAW b'ectetuer adipiscing elit.\nDonec '
+Server: BUFFERING
+Server: RAW b'egestas, enim et consectetuer ul'
+Server: BUFFERING
+Server: RAW b'lamcorper, lectus ligula rutrum '
+Server: BUFFERING
+Server: RAW b'leo,\na elementum elit tortor eu '
+Server: BUFFERING
+Server: RAW b'quam. Duis tincidunt nisi ut ant'
+Server: BUFFERING
+Server: RAW b'e. Nulla\nfacilisi. Sed tristique'
+Server: BUFFERING
+Server: RAW b' eros eu libero. Pellentesque ve'
+Server: BUFFERING
+Server: RAW b'l\narcu. Vivamus purus orci, iacu'
+Server: BUFFERING
+Server: RAW b'lis ac, suscipit sit amet, pulvi'
+Server: BUFFERING
+Server: RAW b'nar eu,\nlacus. Praesent placerat'
+Server: BUFFERING
+Server: RAW b' tortor sed nisl. Nunc blandit d'
+Server: BUFFERING
+Server: RAW b'iam egestas\ndui. Pellentesque ha'
+Server: BUFFERING
+Server: RAW b'bitant morbi tristique senectus '
+Server: BUFFERING
+Server: RAW b'et netus et\nmalesuada fames ac t'
+Server: BUFFERING
+Server: RAW b'urpis egestas. Aliquam viverra f'
+Server: BUFFERING
+Server: RAW b'ringilla\nleo. Nulla feugiat augu'
+Server: BUFFERING
+Server: RAW b'e eleifend nulla. Vivamus mauris'
+Server: BUFFERING
+Server: RAW b'. Vivamus sed\nmauris in nibh pla'
+Server: BUFFERING
+Server: RAW b'cerat egestas. Suspendisse poten'
+Server: BUFFERING
+Server: RAW b'ti. Mauris\nmassa. Ut eget velit '
+Server: BUFFERING
+Server: RAW b'auctor tortor blandit sollicitud'
+Server: BUFFERING
+Server: RAW b'in. Suspendisse\nimperdiet justo.'
+Server: BUFFERING
+Server: FLUSHING b'425a6839314159265359cb07c9da000042d7800010400524074b003ff7ff0040'
+Server: FLUSHING b'01d2e34183423129ed53d353ca34068341aa78d26446a34d0068c818d3118469'
+Client: READ b'425a6839314159265359cb07c9da000042d7800010400524074b003ff7ff0040'
+Server: FLUSHING b'80000129910453d3265234f53689ea0cddf6e3ccaee7a400028dce03aac30d41'
+Client: BUFFERING
+Server: FLUSHING b'7615abf883428245302e5e197e9047c4c836ad3262ab674a0a16613eee561f2d'
+Client: READ b'01d2e34183423129ed53d353ca34068341aa78d26446a34d0068c818d3118469'
+Server: FLUSHING b'b16ad21a50bad29ca48a9a258422e72793045c04ae97373c3041eec9137bacc2'
+Client: BUFFERING
+Server: FLUSHING b'b5cff449ccf7ed21a69a973c514573633d4854be0bdcc60dd19c0cca77ab4d82'
+Client: READ b'80000129910453d3265234f53689ea0cddf6e3ccaee7a400028dce03aac30d41'
+Server: FLUSHING b'bdb3a5e123daf22d99e7304eec48f26d5dffa66ea8d7bb362ff02f59db1ce87e'
+Client: BUFFERING
+Server: FLUSHING b'c35b9ca9b9639a8dfa78457bc1c355d9d33ced467ed7e164938b33be5119e31a'
+Client: READ b'7615abf883428245302e5e197e9047c4c836ad3262ab674a0a16613eee561f2d'
+Server: FLUSHING b'157ab875d16e8b629208b83364cdf5f51b6dc6988d96a6ef53182475eee579cf'
+Client: BUFFERING
+Server: FLUSHING b'5886d433e46615539331874a1d9c28b2a892eed426892ad4d0523bf5db9fae8a'
+Client: READ b'b16ad21a50bad29ca48a9a258422e72793045c04ae97373c3041eec9137bacc2'
+Server: FLUSHING b'8dd7c69f76a8d3ad4785c1984849525b706ea197f0c929bf1cc6c5152dc4ceb7'
+Client: BUFFERING
+Server: FLUSHING b'd6e8a2edc0a869eaa59fa3118b0c4ac497a18225f6b3a295a5bf53848a8a9866'
+Client: READ b'b5cff449ccf7ed21a69a973c514573633d4854be0bdcc60dd19c0cca77ab4d82'
+Server: FLUSHING b'42b44702d2a3429c8855e81e68a0c8df715b7990081a7aead4fc2231c62ed582'
+Client: BUFFERING
+Server: FLUSHING b'9b19746315a6c3786c1203ee9fc5dc914e142432c1f27680'
+Client: READ b'bdb3a5e123daf22d99e7304eec48f26d5dffa66ea8d7bb362ff02f59db1ce87e'
+Client: BUFFERING
+Client: READ b'c35b9ca9b9639a8dfa78457bc1c355d9d33ced467ed7e164938b33be5119e31a'
+Client: BUFFERING
+Client: READ b'157ab875d16e8b629208b83364cdf5f51b6dc6988d96a6ef53182475eee579cf'
+Client: BUFFERING
+Client: READ b'5886d433e46615539331874a1d9c28b2a892eed426892ad4d0523bf5db9fae8a'
+Client: BUFFERING
+Client: READ b'8dd7c69f76a8d3ad4785c1984849525b706ea197f0c929bf1cc6c5152dc4ceb7'
+Client: BUFFERING
+Client: READ b'd6e8a2edc0a869eaa59fa3118b0c4ac497a18225f6b3a295a5bf53848a8a9866'
+Client: BUFFERING
+Client: READ b'42b44702d2a3429c8855e81e68a0c8df715b7990081a7aead4fc2231c62ed582'
+Client: BUFFERING
+Client: READ b'9b19746315a6c3786c1203ee9fc5dc914e142432c1f27680'
+Client: DECOMPRESSED b'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\nDonec egestas, enim et consectetuer ullamcorper, lectus ligula rutrum leo,\na elementum elit tortor eu quam. Duis tincidunt nisi ut ante. Nulla\nfacilisi. Sed tristique eros eu libero. Pellentesque vel\narcu. Vivamus purus orci, iaculis ac, suscipit sit amet, pulvinar eu,\nlacus. Praesent placerat tortor sed nisl. Nunc blandit diam egestas\ndui. Pellentesque habitant morbi tristique senectus et netus et\nmalesuada fames ac turpis egestas. Aliquam viverra fringilla\nleo. Nulla feugiat augue eleifend nulla. Vivamus mauris. Vivamus sed\nmauris in nibh placerat egestas. Suspendisse potenti. Mauris\nmassa. Ut eget velit auctor tortor blandit sollicitudin. Suspendisse\nimperdiet justo.'
+Client: response matches file contents: True
+```
+
+### See also
+
+* [Standard library documentation for bz2](https://docs.python.org/3/library/bz2.html)
+* [bzip2.org](http://www.bzip.org/) – The home page for bzip2.
+* [zlib](https://pymotw.com/3/zlib/index.html) – The zlib module for GNU zip compression.
+* [gzip](https://pymotw.com/3/gzip/index.html) – A file-like interface to GNU zip compressed files.
+* [io](https://pymotw.com/3/io/index.html) – Building-blocks for creating input and output pipelines.
+* [Python 2 to 3 porting notes for bz2](https://pymotw.com/3/porting_notes.html#porting-bz2)
