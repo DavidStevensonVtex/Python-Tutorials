@@ -255,3 +255,65 @@ The same line, over and over.
 The same line, over and over.
 The same line, over and over.
 ```
+
+### 8.3.5 Reading Compressed Files
+
+To read data back from previously compressed files, open the file with read mode ('rb'). The value returned from read() will be a byte string.
+
+```
+# bz2_file_read.py
+import bz2
+import io
+
+with bz2.BZ2File("example.bz2", "rb") as input:
+    with io.TextIOWrapper(input, encoding="utf-8") as dec:
+        print(dec.read())
+```
+
+This example reads the file written by bz2_file_write.py from the previous section. The BZ2File is wrapped with a TextIOWrapper to decode bytes read to Unicode text.
+
+```
+$ python3 bz2_file_read.py
+Contents of the example file go here.
+
+```
+
+While reading a file, it is also possible to seek, and to read only part of the data.
+
+```
+# bz2_file_seek.py
+import bz2
+import contextlib
+
+with bz2.BZ2File("example.bz2", "rb") as input:
+    print("Entire file:")
+    all_data = input.read()
+    print(all_data)
+
+    expected = all_data[5:15]
+
+    # rewind to beginning
+    input.seek(0)
+
+    # move ahead 5 bytes
+    input.seek(5)
+    print("Starting at position 5 for 10 bytes:")
+    partial = input.read(10)
+    print(partial)
+
+    print()
+    print(expected == partial)
+```
+
+The seek() position is relative to the uncompressed data, so the caller does not need to be aware that the data file is compressed. This allows a BZ2File instance to be passed to a function expecting a regular uncompressed file.
+
+```
+$ python3 bz2_file_seek.py
+Entire file:
+b'Contents of the example file go here.\n'
+Starting at position 5 for 10 bytes:
+b'nts of the'
+
+True
+```
+
