@@ -128,3 +128,54 @@ $ python3 tarfile_getmember.py
 ./tarfile.md is 1600 bytes
 ERROR: Did not find notthere.txt in tar archive
 ```
+
+### 8.4.3 Extracting Files from an Archive
+
+To access the data from an archive member within a program, use the extractfile() method, passing the member’s name.
+
+```
+# tarfile_extractfile.py
+import tarfile
+
+with tarfile.open("example.tar", "r") as t:
+    for filename in ["README.txt", "notthere.txt"]:
+        try:
+            f = t.extractfile(filename)
+        except KeyError:
+            print("ERROR: Did not find {} in tar archive".format(filename))
+        else:
+            print(filename, ":")
+            print(f.read().decode("utf-8"))
+```
+
+The return value is a file-like object from which the contents of the archive member can be read.
+
+```
+$ python3 tarfile_extractfile.py
+
+README.txt :
+The examples for the tarfile module use this file and
+example.tar as data.
+
+ERROR: Did not find notthere.txt in tar archive
+```
+
+To unpack the archive and write the files to the file system, use extract() or extractall() instead.
+
+```
+# tarfile_extract.py
+import tarfile
+import os
+
+os.mkdir("outdir")
+with tarfile.open("example.tar", "r") as t:
+    t.extract("./tarfile_is_tarfile.py", "outdir")
+print(os.listdir("outdir"))
+```
+
+The member or members are read from the archive and written to the file system, starting in the directory named in the arguments.
+
+```
+$ python3 tarfile_extract.py
+['tarfile_is_tarfile.py']
+```
