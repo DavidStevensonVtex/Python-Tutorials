@@ -179,3 +179,48 @@ The member or members are read from the archive and written to the file system, 
 $ python3 tarfile_extract.py
 ['tarfile_is_tarfile.py']
 ```
+
+The standard library documentation includes a note stating that extractall() is safer than extract(), especially for working with streaming data where rewinding to read an earlier part of the input is not possible, and it should be used in most cases.
+
+```
+# tarfile_extractall.py
+import tarfile
+import os
+
+os.mkdir("outdir")
+with tarfile.open("example.tar", "r") as t:
+    t.extractall("outdir")
+print(os.listdir("outdir"))
+```
+
+With extractall(), the first argument is the name of the directory where the files should be written.
+
+```
+$ python3 tarfile_extractall.py
+['tarfile_extract.py', 'tarfile_getnames.py', 'tarfile_getmembers.py', 'tarfile.md', 'tarfile_extractall.py', 'tarfile_is_tarfile.py', 'tarfile_getmember.py', 'tarfile_extractfile.py']
+```
+
+To extract specific files from the archive, pass their names or TarInfo metadata containers to extractall().
+
+```
+# tarfile_extractall_members.py
+import tarfile
+import os
+
+os.mkdir("outdir")
+with tarfile.open("example.tar", "r") as t:
+    t.extractall(
+        "outdir",
+        members=[t.getmember("README.txt")],
+    )
+print(os.listdir("outdir"))
+```
+
+When a members list is provided, only the named files are extracted.
+
+```
+$ python3 tarfile_extractall_members.py
+
+['README.txt']
+```
+
