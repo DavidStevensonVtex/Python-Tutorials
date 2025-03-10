@@ -320,3 +320,40 @@ Contents:
 made_up_file.txt
 This is the data to write to the archive.
 ```
+
+### 8.4.7 Appending to Archives
+
+In addition to creating new archives, it is possible to append to an existing file by using mode 'a'.
+
+```
+# tarfile_append.py
+import tarfile
+
+print('creating archive')
+with tarfile.open('tarfile_append.tar', mode='w') as out:
+    out.add('README.txt')
+
+print('contents:',)
+with tarfile.open('tarfile_append.tar', mode='r') as t:
+    print([m.name for m in t.getmembers()])
+
+print('adding index.rst')
+with tarfile.open('tarfile_append.tar', mode='a') as out:
+    out.add('index.rst')
+
+print('contents:',)
+with tarfile.open('tarfile_append.tar', mode='r') as t:
+    print([m.name for m in t.getmembers()])
+```
+
+The resulting archive ends up with two members:
+
+```
+$ python3 tarfile_append.py
+creating archive
+contents:
+['README.txt']
+adding index.rst
+contents:
+['README.txt', 'index.rst']
+```
