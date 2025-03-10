@@ -357,3 +357,49 @@ adding index.rst
 contents:
 ['README.txt', 'index.rst']
 ```
+
+### 8.4.8 Working with Compressed Archives
+
+Besides regular tar archive files, the tarfile module can work with archives compressed via the gzip or bzip2 protocols. To open a compressed archive, modify the mode string passed to open() to include ":gz" or ":bz2", depending on the desired compression method.
+
+```
+# tarfile_compression.py
+import tarfile
+import os
+
+fmt = "{:<30} {:<10}"
+print(fmt.format("FILENAME", "SIZE"))
+print(fmt.format("README.txt", os.stat("README.txt").st_size))
+
+FILES = [
+    ("tarfile_compression.tar", "w"),
+    ("tarfile_compression.tar.gz", "w:gz"),
+    ("tarfile_compression.tar.bz2", "w:bz2"),
+]
+
+for filename, write_mode in FILES:
+    with tarfile.open(filename, mode=write_mode) as out:
+        out.add("README.txt")
+
+    print(fmt.format(filename, os.stat(filename).st_size), end=" ")
+    print([m.name for m in tarfile.open(filename, "r:*").getmembers()])
+```
+
+When opening an existing archive for reading, specify "r:*" to have tarfile determine the compression method to use automatically.
+
+```
+$ python3 tarfile_compression.py
+FILENAME                       SIZE      
+README.txt                     12        
+tarfile_compression.tar        10240      ['README.txt']
+tarfile_compression.tar.gz     223        ['README.txt']
+tarfile_compression.tar.bz2    212        ['README.txt']
+```
+
+### See also
+
+* [Standard library documentation for tarfile](https://docs.python.org/3/library/tarfile.html)
+* [GNU tar manual](https://www.gnu.org/software/tar/manual/html_node/Standard.html) – Documentation of the tar format, including extensions.
+* [zipfile](https://pymotw.com/3/zipfile/index.html) – Similar access for ZIP archives.
+* [gzip](https://pymotw.com/3/gzip/index.html) – GNU zip compression
+* [bz2](https://pymotw.com/3/bz2/index.html) – bzip2 compression
