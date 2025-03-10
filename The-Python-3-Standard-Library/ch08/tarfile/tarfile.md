@@ -286,3 +286,37 @@ adding README.txt as RENAMED.txt
 Contents:
 RENAMED.txt
 ```
+
+### 8.4.6 Writing Data from Sources Other Than Files
+
+Sometimes it is necessary to write data into an archive directly from memory. Rather than writing the data to a file, then adding that file to the archive, you can use addfile() to add data from an open file-like handle that returns bytes.
+
+```
+# tarfile_addfile_string.py
+import io
+import tarfile
+
+text = "This is the data to write to the archive."
+data = text.encode("utf-8")
+
+with tarfile.open("addfile_string.tar", mode="w") as out:
+    info = tarfile.TarInfo("made_up_file.txt")
+    info.size = len(data)
+    out.addfile(info, io.BytesIO(data))
+
+print("Contents:")
+with tarfile.open("addfile_string.tar", mode="r") as t:
+    for member_info in t.getmembers():
+        print(member_info.name)
+        f = t.extractfile(member_info)
+        print(f.read().decode("utf-8"))
+```
+
+By first constructing a TarInfo object, the archive member can be given any name desired. After setting the size, the data is written to the archive using addfile() and a BytesIO buffer as a source of the data.
+
+```
+$ python3 tarfile_addfile_string.py
+Contents:
+made_up_file.txt
+This is the data to write to the archive.
+```
