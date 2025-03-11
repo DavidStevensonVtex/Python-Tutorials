@@ -248,3 +248,31 @@ README.txt
   Compressed  : 399 bytes
   Uncompressed: 736 bytes
 ```
+
+### 8.5.5 Using Alternate Archive Member Names
+
+Pass an arcname value to write() to add a file to an archive using a name other than the original filename.
+
+```
+# zipfile_write_arcname.py
+from zipfile_infolist import print_info
+import zipfile
+
+with zipfile.ZipFile("write_arcname.zip", mode="w") as zf:
+    zf.write("README.txt", arcname="NOT_README.txt")
+
+print_info("write_arcname.zip")
+```
+
+There is no sign of the original filename in the archive.
+
+```
+$ python3 zipfile_write_arcname.py
+NOT_README.txt
+  Comment     : b''
+  Modified    : 2025-03-11 11:27:44
+  System      : Unix
+  ZIP version : 20
+  Compressed  : 736 bytes
+  Uncompressed: 736 bytes
+```
