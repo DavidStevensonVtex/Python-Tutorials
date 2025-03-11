@@ -412,3 +412,72 @@ README2.txt
   Compressed  : 736 bytes
   Uncompressed: 736 bytes
 ```
+
+### 8.5.9 Python ZIP Archives
+
+Python can import modules from inside ZIP archives using [zipimport](https://pymotw.com/3/zipimport/index.html), if those archives appear in sys.path. The PyZipFile class can be used to construct a module suitable for use in this way. The extra method writepy() tells PyZipFile to scan a directory for .py files and add the corresponding .pyo or .pyc file to the archive. If neither compiled form exists, a .pyc file is created and added.
+
+```
+# zipfile_pyzipfile.py
+import sys
+import zipfile
+
+if __name__ == "__main__":
+    with zipfile.PyZipFile("pyzipfile.zip", mode="w") as zf:
+        zf.debug = 3
+        print("Adding python files")
+        zf.writepy(".")
+    for name in zf.namelist():
+        print(name)
+
+    print()
+    sys.path.insert(0, "pyzipfile.zip")
+    import zipfile_pyzipfile
+
+    print("Imported from:", zipfile_pyzipfile.__file__)
+```
+
+With the debug attribute of the PyZipFile set to 3, verbose debugging is enabled and output is produced as it compiles each .py file it finds.
+
+```
+$ python3 zipfile_pyzipfile.py
+Adding python files
+Adding files from directory .
+Compiling ./zipfile_append.py
+Adding zipfile_append.pyc
+Compiling ./zipfile_getinfo.py
+Adding zipfile_getinfo.pyc
+Adding zipfile_infolist.pyc
+Compiling ./zipfile_is_zipfile.py
+Adding zipfile_is_zipfile.pyc
+Compiling ./zipfile_namelist.py
+Adding zipfile_namelist.pyc
+Compiling ./zipfile_pyzipfile.py
+Adding zipfile_pyzipfile.pyc
+Compiling ./zipfile_read.py
+Adding zipfile_read.pyc
+Compiling ./zipfile_write.py
+Adding zipfile_write.pyc
+Compiling ./zipfile_write_arcname.py
+Adding zipfile_write_arcname.pyc
+Compiling ./zipfile_write_compression.py
+Adding zipfile_write_compression.pyc
+Compiling ./zipfile_writestr.py
+Adding zipfile_writestr.pyc
+Compiling ./zipfile_writestr_zipinfo.py
+Adding zipfile_writestr_zipinfo.pyc
+zipfile_append.pyc
+zipfile_getinfo.pyc
+zipfile_infolist.pyc
+zipfile_is_zipfile.pyc
+zipfile_namelist.pyc
+zipfile_pyzipfile.pyc
+zipfile_read.pyc
+zipfile_write.pyc
+zipfile_write_arcname.pyc
+zipfile_write_compression.pyc
+zipfile_writestr.pyc
+zipfile_writestr_zipinfo.pyc
+
+Imported from: pyzipfile.zip/zipfile_pyzipfile.pyc
+```
