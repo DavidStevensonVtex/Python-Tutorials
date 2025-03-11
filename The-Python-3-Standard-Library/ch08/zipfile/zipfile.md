@@ -276,3 +276,41 @@ NOT_README.txt
   Compressed  : 736 bytes
   Uncompressed: 736 bytes
 ```
+
+### 8.5.6 Writing Data from Sources Other Than Files
+
+Sometimes it is necessary to write to a ZIP archive using data that did not come from an existing file. Rather than writing the data to a file, then adding that file to the ZIP archive, use the writestr() method to add a string of bytes to the archive directly.
+
+```
+# zipfile_writestr.py
+from zipfile_infolist import print_info
+import zipfile
+
+msg = "This data did not exist in a file."
+with zipfile.ZipFile(
+    "writestr.zip",
+    mode="w",
+    compression=zipfile.ZIP_DEFLATED,
+) as zf:
+    zf.writestr("from_string.txt", msg)
+
+print_info("writestr.zip")
+
+with zipfile.ZipFile("writestr.zip", "r") as zf:
+    print(zf.read("from_string.txt"))
+```
+
+In this case, the compress_type argument to ZipFile was used to compress the data, since writestr() does not take an argument to specify the compression.
+
+```
+$ python3 zipfile_writestr.py
+from_string.txt
+  Comment     : b''
+  Modified    : 2025-03-11 11:44:08
+  System      : Unix
+  ZIP version : 20
+  Compressed  : 36 bytes
+  Uncompressed: 34 bytes
+
+b'This data did not exist in a file.'
+```
