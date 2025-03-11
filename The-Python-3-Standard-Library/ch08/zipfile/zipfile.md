@@ -481,3 +481,15 @@ zipfile_writestr_zipinfo.pyc
 
 Imported from: pyzipfile.zip/zipfile_pyzipfile.pyc
 ```
+
+### 8.5.10 Limitations
+
+The zipfile module does not support ZIP files with appended comments, or multi-disk archives. It does support ZIP files larger than 4 GB that use the ZIP64 extensions.
+
+### See also
+
+* [Standard library documentation for zipfile](https://docs.python.org/3/library/zipfile.html)
+* [zlib](https://pymotw.com/3/zlib/index.html) – ZIP compression library
+* [tarfile](https://pymotw.com/3/tarfile/index.html) – Read and write tar archives
+* [zipimport](https://pymotw.com/3/zipimport/index.html) – Import Python modules from ZIP archive.
+* [PKZIP Application Note](https://support.pkware.com/pkzip/appnote) – Official specification for the ZIP archive format.
