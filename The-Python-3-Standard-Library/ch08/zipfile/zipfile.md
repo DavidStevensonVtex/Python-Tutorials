@@ -141,3 +141,33 @@ $ python3 zipfile_getinfo.py
 README.txt is 12 bytes
 ERROR: Did not find notthere.txt in zip file
 ```
+
+### 8.5.3 Extracting Archived Files From an Archive
+
+To access the data from an archive member, use the read() method, passing the member’s name.
+
+```
+# zipfile_read.py
+import zipfile
+
+with zipfile.ZipFile("example.zip") as zf:
+    for filename in ["README.txt", "notthere.txt"]:
+        try:
+            data = zf.read(filename)
+        except KeyError:
+            print("ERROR: Did not find {} in zip file".format(filename))
+        else:
+            print(filename, ":")
+            print(data)
+        print()
+```
+
+The data is automatically decompressed, if necessary.
+
+```
+$ python3 zipfile_read.py
+README.txt :
+b'Hello world\n'
+
+ERROR: Did not find notthere.txt in zip file
+```
