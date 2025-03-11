@@ -314,3 +314,44 @@ from_string.txt
 
 b'This data did not exist in a file.'
 ```
+
+### 8.5.7 Writing with a ZipInfo Instance
+
+Normally, the modification date is computed when a file or string is added to the archive. A ZipInfo instance can be passed to writestr() to define the modification date and other metadata.
+
+```
+# zipfile_writestr_zipinfo.py
+import time
+import zipfile
+from zipfile_infolist import print_info
+
+msg = b"This data did not exist in a file."
+
+with zipfile.ZipFile(
+    "writestr_zipinfo.zip",
+    mode="w",
+) as zf:
+    info = zipfile.ZipInfo(
+        "from_string.txt",
+        date_time=time.localtime(time.time()),
+    )
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.comment = b"Remarks go here"
+    info.create_system = 0
+    zf.writestr(info, msg)
+
+print_info("writestr_zipinfo.zip")
+```
+
+In this example, the modified time is set to the current time, the data is compressed, and false value for create_system is used. A simple comment is also associated with the new file.
+
+```
+$ python3 zipfile_writestr_zipinfo.py
+from_string.txt
+  Comment     : b'Remarks go here'
+  Modified    : 2025-03-11 11:48:30
+  System      : Windows
+  ZIP version : 20
+  Compressed  : 36 bytes
+  Uncompressed: 34 bytes
+```
