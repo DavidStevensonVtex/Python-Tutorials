@@ -171,3 +171,80 @@ b'Hello world\n'
 
 ERROR: Did not find notthere.txt in zip file
 ```
+
+### 8.5.4 Creating New Archives
+
+To create a new archive, instantiate the ZipFile with a mode of 'w'. Any existing file is truncated and a new archive is started. To add files, use the write() method.
+
+```
+# zipfile_write.py
+from zipfile_infolist import print_info
+import zipfile
+
+print("creating archive")
+with zipfile.ZipFile("write.zip", mode="w") as zf:
+    print("adding README.txt")
+    zf.write("README.txt")
+
+print()
+print_info("write.zip")
+```
+
+```
+$ python3 zipfile_write.py
+creating archive
+adding README.txt
+
+README.txt
+  Comment     : b''
+  Modified    : 2025-03-11 10:47:54
+  System      : Unix
+  ZIP version : 20
+  Compressed  : 12 bytes
+  Uncompressed: 12 bytes
+```
+
+To add compression, the zlib module is required. If zlib is available, the compression mode for individual files or for the archive as a whole can be set using zipfile.ZIP_DEFLATED. The default compression mode is zipfile.ZIP_STORED, which adds the input data to the archive without compressing it.
+
+```
+# zipfile_write_compression.py
+from zipfile_infolist import print_info
+import zipfile
+
+try:
+    import zlib
+
+    compression = zipfile.ZIP_DEFLATED
+except (ImportError, AttributeError):
+    compression = zipfile.ZIP_STORED
+
+modes = {
+    zipfile.ZIP_DEFLATED: "deflated",
+    zipfile.ZIP_STORED: "stored",
+}
+
+print("creating archive")
+with zipfile.ZipFile("write_compression.zip", mode="w") as zf:
+    mode_name = modes[compression]
+    print("adding README.txt with compression mode", mode_name)
+    zf.write("README.txt", compress_type=compression)
+
+print()
+print_info("write_compression.zip")
+```
+
+This time, the archive member is compressed.
+
+```
+$ python3 zipfile_write_compression.py
+creating archive
+adding README.txt with compression mode deflated
+
+README.txt
+  Comment     : b''
+  Modified    : 2025-03-11 11:27:44
+  System      : Unix
+  ZIP version : 20
+  Compressed  : 399 bytes
+  Uncompressed: 736 bytes
+```
