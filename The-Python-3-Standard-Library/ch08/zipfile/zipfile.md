@@ -355,3 +355,60 @@ from_string.txt
   Compressed  : 36 bytes
   Uncompressed: 34 bytes
 ```
+
+### 8.5.8 Appending to Files
+
+In addition to creating new archives, it is possible to append to an existing archive or add an archive at the end of an existing file (such as a .exe file for a self-extracting archive). To open a file to append to it, use mode 'a'.
+
+```
+# zipfile_append.py
+from zipfile_infolist import print_info
+import zipfile
+
+print("creating archive")
+with zipfile.ZipFile("append.zip", mode="w") as zf:
+    zf.write("README.txt")
+
+print()
+print_info("append.zip")
+
+print("appending to the archive")
+with zipfile.ZipFile("append.zip", mode="a") as zf:
+    zf.write("README.txt", arcname="README2.txt")
+
+print()
+print_info("append.zip")
+```
+
+The resulting archive contains two members:
+
+```
+$ python3 zipfile_append.py
+creating archive
+
+README.txt
+  Comment     : b''
+  Modified    : 2025-03-11 11:27:44
+  System      : Unix
+  ZIP version : 20
+  Compressed  : 736 bytes
+  Uncompressed: 736 bytes
+
+appending to the archive
+
+README.txt
+  Comment     : b''
+  Modified    : 2025-03-11 11:27:44
+  System      : Unix
+  ZIP version : 20
+  Compressed  : 736 bytes
+  Uncompressed: 736 bytes
+
+README2.txt
+  Comment     : b''
+  Modified    : 2025-03-11 11:27:44
+  System      : Unix
+  ZIP version : 20
+  Compressed  : 736 bytes
+  Uncompressed: 736 bytes
+```
