@@ -98,3 +98,48 @@ The digest value is different in this example because the algorithm changed from
 $ python3 hashlib_sha1.py
 ea360b288b3dd178fe2625f55b2959bf1dba6eef
 ```
+
+### 9.1.5 Creating a Hash by Name
+
+Sometimes it is more convenient to refer to the algorithm by name in a string rather than by using the constructor function directly. It is useful, for example, to be able to store the hash type in a configuration file. In those cases, use new() to create a hash calculator.
+
+```
+# hashlib_new.py
+import argparse
+import hashlib
+import sys
+
+from hashlib_data import lorem
+
+
+parser = argparse.ArgumentParser("hashlib demo")
+parser.add_argument(
+    "hash_name",
+    choices=hashlib.algorithms_available,
+    help="the name of the hash algorithm to use",
+)
+parser.add_argument(
+    "data",
+    nargs="?",
+    default=lorem,
+    help="the input data to hash, defaults to lorem ipsum",
+)
+args = parser.parse_args()
+
+h = hashlib.new(args.hash_name)
+h.update(args.data.encode("utf-8"))
+print(h.hexdigest())
+```
+
+When run with a variety of arguments:
+
+```
+$ python3 hashlib_new.py sha1
+ea360b288b3dd178fe2625f55b2959bf1dba6eef
+$ python3 hashlib_new.py sha256
+3c887cc71c67949df29568119cc646f46b9cd2c2b39d456065646bc2fc09ffd8
+$ python3 hashlib_new.py sha512
+a7e53384eb9bb4251a19571450465d51809e0b7046101b87c4faef96b9bc904cf7f90035f444952dfd9f6084eeee2457433f3ade614712f42f80960b2fca43ff
+$ python3 hashlib_new.py md5
+3f2fd2c9e25d60fb0fa5d593b802b7a8
+```
