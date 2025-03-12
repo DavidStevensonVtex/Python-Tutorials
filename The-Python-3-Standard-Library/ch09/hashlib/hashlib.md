@@ -143,3 +143,55 @@ a7e53384eb9bb4251a19571450465d51809e0b7046101b87c4faef96b9bc904cf7f90035f444952d
 $ python3 hashlib_new.py md5
 3f2fd2c9e25d60fb0fa5d593b802b7a8
 ```
+
+### 9.1.6 Incremental Updates
+
+The update() method of the hash calculators can be called repeatedly. Each time, the digest is updated based on the additional text fed in. Updating incrementally is more efficient than reading an entire file into memory, and produces the same results.
+
+```
+# hashlib_update.py
+import hashlib
+
+from hashlib_data import lorem
+
+h = hashlib.md5()
+h.update(lorem.encode("utf-8"))
+all_at_once = h.hexdigest()
+
+
+def chunkize(size, text):
+    "Return parts of the text in size-based increments."
+    start = 0
+    while start < len(text):
+        chunk = text[start : start + size]
+        yield chunk
+        start += size
+    return
+
+
+h = hashlib.md5()
+for chunk in chunkize(64, lorem.encode("utf-8")):
+    h.update(chunk)
+line_by_line = h.hexdigest()
+
+print("All at once :", all_at_once)
+print("Line by line:", line_by_line)
+print("Same        :", (all_at_once == line_by_line))
+```
+
+This example demonstrates how to update a digest incrementally as data is read or otherwise produced.
+
+```
+$ python3 hashlib_update.py
+All at once : 3f2fd2c9e25d60fb0fa5d593b802b7a8
+Line by line: 3f2fd2c9e25d60fb0fa5d593b802b7a8
+Same        : True
+```
+
+### See also
+
+* [Standard library documentation for hashlib](https://docs.python.org/3/library/hashlib.html)
+* [hmac](https://pymotw.com/3/hmac/index.html#module-hmac) – The hmac module.
+* [OpenSSL](https://www.openssl.org/) – An open source encryption toolkit.
+* [Cryptography module](https://pypi.org/project/cryptography/) – A Python package that provides cryptographic recipes and primitives.
+* [Voidspace: IronPython and hashlib](https://ironpython-test.readthedocs.io/en/latest/library/hashlib.html) – A wrapper for hashlib that works with IronPython.
