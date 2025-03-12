@@ -73,3 +73,33 @@ The new() function takes three arguments. The first is the secret key, which sho
 $ python3 hmac_sha.py
 c4c4a58bba01500ab6247254bdcf5991aff715ff
 ```
+
+### 9.2.3 Binary Digests
+
+The previous examples used the hexdigest() method to produce printable digests. The hexdigest is a different representation of the value calculated by the digest() method, which is a binary value that may include unprintable characters, including NUL. Some web services (Google checkout, Amazon S3) use the base64 encoded version of the binary digest instead of the hexdigest.
+
+```
+# hmac_base64.py
+import base64
+import hmac
+import hashlib
+
+with open("lorem.txt", "rb") as f:
+    body = f.read()
+
+hash = hmac.new(
+    b"secret-shared-key-goes-here",
+    body,
+    hashlib.sha1,
+)
+
+digest = hash.digest()
+print(base64.encodebytes(digest))
+```
+
+The base64 encoded string ends in a newline, which frequently needs to be stripped off when embedding the string in http headers or other formatting-sensitive contexts.
+
+```
+$ python3 hmac_base64.py
+b'/eBL9fVLxv9ouYXvZ/Dfpk5oCMo=\n'
+```
