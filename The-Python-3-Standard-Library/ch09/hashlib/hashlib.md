@@ -76,3 +76,25 @@ This example uses the hexdigest() method instead of digest() because the output 
 $ python3 hashlib_md5.py
 3f2fd2c9e25d60fb0fa5d593b802b7a8
 ```
+
+### 9.1.4 SHA1 Example
+
+A SHA1 digest is calculated in the same way.
+
+```
+# hashlib_sha1.py
+import hashlib
+
+from hashlib_data import lorem
+
+h = hashlib.sha1()
+h.update(lorem.encode("utf-8"))
+print(h.hexdigest())
+```
+
+The digest value is different in this example because the algorithm changed from MD5 to SHA1.
+
+```
+$ python3 hashlib_sha1.py
+ea360b288b3dd178fe2625f55b2959bf1dba6eef
+```
