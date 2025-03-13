@@ -241,3 +241,7 @@ returncode: 1
 stdout is None
 stderr is None
 ```
+
+### 10.1.2 Working with Pipes Directly
+
+The functions run(), call(), check_call(), and check_output() are wrappers around the Popen class. Using Popen directly gives more control over how the command is run, and how its input and output streams are processed. For example, by passing different arguments for stdin, stdout, and stderr it is possible to mimic the variations of os.popen().
