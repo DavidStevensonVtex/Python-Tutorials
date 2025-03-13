@@ -54,3 +54,28 @@ returncode: 0
 Note
 
 Using run() without passing check=True is equivalent to using call(), which only returned the exit code from the process.
+
+#### 10.1.1.1 Error Handling
+
+The returncode attribute of the CompletedProcess is the exit code of the program. The caller is responsible for interpreting it to detect errors. If the check argument to run() is True, the exit code is checked and if it indicates an error happened then a CalledProcessError exception is raised.
+
+```
+# subprocess_run_check.py
+import subprocess
+
+try:
+    subprocess.run(["false"], check=True)
+except subprocess.CalledProcessError as err:
+    print("ERROR:", err)
+```
+
+The false command always exits with a non-zero status code, which run() interprets as an error.
+
+```
+$ python3 subprocess_run_check.py
+ERROR: Command '['false']' returned non-zero exit status 1.
+```
+
+Note
+
+Passing check=True to run() makes it equivalent to using check_call().
