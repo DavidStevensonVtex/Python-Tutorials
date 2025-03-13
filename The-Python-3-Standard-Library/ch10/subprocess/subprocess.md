@@ -245,3 +245,50 @@ stderr is None
 ### 10.1.2 Working with Pipes Directly
 
 The functions run(), call(), check_call(), and check_output() are wrappers around the Popen class. Using Popen directly gives more control over how the command is run, and how its input and output streams are processed. For example, by passing different arguments for stdin, stdout, and stderr it is possible to mimic the variations of os.popen().
+
+#### 10.1.2.1 One-way Communication With a Process
+
+To run a process and read all of its output, set the stdout value to PIPE and call communicate().
+
+```
+# subprocess_popen_read.py
+import subprocess
+
+print("read:")
+proc = subprocess.Popen(
+    ["echo", '"to stdout"'],
+    stdout=subprocess.PIPE,
+)
+stdout_value = proc.communicate()[0].decode("utf-8")
+print("stdout:", repr(stdout_value))
+```
+
+This is similar to the way popen() works, except that the reading is managed internally by the Popen instance.
+
+```
+$ python3 subprocess_popen_read.py
+read:
+stdout: '"to stdout"\n'
+```
+
+To set up a pipe to allow the calling program to write data to it, set stdin to PIPE.
+
+```
+# subprocess_popen_write.py
+import subprocess
+
+print("write:")
+proc = subprocess.Popen(
+    ["cat", "-"],
+    stdin=subprocess.PIPE,
+)
+proc.communicate("stdin: to stdin\n".encode("utf-8"))
+```
+
+To send data to the standard input channel of the process one time, pass the data to communicate(). This is similar to using popen() with mode 'w'.
+
+```
+$ python3 -u subprocess_popen_write.py
+write:
+stdin: to stdin
+```
