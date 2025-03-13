@@ -79,3 +79,133 @@ ERROR: Command '['false']' returned non-zero exit status 1.
 Note
 
 Passing check=True to run() makes it equivalent to using check_call().
+
+#### 10.1.1.2 Capturing Output
+
+The standard input and output channels for the process started by run() are bound to the parent’s input and output. That means the calling program cannot capture the output of the command. Pass PIPE for the stdout and stderr arguments to capture the output for later processing.
+
+```
+# subprocess_run_output.py
+import subprocess
+
+completed = subprocess.run(
+    ["ls", "-1"],
+    stdout=subprocess.PIPE,
+)
+print("returncode:", completed.returncode)
+print(
+    "Have {} bytes in stdout:\n{}".format(
+        len(completed.stdout), completed.stdout.decode("utf-8")
+    )
+)
+```
+
+The ls -1 command runs successfully, so the text it prints to standard output is captured and returned.
+
+```
+$ python3 subprocess_run_output.py
+returncode: 0
+Have 117 bytes in stdout:
+subprocess.md
+subprocess_os_system.py
+subprocess_run_check.py
+subprocess_run_output.py
+subprocess_shell_variables.py
+```
+
+Note
+
+Passing check=True and setting stdout to PIPE is equivalent to using check_output().
+
+The next example runs a series of commands in a sub-shell. Messages are sent to standard output and standard error before the commands exit with an error code.
+
+```
+# subprocess_run_output_error.py
+import subprocess
+
+try:
+    completed = subprocess.run(
+        "echo to stdout; echo to stderr 1>&2; exit 1",
+        check=True,
+        shell=True,
+        stdout=subprocess.PIPE,
+    )
+except subprocess.CalledProcessError as err:
+    print("ERROR:", err)
+else:
+    print("returncode:", completed.returncode)
+    print(
+        "Have {} bytes in stdout: {!r}".format(
+            len(completed.stdout), completed.stdout.decode("utf-8")
+        )
+    )
+```
+
+The message to standard error is printed to the console, but the message to standard output is hidden.
+
+```
+$ python3 subprocess_run_output_error.py
+to stderr
+ERROR: Command 'echo to stdout; echo to stderr 1>&2; exit 1' returned non-zero exit status 1.
+```
+
+To prevent error messages from commands run through run() from being written to the console, set the stderr parameter to the constant PIPE.
+
+```
+# subprocess_run_output_error_trap.py
+import subprocess
+
+try:
+    completed = subprocess.run(
+        'echo to stdout; echo to stderr 1>&2; exit 1',
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+except subprocess.CalledProcessError as err:
+    print('ERROR:', err)
+else:
+    print('returncode:', completed.returncode)
+    print('Have {} bytes in stdout: {!r}'.format(
+        len(completed.stdout),
+        completed.stdout.decode('utf-8'))
+    )
+    print('Have {} bytes in stderr: {!r}'.format(
+        len(completed.stderr),
+        completed.stderr.decode('utf-8'))
+    )
+```
+
+This example does not set check=True so the output of the command is captured and printed.
+
+```
+$ python3 subprocess_run_output_error_trap.py
+returncode: 1
+Have 10 bytes in stdout: 'to stdout\n'
+Have 10 bytes in stderr: 'to stderr\n'
+```
+
+To capture error messages when using check_output(), set stderr to STDOUT, and the messages will be merged with the rest of the output from the command.
+
+```
+# subprocess_check_output_error_trap_output.py
+import subprocess
+
+try:
+    output = subprocess.check_output(
+        "echo to stdout; echo to stderr 1>&2",
+        shell=True,
+        stderr=subprocess.STDOUT,
+    )
+except subprocess.CalledProcessError as err:
+    print("ERROR:", err)
+else:
+    print("Have {} bytes in output: {!r}".format(len(output), output.decode("utf-8")))
+```
+
+The order of output may vary, depending on how buffering is applied to the standard output stream and how much data is being printed.
+
+```
+$ python3 subprocess_check_output_error_trap_output.py
+Have 20 bytes in output: 'to stdout\nto stderr\n'
+```
