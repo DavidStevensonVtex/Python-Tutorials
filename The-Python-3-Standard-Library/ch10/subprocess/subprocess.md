@@ -209,3 +209,35 @@ The order of output may vary, depending on how buffering is applied to the stand
 $ python3 subprocess_check_output_error_trap_output.py
 Have 20 bytes in output: 'to stdout\nto stderr\n'
 ```
+
+#### 10.1.1.3 Suppressing Output
+
+For cases where the output should not be shown or captured, use DEVNULL to suppress an output stream. This example suppresses both the standard output and error streams.
+
+```
+# subprocess_run_output_error_suppress.py
+import subprocess
+
+try:
+    completed = subprocess.run(
+        "echo to stdout; echo to stderr 1>&2; exit 1",
+        shell=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+except subprocess.CalledProcessError as err:
+    print("ERROR:", err)
+else:
+    print("returncode:", completed.returncode)
+    print("stdout is {!r}".format(completed.stdout))
+    print("stderr is {!r}".format(completed.stderr))
+```
+
+The name DEVNULL comes from the Unix special device file, /dev/null, which responds with end-of-file when opened for reading and receives but ignores any amount of input when writing.
+
+```
+$ python3 subprocess_run_output_error_suppress.py
+returncode: 1
+stdout is None
+stderr is None
+```
