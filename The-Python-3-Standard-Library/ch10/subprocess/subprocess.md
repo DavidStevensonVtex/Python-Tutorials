@@ -11,3 +11,46 @@ The subprocess module is intended to replace functions such as os.system(), os.s
 Note
 
 The API for working on Unix and Windows is roughly the same, but the underlying implementation is different because of the difference in process models in the operating systems. All of the examples shown here were tested on Mac OS X. Behavior on a non-Unix OS may vary.
+
+### 10.1.1 Running External Command
+
+To run an external command without interacting with it in the same way as os.system(), use the run() function.
+
+```
+# subprocess_os_system.py
+import subprocess
+
+completed = subprocess.run(["ls", "-1"])
+print("returncode:", completed.returncode)
+```
+
+The command line arguments are passed as a list of strings, which avoids the need for escaping quotes or other special characters that might be interpreted by the shell. run() returns a CompletedProcess instance, with information about the process like the exit code and output.
+
+```
+$ python3 subprocess_os_system.py
+subprocess.md
+subprocess_os_system.py
+returncode: 0
+```
+
+Setting the shell argument to a true value causes subprocess to spawn an intermediate shell process which then runs the command. The default is to run the command directly.
+
+```
+# subprocess_shell_variables.py
+import subprocess
+
+completed = subprocess.run("echo $HOME", shell=True)
+print("returncode:", completed.returncode)
+```
+
+Using an intermediate shell means that variables, glob patterns, and other special shell features in the command string are processed before the command is run.
+
+```
+$ python3 subprocess_shell_variables.py
+/home/dstevenson
+returncode: 0
+```
+
+Note
+
+Using run() without passing check=True is equivalent to using call(), which only returned the exit code from the process.
