@@ -71,3 +71,69 @@ $ kill -USR1 $pid
 $ kill -USR2 $pid
 $ kill -INT $pid
 ```
+
+### 10.2.2 Retrieving Registered Handlers
+
+To see what signal handlers are registered for a signal, use getsignal(). Pass the signal number as argument. The return value is the registered handler, or one of the special values SIG_IGN (if the signal is being ignored), SIG_DFL (if the default behavior is being used), or None (if the existing signal handler was registered from C, rather than Python).
+
+```
+# signal_getsignal.py
+import signal
+
+
+def alarm_received(n, stack):
+    return
+
+
+signal.signal(signal.SIGALRM, alarm_received)
+
+signals_to_names = {
+    getattr(signal, n): n for n in dir(signal) if n.startswith("SIG") and "_" not in n
+}
+
+for s, name in sorted(signals_to_names.items()):
+    handler = signal.getsignal(s)
+    if handler is signal.SIG_DFL:
+        handler = "SIG_DFL"
+    elif handler is signal.SIG_IGN:
+        handler = "SIG_IGN"
+    print("{:<10} ({:2d}):".format(name, s), handler)
+```
+
+Again, since each OS may have different signals defined, the output on other systems may vary. This is from Ubuntu 20.04:
+
+```
+$ python3 signal_getsignal.py
+SIGHUP     ( 1): SIG_DFL
+SIGINT     ( 2): <built-in function default_int_handler>
+SIGQUIT    ( 3): SIG_DFL
+SIGILL     ( 4): SIG_DFL
+SIGTRAP    ( 5): SIG_DFL
+SIGIOT     ( 6): SIG_DFL
+SIGBUS     ( 7): SIG_DFL
+SIGFPE     ( 8): SIG_DFL
+SIGKILL    ( 9): SIG_DFL
+SIGUSR1    (10): SIG_DFL
+SIGSEGV    (11): SIG_DFL
+SIGUSR2    (12): SIG_DFL
+SIGPIPE    (13): SIG_IGN
+SIGALRM    (14): <function alarm_received at 0x7f8e15637c10>
+SIGTERM    (15): SIG_DFL
+SIGCLD     (17): SIG_DFL
+SIGCONT    (18): SIG_DFL
+SIGSTOP    (19): SIG_DFL
+SIGTSTP    (20): SIG_DFL
+SIGTTIN    (21): SIG_DFL
+SIGTTOU    (22): SIG_DFL
+SIGURG     (23): SIG_DFL
+SIGXCPU    (24): SIG_DFL
+SIGXFSZ    (25): SIG_IGN
+SIGVTALRM  (26): SIG_DFL
+SIGPROF    (27): SIG_DFL
+SIGWINCH   (28): SIG_DFL
+SIGPOLL    (29): SIG_DFL
+SIGPWR     (30): SIG_DFL
+SIGSYS     (31): SIG_DFL
+SIGRTMIN   (34): SIG_DFL
+SIGRTMAX   (64): SIG_DFL
+```
