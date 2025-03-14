@@ -142,95 +142,34 @@ SIGRTMAX   (64): SIG_DFL
 
 The function for sending signals from within Python is os.kill(). Its use is covered in the section on the os module, [Creating Processes with os.fork()](https://pymotw.com/3/os/index.html#creating-processes-with-os-fork).
 
-### 10.2.4 Creating Processes with os.fork()
+### 10.2.4 Alarms
 
-The POSIX functions fork() and exec() (available under Mac OS X, Linux, and other Unix variants) are exposed via the os module. Entire books have been written about reliably using these functions, so check the library or bookstore for more details than are presented here in this introduction.
-
-To create a new process as a clone of the current process, use fork():
+Alarms are a special sort of signal, where the program asks the OS to notify it after some period of time has elapsed. As the standard module documentation for os points out, this is useful for avoiding blocking indefinitely on an I/O operation or other system call.
 
 ```
-# os_fork_example.py
-import os
-
-pid = os.fork()
-
-if pid:
-    print('Child process id:', pid)
-else:
-    print('I am the child')
-```
-
-The output will vary based on the state of the system each time the example is run, but it will look something like:
-
-```
-$ python3 -u os_fork_example.py
-Child process id: 29053
-I am the child
-```
-
-After the fork, there are two processes running the same code. For a program to tell which one it is in, it needs to check the return value of fork(). If the value is 0, the current process is the child. If it is not 0, the program is running in the parent process and the return value is the process id of the child process.
-
-```
-# os_kill_example.py
-import os
+# signal_alarm.py
 import signal
 import time
 
 
-def signal_usr1(signum, frame):
-    "Callback invoked when a signal is received"
-    pid = os.getpid()
-    print("Received USR1 in process {}".format(pid))
+def receive_alarm(signum, stack):
+    print("Alarm :", time.ctime())
 
 
-print("Forking...")
-child_pid = os.fork()
-if child_pid:
-    print("PARENT: pid: ", os.getpid())
-    print("PARENT: Pausing before sending signal...")
-    time.sleep(1)
-    print("PARENT: Signaling {}".format(child_pid))
-    os.kill(child_pid, signal.SIGUSR1)
-else:
-    print("CHILD: pid: ", os.getpid())
-    print("CHILD: Setting up signal handler")
-    signal.signal(signal.SIGUSR1, signal_usr1)
-    print("CHILD: Pausing to wait for signal")
-    time.sleep(5)
+# Call receive_alarm in 2 seconds
+signal.signal(signal.SIGALRM, receive_alarm)
+signal.alarm(2)
+
+print("Before:", time.ctime())
+time.sleep(4)
+print("After :", time.ctime())
 ```
 
-The parent can send signals to the child process using kill() and the signal module. First, define a signal handler to be invoked when the signal is received. Then fork(), and in the parent pause a short amount of time before sending a USR1 signal using kill(). This example uses a short pause to give the child process time to set up the signal handler. A real application, would not need (or want) to call sleep(). In the child, set up the signal handler and go to sleep for a while to give the parent time to send the signal.
+In this example, the call to sleep() is interrupted, but then continues after the signal is processed so the message printed after sleep() returns shows that the program was paused for at least as long as the sleep duration.
 
 ```
-$ python3 -u os_kill_example.py
-Forking...
-PARENT: pid:  29598
-PARENT: Pausing before sending signal...
-CHILD: pid:  29599
-CHILD: Setting up signal handler
-CHILD: Pausing to wait for signal
-PARENT: Signaling 29599
-Received USR1 in process 29599
+$ python3 signal_alarm.py
+Before: Fri Mar 14 14:11:30 2025
+Alarm : Fri Mar 14 14:11:32 2025
+After : Fri Mar 14 14:11:34 2025
 ```
-
-A simple way to handle separate behavior in the child process is to check the return value of fork() and branch. More complex behavior may call for more code separation than a simple branch. In other cases, there may be an existing program that needs to be wrapped. For both of these situations, the exec*() series of functions can be used to run another program.
-
-```
-# os_exec_example.py
-import os
-
-child_pid = os.fork()
-if child_pid:
-    os.waitpid(child_pid, 0)
-else:
-    os.execlp("pwd", "pwd", "-P")
-```
-
-When a program is run by exec(), the code from that program replaces the code from the existing process.
-
-```
-$ python3 os_exec_example.py
-/home/dstevenson/Python/GitHub/Python-Tutorials/The-Python-3-Standard-Library/ch10/signal
-```
-
-There are many variations of exec(), depending on the form in which the arguments are available, whether the path and environment of the parent process should be copied to the child, etc. For all variations, the first argument is a path or filename and the remaining arguments control how that program runs. They are either passed as command line arguments or override the process “environment” (see os.environ and os.getenv). Refer to the library documentation for complete details.
