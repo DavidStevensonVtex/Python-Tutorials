@@ -11,3 +11,63 @@ Signals are identified by integers and are defined in the operating system C hea
 Note
 
 Programming with Unix signal handlers is a non-trivial endeavor. This is an introduction, and does not include all of the details needed to use signals successfully on every platform. There is some degree of standardization across versions of Unix, but there is also some variation, so consult the operating system documentation if you run into trouble.
+
+### 10.2.1 Receiving Signals
+
+As with other forms of event-based programming, signals are received by establishing a callback function, called a signal handler, that is invoked when the signal occurs. The arguments to the signal handler are the signal number and the stack frame from the point in the program that was interrupted by the signal.
+
+```
+# signal_signal.py
+import signal
+import os
+import time
+
+
+def receive_signal(signum, stack):
+    print("Received:", signum)
+
+
+# Register signal handlers
+signal.signal(signal.SIGUSR1, receive_signal)
+signal.signal(signal.SIGUSR2, receive_signal)
+
+# Print the process ID so it can be used with 'kill'
+# to send this program signals.
+print("My PID is:", os.getpid())
+
+while True:
+    print("Waiting...")
+    time.sleep(3)
+```
+
+This example script loops indefinitely, pausing for a few seconds each time. When a signal comes in, the sleep() call is interrupted and the signal handler receive_signal prints the signal number. After the signal handler returns, the loop continues.
+
+Send signals to the running program using os.kill() or the Unix command line program kill.
+
+```
+$ python3 signal_signal.py
+My PID is: 27086
+Waiting...
+Waiting...
+Waiting...
+Waiting...
+Waiting...
+Waiting...
+Waiting...
+Waiting...
+Received: 10
+Received: 12
+Traceback (most recent call last):
+  File "signal_signal.py", line 21, in <module>
+    time.sleep(3)
+KeyboardInterrupt
+```
+
+The previous output was produced by running signal_signal.py in one window, then in another window running:
+
+```
+$ pid=27086
+$ kill -USR1 $pid
+$ kill -USR2 $pid
+$ kill -INT $pid
+```
