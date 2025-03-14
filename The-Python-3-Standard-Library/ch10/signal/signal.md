@@ -173,3 +173,40 @@ Before: Fri Mar 14 14:11:30 2025
 Alarm : Fri Mar 14 14:11:32 2025
 After : Fri Mar 14 14:11:34 2025
 ```
+
+### 10.2.5 Ignoring Signals
+
+To ignore a signal, register SIG_IGN as the handler. This script replaces the default handler for SIGINT with SIG_IGN, and registers a handler for SIGUSR1. Then it uses signal.pause() to wait for a signal to be received.
+
+```
+# signal_ignore.py
+import signal
+import os
+import time
+
+
+def do_exit(sig, stack):
+    raise SystemExit("Exiting")
+
+
+signal.signal(signal.SIGINT, signal.SIG_IGN)
+signal.signal(signal.SIGUSR1, do_exit)
+
+print("My PID:", os.getpid())
+
+signal.pause()
+```
+
+Normally SIGINT (the signal sent by the shell to a program when the user presses Ctrl-C) raises a KeyboardInterrupt. This example ignores SIGINT and raises SystemExit when it sees SIGUSR1. Each ^C in the output represents an attempt to use Ctrl-C to kill the script from the terminal. Using kill -USR1 30706 from another terminal eventually causes the script to exit.
+
+```
+$ python3 signal_ignore.py
+My PID: 30706
+^C^C^C^C
+
+Exiting
+```
+
+```
+$ kill -USR1 30706
+```
