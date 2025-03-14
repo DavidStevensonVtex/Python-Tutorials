@@ -1,0 +1,16 @@
+Hello:world:Goodbye:World
+.. literalinclude:The:rain:in:Spain:falls:mainly:in:the:plain.
+subprocess_check_output_error_trap_output.py
+subprocess_os_system.py
+subprocess_pipes.py
+subprocess_popen2.py
+subprocess_popen3.py
+subprocess_popen4.py
+subprocess_popen_read.py
+subprocess_popen_write.py
+subprocess_run_check.py
+subprocess_run_output_error.py
+subprocess_run_output_error_suppress.py
+subprocess_run_output_error_trap.py
+subprocess_run_output.py
+subprocess_shell_variables.py
