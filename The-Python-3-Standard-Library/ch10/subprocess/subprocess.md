@@ -431,3 +431,104 @@ The pipeline reads the reStructuredText source file for this section and finds a
 ```
 python3 -u subprocess_pipes.py
 ```
+
+### 10.1.4 Interacting with Another Command
+
+All of the previous examples assume a limited amount of interaction. The communicate() method reads all of the output and waits for child process to exit before returning. It is also possible to write to and read from the individual pipe handles used by the Popen instance incrementally, as the program runs. A simple echo program that reads from standard input and writes to standard output illustrates this technique.
+
+The script repeater.py is used as the child process in the next example. It reads from stdin and writes the values to stdout, one line at a time until there is no more input. It also writes a message to stderr when it starts and stops, showing the lifetime of the child process.
+
+```
+# repeater.py
+import sys
+
+sys.stderr.write("repeater.py: starting\n")
+sys.stderr.flush()
+
+while True:
+    next_line = sys.stdin.readline()
+    sys.stderr.flush()
+    if not next_line:
+        break
+    sys.stdout.write(next_line)
+    sys.stdout.flush()
+
+sys.stderr.write("repeater.py: exiting\n")
+sys.stderr.flush()
+```
+
+The next interaction example uses the stdin and stdout file handles owned by the Popen instance in different ways. In the first example, a sequence of five numbers are written to stdin of the process, and after each write the next line of output is read back. In the second example, the same five numbers are written but the output is read all at once using communicate().
+
+```
+# interaction.py
+import io
+import subprocess
+
+print("One line at a time:")
+proc = subprocess.Popen(
+    "python3 repeater.py",
+    shell=True,
+    stdin=subprocess.PIPE,
+    stdout=subprocess.PIPE,
+)
+stdin = io.TextIOWrapper(
+    proc.stdin,
+    encoding="utf-8",
+    line_buffering=True,  # send data on newline
+)
+stdout = io.TextIOWrapper(
+    proc.stdout,
+    encoding="utf-8",
+)
+for i in range(5):
+    line = "{}\n".format(i)
+    stdin.write(line)
+    output = stdout.readline()
+    print(output.rstrip())
+remainder = proc.communicate()[0].decode("utf-8")
+print(remainder)
+
+print()
+print("All output at once:")
+proc = subprocess.Popen(
+    "python3 repeater.py",
+    shell=True,
+    stdin=subprocess.PIPE,
+    stdout=subprocess.PIPE,
+)
+stdin = io.TextIOWrapper(
+    proc.stdin,
+    encoding="utf-8",
+)
+for i in range(5):
+    line = "{}\n".format(i)
+    stdin.write(line)
+stdin.flush()
+
+output = proc.communicate()[0].decode("utf-8")
+print(output)
+```
+
+The "repeater.py: exiting" lines come at different points in the output for each loop style.
+
+```
+$ python3 -u interaction.py
+One line at a time:
+repeater.py: starting
+0
+1
+2
+3
+4
+repeater.py: exiting
+
+
+All output at once:
+repeater.py: starting
+repeater.py: exiting
+0
+1
+2
+3
+4
+```
