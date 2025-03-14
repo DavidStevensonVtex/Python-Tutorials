@@ -532,3 +532,67 @@ repeater.py: exiting
 3
 4
 ```
+
+### 10.1.5 Signaling Between Processes
+
+The process management examples for the os module include a demonstration of signaling between processes using os.fork() and os.kill(). Since each Popen instance provides a pid attribute with the process id of the child process, it is possible to do something similar with subprocess. The next example combines two scripts. This child process sets up a signal handler for the USR signal.
+
+```
+# signal_child.py
+import os
+import signal
+import time
+import sys
+
+pid = os.getpid()
+received = False
+
+
+def signal_usr1(signum, frame):
+    "Callback invoked when a signal is received"
+    global received
+    received = True
+    print("CHILD {:>6}: Received USR1".format(pid))
+    sys.stdout.flush()
+
+
+print("CHILD {:>6}: Setting up signal handler".format(pid))
+sys.stdout.flush()
+signal.signal(signal.SIGUSR1, signal_usr1)
+print("CHILD {:>6}: Pausing to wait for signal".format(pid))
+sys.stdout.flush()
+time.sleep(3)
+
+if not received:
+    print("CHILD {:>6}: Never received signal".format(pid))
+```
+
+This script runs as the parent process. It starts signal_child.py, then sends the USR1 signal.
+
+```
+# signal_parent.py
+import os
+import signal
+import subprocess
+import time
+import sys
+
+proc = subprocess.Popen(["python3", "signal_child.py"])
+print("PARENT      : Pausing before sending signal...")
+sys.stdout.flush()
+time.sleep(1)
+print("PARENT      : Signaling child")
+sys.stdout.flush()
+os.kill(proc.pid, signal.SIGUSR1)
+```
+
+The output is:
+
+```
+$ python3 signal_parent.py
+PARENT      : Pausing before sending signal...
+CHILD  19972: Setting up signal handler
+CHILD  19972: Pausing to wait for signal
+PARENT      : Signaling child
+CHILD  19972: Received USR1
+```
