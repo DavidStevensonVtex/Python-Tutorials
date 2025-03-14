@@ -137,3 +137,7 @@ SIGSYS     (31): SIG_DFL
 SIGRTMIN   (34): SIG_DFL
 SIGRTMAX   (64): SIG_DFL
 ```
+
+### 10.2.3 Sending Signals
+
+The function for sending signals from within Python is os.kill(). Its use is covered in the section on the os module, [Creating Processes with os.fork()](https://pymotw.com/3/os/index.html#creating-processes-with-os-fork).
