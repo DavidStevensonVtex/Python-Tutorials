@@ -210,3 +210,122 @@ Exiting
 ```
 $ kill -USR1 30706
 ```
+
+### 10.2.6 Signals and Threads
+
+Signals and threads do not generally mix well because only the main thread of a process will receive signals. The following example sets up a signal handler, waits for the signal in one thread, and sends the signal from another.
+
+```
+# signal_threads.py
+import signal
+import threading
+import os
+import time
+
+
+def signal_handler(num, stack):
+    print("Received signal {} in {}".format(num, threading.currentThread().name))
+
+
+signal.signal(signal.SIGUSR1, signal_handler)
+
+
+def wait_for_signal():
+    print("Waiting for signal in", threading.currentThread().name)
+    signal.pause()
+    print("Done waiting")
+
+
+# Start a thread that will not receive the signal
+receiver = threading.Thread(
+    target=wait_for_signal,
+    name="receiver",
+)
+receiver.start()
+time.sleep(0.1)
+
+
+def send_signal():
+    print("Sending signal in", threading.currentThread().name)
+    os.kill(os.getpid(), signal.SIGUSR1)
+
+
+sender = threading.Thread(target=send_signal, name="sender")
+sender.start()
+sender.join()
+
+# Wait for the thread to see the signal (not going to happen!)
+print("Waiting for", receiver.name)
+signal.alarm(2)
+receiver.join()
+```
+
+The signal handlers were all registered in the main thread because this is a requirement of the signal module implementation for Python, regardless of underlying platform support for mixing threads and signals. Although the receiver thread calls signal.pause(), it does not receive the signal. The signal.alarm(2) call near the end of the example prevents an infinite block, since the receiver thread will never exit.
+
+```
+$ python3 signal_threads.py
+Waiting for signal in receiver
+Sending signal in sender
+Received signal 10 in MainThread
+Waiting for receiver
+Alarm clock
+```
+
+Although alarms can be set in any thread, they are always received by the main thread.
+
+```
+# signal_threads_alarm.py
+import signal
+import time
+import threading
+
+
+def signal_handler(num, stack):
+    print(time.ctime(), "Alarm in", threading.currentThread().name)
+
+
+signal.signal(signal.SIGALRM, signal_handler)
+
+
+def use_alarm():
+    t_name = threading.currentThread().name
+    print(time.ctime(), "Setting alarm in", t_name)
+    signal.alarm(1)
+    print(time.ctime(), "Sleeping in", t_name)
+    time.sleep(3)
+    print(time.ctime(), "Done with sleep in", t_name)
+
+
+# Start a thread that will not receive the signal
+alarm_thread = threading.Thread(
+    target=use_alarm,
+    name="alarm_thread",
+)
+alarm_thread.start()
+time.sleep(0.1)
+
+# Wait for the thread to see the signal (not going to happen!)
+print(time.ctime(), "Waiting for", alarm_thread.name)
+alarm_thread.join()
+
+print(time.ctime(), "Exiting normally")
+```
+
+The alarm does not abort the sleep() call in use_alarm().
+
+```
+$ python3 signal_threads_alarm.py
+Fri Mar 14 14:24:44 2025 Setting alarm in alarm_thread
+Fri Mar 14 14:24:44 2025 Sleeping in alarm_thread
+Fri Mar 14 14:24:44 2025 Waiting for alarm_thread
+Fri Mar 14 14:24:45 2025 Alarm in MainThread
+Fri Mar 14 14:24:47 2025 Done with sleep in alarm_thread
+Fri Mar 14 14:24:47 2025 Exiting normally
+```
+
+### See also
+
+* [Standard library documentation for signal](https://docs.python.org/3/library/signal.html)
+* [PEP 475](https://peps.python.org/pep-0475/) – Retry system calls failing with EINTR
+* [subprocess](https://pymotw.com/3/subprocess/index.html) – More examples of sending signals to processes.
+* [Creating Processes with os.fork()](https://pymotw.com/3/os/index.html#creating-processes-with-os-fork) – The kill() function can be used to send signals between processes.
