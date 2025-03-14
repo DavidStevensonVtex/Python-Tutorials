@@ -596,3 +596,129 @@ CHILD  19972: Pausing to wait for signal
 PARENT      : Signaling child
 CHILD  19972: Received USR1
 ```
+
+#### 10.1.5.1 Process Groups / Sessions
+
+If the process created by Popen spawns sub-processes, those children will not receive any signals sent to the parent. That means when using the shell argument to Popen it will be difficult to cause the command started in the shell to terminate by sending SIGINT or SIGTERM.
+
+```
+# subprocess_signal_parent_shell.py
+import os
+import signal
+import subprocess
+import tempfile
+import time
+import sys
+
+script = """#!/bin/sh
+echo "Shell script in process $$"
+set -x
+python3 signal_child.py
+"""
+script_file = tempfile.NamedTemporaryFile("wt")
+script_file.write(script)
+script_file.flush()
+
+proc = subprocess.Popen(["sh", script_file.name])
+print("PARENT      : Pausing before signaling {}...".format(proc.pid))
+sys.stdout.flush()
+time.sleep(1)
+print("PARENT      : Signaling child {}".format(proc.pid))
+sys.stdout.flush()
+os.kill(proc.pid, signal.SIGUSR1)
+time.sleep(3)
+```
+
+The pid used to send the signal does not match the pid of the child of the shell script waiting for the signal, because in this example there are three separate processes interacting:
+
+1. The program subprocess_signal_parent_shell.py
+1. The shell process running the script created by the main python program
+1. The program signal_child.py
+
+```
+$ python3 subprocess_signal_parent_shell.py
+PARENT      : Pausing before signaling 25488...
+Shell script in process 25488
++ python3 signal_child.py
+CHILD  25489: Setting up signal handler
+CHILD  25489: Pausing to wait for signal
+PARENT      : Signaling child 25488
+CHILD  25489: Never received signal
+```
+
+To send signals to descendants without knowing their process id, use a process group to associate the children so they can be signaled together. The process group is created with os.setpgrp(), which sets process group id to the process id of the current process. All child processes inherit their process group from their parent, and since it should only be set in the shell created by Popen and its descendants, os.setpgrp() should not be called in the same process where the Popen is created. Instead, the function is passed to Popen as the preexec_fn argument so it is run after the fork() inside the new process, before it uses exec() to run the shell. To signal the entire process group, use os.killpg() with the pid value from the Popen instance.
+
+```
+# subprocess_signal_setpgrp.py
+import os
+import signal
+import subprocess
+import tempfile
+import time
+import sys
+
+
+def show_setting_prgrp():
+    print("Calling os.setpgrp() from {}".format(os.getpid()))
+    os.setpgrp()
+    print("Process group is now {}".format(os.getpgrp()))
+    sys.stdout.flush()
+
+
+script = """#!/bin/sh
+echo "Shell script in process $$"
+set -x
+python3 signal_child.py
+"""
+script_file = tempfile.NamedTemporaryFile("wt")
+script_file.write(script)
+script_file.flush()
+
+proc = subprocess.Popen(
+    ["sh", script_file.name],
+    preexec_fn=show_setting_prgrp,
+)
+print("PARENT      : Pausing before signaling {}...".format(proc.pid))
+sys.stdout.flush()
+time.sleep(1)
+print("PARENT      : Signaling process group {}".format(proc.pid))
+sys.stdout.flush()
+os.killpg(proc.pid, signal.SIGUSR1)
+time.sleep(3)
+```
+
+The sequence of events is
+
+1. The parent program instantiates Popen.
+1. The Popen instance forks a new process.
+1. The new process runs os.setpgrp().
+1. The new process runs exec() to start the shell.
+1. The shell runs the shell script.
+1. The shell script forks again and that process execs Python.
+1. Python runs signal_child.py.
+1. The parent program signals the process group using the pid of the shell.
+1. The shell and Python processes receive the signal.
+1. The shell ignores the signal.
+1. The Python process running signal_child.py invokes the signal handler.
+
+```
+$ python3 subprocess_signal_setpgrp.py
+Calling os.setpgrp() from 25840
+Process group is now 25840
+PARENT      : Pausing before signaling 25840...
+Shell script in process 25840
++ python3 signal_child.py
+CHILD  25841: Setting up signal handler
+CHILD  25841: Pausing to wait for signal
+PARENT      : Signaling process group 25840
+CHILD  25841: Received USR1
+```
+
+### See also
+
+* [Standard library documentation for subprocess](https://docs.python.org/3/library/subprocess.html)
+* [os](https://pymotw.com/3/os/index.html) – Although subprocess replaces many of them, the functions for working with processes found in the os module are still widely used in existing code.
+* [UNIX Signals and Process Groups](https://sites.cs.ucsb.edu/~almeroth/classes/W99.276/assignment1/signals.html) – A good description of Unix signaling and how process groups work.
+* [signal](https://pymotw.com/3/signal/index.html) – More details about using the signal module.
+* [Advanced Programming in the UNIX(R) Environment](https://www.amazon.com/Programming-Environment-Addison-Wesley-Professional-Computing/dp/0201433079/ref=pd_bbs_3/002-2842372-4768037) – Covers working with multiple processes, such as * handling signals, closing duplicated file descriptors, etc.
+* [pipes – Unix shell command pipeline templates in the standard library](https://pymotw.com/2/pipes/).
