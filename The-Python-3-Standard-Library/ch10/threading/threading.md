@@ -494,3 +494,51 @@ $ python3 threading_subclass_args.py
 (Thread-4  ) running with (3,) and {'a': 'A', 'b': 'B'}
 (Thread-5  ) running with (4,) and {'a': 'A', 'b': 'B'}
 ```
+
+### 10.3.6 Timer Threads
+
+One example of a reason to subclass Thread is provided by Timer, also included in threading. A Timer starts its work after a delay, and can be canceled at any point within that delay time period.
+
+```
+# threading_timer.py
+import threading
+import time
+import logging
+
+
+def delayed():
+    logging.debug("worker running")
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="(%(threadName)-10s) %(message)s",
+)
+
+t1 = threading.Timer(0.3, delayed)
+t1.setName("t1")
+t2 = threading.Timer(0.3, delayed)
+t2.setName("t2")
+
+logging.debug("starting timers")
+t1.start()
+t2.start()
+
+logging.debug("waiting before canceling %s", t2.getName())
+time.sleep(0.2)
+logging.debug("canceling %s", t2.getName())
+t2.cancel()
+logging.debug("done")
+```
+
+The second timer in this example is never run, and the first timer appears to run after the rest of the main program is done. Since it is not a daemon thread, it is joined implicitly when the main thread is done.
+
+```
+$ python3 threading_timer.py
+(MainThread) starting timers
+(MainThread) waiting before canceling t2
+(MainThread) canceling t2
+(MainThread) done
+(t1        ) worker running
+```
+
