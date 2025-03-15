@@ -157,3 +157,209 @@ $ python3 threading_names_log.py
 [DEBUG] (Thread-1  ) Exiting
 [DEBUG] (my_service) Exiting
 ```
+
+### 10.3.3 Daemon vs. Non-Daemon Threads
+
+Up to this point, the example programs have implicitly waited to exit until all threads have completed their work. Sometimes programs spawn a thread as a daemon that runs without blocking the main program from exiting. Using daemon threads is useful for services where there may not be an easy way to interrupt the thread, or where letting the thread die in the middle of its work does not lose or corrupt data (for example, a thread that generates “heart beats” for a service monitoring tool). To mark a thread as a daemon, pass daemon=True when constructing it or call its set_daemon() method with True. The default is for threads to not be daemons.
+
+```
+# threading_daemon.py
+import threading
+import time
+import logging
+
+
+def daemon():
+    logging.debug("Starting")
+    time.sleep(0.2)
+    logging.debug("Exiting")
+
+
+def non_daemon():
+    logging.debug("Starting")
+    logging.debug("Exiting")
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="(%(threadName)-10s) %(message)s",
+)
+
+d = threading.Thread(name="daemon", target=daemon, daemon=True)
+
+t = threading.Thread(name="non-daemon", target=non_daemon)
+
+d.start()
+t.start()
+```
+
+The output does not include the "Exiting" message from the daemon thread, since all of the non-daemon threads (including the main thread) exit before the daemon thread wakes up from the sleep() call.
+
+```
+$ python3 threading_daemon.py
+(daemon    ) Starting
+(non-daemon) Starting
+(non-daemon) Exiting
+```
+
+To wait until a daemon thread has completed its work, use the join() method.
+
+```
+# threading_daemon.py
+import threading
+import time
+import logging
+
+
+def daemon():
+    logging.debug("Starting")
+    time.sleep(0.2)
+    logging.debug("Exiting")
+
+
+def non_daemon():
+    logging.debug("Starting")
+    logging.debug("Exiting")
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="(%(threadName)-10s) %(message)s",
+)
+
+d = threading.Thread(name="daemon", target=daemon, daemon=True)
+
+t = threading.Thread(name="non-daemon", target=non_daemon)
+
+d.start()
+t.start()
+```
+
+Waiting for the daemon thread to exit using join() means it has a chance to produce its "Exiting" message.
+
+```
+# threading_daemon_join.py
+import threading
+import time
+import logging
+
+
+def daemon():
+    logging.debug("Starting")
+    time.sleep(0.2)
+    logging.debug("Exiting")
+
+
+def non_daemon():
+    logging.debug("Starting")
+    logging.debug("Exiting")
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="(%(threadName)-10s) %(message)s",
+)
+
+d = threading.Thread(name="daemon", target=daemon, daemon=True)
+
+t = threading.Thread(name="non-daemon", target=non_daemon)
+
+d.start()
+t.start()
+
+d.join()
+t.join()
+```
+
+Waiting for the daemon thread to exit using join() means it has a chance to produce its "Exiting" message.
+
+```
+# threading_daemon_join.py
+import threading
+import time
+import logging
+
+
+def daemon():
+    logging.debug('Starting')
+    time.sleep(0.2)
+    logging.debug('Exiting')
+
+
+def non_daemon():
+    logging.debug('Starting')
+    logging.debug('Exiting')
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='(%(threadName)-10s) %(message)s',
+)
+
+d = threading.Thread(name='daemon', target=daemon, daemon=True)
+
+t = threading.Thread(name='non-daemon', target=non_daemon)
+
+d.start()
+t.start()
+
+d.join()
+t.join()
+```
+
+Waiting for the daemon thread to exit using join() means it has a chance to produce its "Exiting" message.
+
+```
+$ python3 threading_daemon_join.py
+(daemon    ) Starting
+(non-daemon) Starting
+(non-daemon) Exiting
+(daemon    ) Exiting
+```
+
+By default, join() blocks indefinitely. It is also possible to pass a float value representing the number of seconds to wait for the thread to become inactive. If the thread does not complete within the timeout period, join() returns anyway.
+
+```
+# threading_daemon_join_timeout.py
+import threading
+import time
+import logging
+
+
+def daemon():
+    logging.debug('Starting')
+    time.sleep(0.2)
+    logging.debug('Exiting')
+
+
+def non_daemon():
+    logging.debug('Starting')
+    logging.debug('Exiting')
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='(%(threadName)-10s) %(message)s',
+)
+
+d = threading.Thread(name='daemon', target=daemon, daemon=True)
+
+t = threading.Thread(name='non-daemon', target=non_daemon)
+
+d.start()
+t.start()
+
+d.join(0.1)
+print("d.is_alive()", d.is_alive())
+t.join()
+```
+
+Since the timeout passed is less than the amount of time the daemon thread sleeps, the thread is still “alive” after join() returns.
+
+```
+$ python3 threading_daemon_join_timeout.py
+(daemon    ) Starting
+(non-daemon) Starting
+(non-daemon) Exiting
+d.is_alive() True
+```
