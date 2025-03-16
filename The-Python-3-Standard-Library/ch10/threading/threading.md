@@ -781,3 +781,44 @@ $ python3 threading_lock_noblock.py
 (Worker    ) Done after 5 iterations
 ```
 
+### 10.3.8.1 Re-entrant Locks
+
+Normal Lock objects cannot be acquired more than once, even by the same thread. This can introduce undesirable side-effects if a lock is accessed by more than one function in the same call chain.
+
+```
+# threading_lock_reacquire.py
+import threading
+
+lock = threading.Lock()
+
+print("First try :", lock.acquire())
+print("Second try:", lock.acquire(0))
+```
+
+In this case, the second call to acquire() is given a zero timeout to prevent it from blocking because the lock has been obtained by the first call.
+
+```
+$ python3 threading_lock_reacquire.py
+First try : True
+Second try: False
+```
+
+In a situation where separate code from the same thread needs to “re-acquire” the lock, use an RLock instead.
+
+```
+# threading_rlock.py
+import threading
+
+lock = threading.RLock()
+
+print('First try :', lock.acquire())
+print('Second try:', lock.acquire(0))
+```
+
+The only change to the code from the previous example was substituting RLock for Lock.
+
+```
+$ python3 threading_rlock.py
+First try : True
+Second try: True
+```
