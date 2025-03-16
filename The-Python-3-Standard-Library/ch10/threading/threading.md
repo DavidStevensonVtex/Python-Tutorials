@@ -1109,3 +1109,123 @@ $ python3 threading_semaphore.py
 2025-03-16 16:51:13,178 (2 ) Running: ['3']
 2025-03-16 16:51:13,179 (3 ) Running: []
 ```
+
+### 10.3.11 Thread-specific Data
+
+While some resources need to be locked so multiple threads can use them, others need to be protected so that they are hidden from threads that do not own them. The local() class creates an object capable of hiding values from view in separate threads.
+
+```
+# threading_local.py
+import random
+import threading
+import logging
+
+
+def show_value(data):
+    try:
+        val = data.value
+    except AttributeError:
+        logging.debug('No value yet')
+    else:
+        logging.debug('value=%s', val)
+
+
+def worker(data):
+    show_value(data)
+    data.value = random.randint(1, 100)
+    show_value(data)
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='(%(threadName)-10s) %(message)s',
+)
+
+local_data = threading.local()
+show_value(local_data)
+local_data.value = 1000
+show_value(local_data)
+
+for i in range(2):
+    t = threading.Thread(target=worker, args=(local_data,))
+    t.start()
+```
+
+The attribute local_data.value is not present for any thread until it is set in that thread.
+
+```
+$ python3 threading_local.py
+(MainThread) No value yet
+(MainThread) value=1000
+(Thread-1  ) No value yet
+(Thread-1  ) value=73
+(Thread-2  ) No value yet
+(Thread-2  ) value=27
+```
+
+To initialize the settings so all threads start with the same value, use a subclass and set the attributes in `__init__()`.
+
+```
+# threading_local_defaults.py
+import random
+import threading
+import logging
+
+
+def show_value(data):
+    try:
+        val = data.value
+    except AttributeError:
+        logging.debug("No value yet")
+    else:
+        logging.debug("value=%s", val)
+
+
+def worker(data):
+    show_value(data)
+    data.value = random.randint(1, 100)
+    show_value(data)
+
+
+class MyLocal(threading.local):
+
+    def __init__(self, value):
+        super().__init__()
+        logging.debug("Initializing %r", self)
+        self.value = value
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="(%(threadName)-10s) %(message)s",
+)
+
+local_data = MyLocal(1000)
+show_value(local_data)
+
+for i in range(2):
+    t = threading.Thread(target=worker, args=(local_data,))
+    t.start()
+```
+
+`__init__()` is invoked on the same object (note the id() value), once in each thread to set the default values.
+
+```
+$ python3 threading_local_defaults.py
+(MainThread) Initializing <__main__.MyLocal object at 0x7fdbfaad3d60>
+(MainThread) value=1000
+(Thread-1  ) Initializing <__main__.MyLocal object at 0x7fdbfaad3d60>
+(Thread-2  ) Initializing <__main__.MyLocal object at 0x7fdbfaad3d60>
+(Thread-1  ) value=1000
+(Thread-2  ) value=1000
+(Thread-1  ) value=19
+(Thread-2  ) value=43
+```
+
+### See also
+
+* [Standard library documentation for threading](https://docs.python.org/3/library/threading.html)
+* [Python 2 to 3 porting notes for threading](https://pymotw.com/3/porting_notes.html#porting-threading)
+* [\_thread – Lower level thread API.](https://docs.python.org/3/library/_thread.html)
+* [Queue](https://docs.python.org/3/library/queue.html) – Thread-safe queue, useful for passing messages between threads.
+* [multiprocessing](https://pymotw.com/3/multiprocessing/index.html) – An API for working with processes that mirrors the threading API.
