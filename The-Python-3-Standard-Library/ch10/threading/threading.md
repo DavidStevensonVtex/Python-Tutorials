@@ -781,7 +781,7 @@ $ python3 threading_lock_noblock.py
 (Worker    ) Done after 5 iterations
 ```
 
-### 10.3.8.1 Re-entrant Locks
+#### 10.3.8.1 Re-entrant Locks
 
 Normal Lock objects cannot be acquired more than once, even by the same thread. This can introduce undesirable side-effects if a lock is accessed by more than one function in the same call chain.
 
@@ -821,4 +821,48 @@ The only change to the code from the previous example was substituting RLock for
 $ python3 threading_rlock.py
 First try : True
 Second try: True
+```
+
+#### 10.3.8.2 Locks as Context Managers
+
+Locks implement the context manager API and are compatible with the with statement. Using with removes the need to explicitly acquire and release the lock.
+
+```
+# threading_lock_with.py
+import threading
+import logging
+
+
+def worker_with(lock):
+    with lock:
+        logging.debug("Lock acquired via with")
+
+
+def worker_no_with(lock):
+    lock.acquire()
+    try:
+        logging.debug("Lock acquired directly")
+    finally:
+        lock.release()
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="(%(threadName)-10s) %(message)s",
+)
+
+lock = threading.Lock()
+w = threading.Thread(target=worker_with, args=(lock,))
+nw = threading.Thread(target=worker_no_with, args=(lock,))
+
+w.start()
+nw.start()
+```
+
+The two functions worker_with() and worker_no_with() manage the lock in equivalent ways.
+
+```
+$ python3 threading_lock_with.py
+(Thread-1  ) Lock acquired via with
+(Thread-2  ) Lock acquired directly
 ```
