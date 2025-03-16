@@ -1036,3 +1036,76 @@ worker-2 aborting
 worker-0 aborting
 worker-1 aborting
 ```
+
+### 10.3.10 Limiting Concurrent Access to Resources
+
+Sometimes it is useful to allow more than one worker access to a resource at a time, while still limiting the overall number. For example, a connection pool might support a fixed number of simultaneous connections, or a network application might support a fixed number of concurrent downloads. A Semaphore is one way to manage those connections.
+
+```
+# threading_semaphore.py
+import logging
+import random
+import threading
+import time
+
+
+class ActivePool:
+
+    def __init__(self):
+        super(ActivePool, self).__init__()
+        self.active = []
+        self.lock = threading.Lock()
+
+    def makeActive(self, name):
+        with self.lock:
+            self.active.append(name)
+            logging.debug('Running: %s', self.active)
+
+    def makeInactive(self, name):
+        with self.lock:
+            self.active.remove(name)
+            logging.debug('Running: %s', self.active)
+
+
+def worker(s, pool):
+    logging.debug('Waiting to join the pool')
+    with s:
+        name = threading.current_thread().getName()
+        pool.makeActive(name)
+        time.sleep(0.1)
+        pool.makeInactive(name)
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s (%(threadName)-2s) %(message)s',
+)
+
+pool = ActivePool()
+s = threading.Semaphore(2)
+for i in range(4):
+    t = threading.Thread(
+        target=worker,
+        name=str(i),
+        args=(s, pool),
+    )
+    t.start()
+```
+
+In this example, the ActivePool class simply serves as a convenient way to track which threads are able to run at a given moment. A real resource pool would allocate a connection or some other value to the newly active thread, and reclaim the value when the thread is done. Here, it is just used to hold the names of the active threads to show that at most two are running concurrently.
+
+```
+$ python3 threading_semaphore.py
+2025-03-16 16:51:12,977 (0 ) Waiting to join the pool
+2025-03-16 16:51:12,977 (0 ) Running: ['0']
+2025-03-16 16:51:12,977 (1 ) Waiting to join the pool
+2025-03-16 16:51:12,977 (1 ) Running: ['0', '1']
+2025-03-16 16:51:12,977 (2 ) Waiting to join the pool
+2025-03-16 16:51:12,978 (3 ) Waiting to join the pool
+2025-03-16 16:51:13,077 (0 ) Running: ['1']
+2025-03-16 16:51:13,078 (2 ) Running: ['1', '2']
+2025-03-16 16:51:13,078 (1 ) Running: ['2']
+2025-03-16 16:51:13,078 (3 ) Running: ['2', '3']
+2025-03-16 16:51:13,178 (2 ) Running: ['3']
+2025-03-16 16:51:13,179 (3 ) Running: []
+```
