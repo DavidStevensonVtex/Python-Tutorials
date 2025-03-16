@@ -866,3 +866,173 @@ $ python3 threading_lock_with.py
 (Thread-1  ) Lock acquired via with
 (Thread-2  ) Lock acquired directly
 ```
+
+### 10.3.9 Synchronizing Threads
+
+In addition to using Events, another way of synchronizing threads is through using a Condition object. Because the Condition uses a Lock, it can be tied to a shared resource, allowing multiple threads to wait for the resource to be updated. In this example, the consumer() threads wait for the Condition to be set before continuing. The producer() thread is responsible for setting the condition and notifying the other threads that they can continue.
+
+```
+# threading_condition.py
+import logging
+import threading
+import time
+
+
+def consumer(cond):
+    """wait for the condition and use the resource"""
+    logging.debug("Starting consumer thread")
+    with cond:
+        cond.wait()
+        logging.debug("Resource is available to consumer")
+
+
+def producer(cond):
+    """set up the resource to be used by the consumer"""
+    logging.debug("Starting producer thread")
+    with cond:
+        logging.debug("Making resource available")
+        cond.notifyAll()
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s (%(threadName)-2s) %(message)s",
+)
+
+condition = threading.Condition()
+c1 = threading.Thread(name="c1", target=consumer, args=(condition,))
+c2 = threading.Thread(name="c2", target=consumer, args=(condition,))
+p = threading.Thread(name="p", target=producer, args=(condition,))
+
+c1.start()
+time.sleep(0.2)
+c2.start()
+time.sleep(0.2)
+p.start()
+```
+
+The threads use with to acquire the lock associated with the Condition. Using the acquire() and release() methods explicitly also works.
+
+```
+$ python3 threading_condition.py
+2025-03-16 16:37:45,188 (c1) Starting consumer thread
+2025-03-16 16:37:45,388 (c2) Starting consumer thread
+2025-03-16 16:37:45,589 (p ) Starting producer thread
+2025-03-16 16:37:45,589 (p ) Making resource available
+2025-03-16 16:37:45,590 (c1) Resource is available to consumer
+2025-03-16 16:37:45,590 (c2) Resource is available to consumer
+```
+
+Barriers are another thread synchronization mechanism. A Barrier establishes a control point and all participating threads block until all of the participating “parties” have reached that point. It lets threads start up separately and then pause until they are all ready to proceed.
+
+```
+# threading_barrier.py
+import threading
+import time
+
+
+def worker(barrier):
+    print(
+        threading.current_thread().name,
+        "waiting for barrier with {} others".format(barrier.n_waiting),
+    )
+    worker_id = barrier.wait()
+    print(threading.current_thread().name, "after barrier", worker_id)
+
+
+NUM_THREADS = 3
+
+barrier = threading.Barrier(NUM_THREADS)
+
+threads = [
+    threading.Thread(
+        name="worker-%s" % i,
+        target=worker,
+        args=(barrier,),
+    )
+    for i in range(NUM_THREADS)
+]
+
+for t in threads:
+    print(t.name, "starting")
+    t.start()
+    time.sleep(0.1)
+
+for t in threads:
+    t.join()
+```
+
+In this example, the Barrier is configured to block until three threads are waiting. When the condition is met, all of the threads are released past the control point at the same time. The return value from wait() indicates the number of the party being released, and can be used to limit some threads from taking an action like cleaning up a shared resource.
+
+```
+$ python3 threading_barrier.py
+worker-0 starting
+worker-0 waiting for barrier with 0 others
+worker-1 starting
+worker-1 waiting for barrier with 1 others
+worker-2 starting
+worker-2 waiting for barrier with 2 others
+worker-2 after barrier 2
+worker-0 after barrier 0
+worker-1 after barrier 1
+```
+
+The abort() method of Barrier causes all of the waiting threads to receive a BrokenBarrierError. This allows threads to clean up if processing is stopped while they are blocked on wait().
+
+```
+# threading_barrier_abort.py
+import threading
+import time
+
+
+def worker(barrier):
+    print(
+        threading.current_thread().name,
+        "waiting for barrier with {} others".format(barrier.n_waiting),
+    )
+    try:
+        worker_id = barrier.wait()
+    except threading.BrokenBarrierError:
+        print(threading.current_thread().name, "aborting")
+    else:
+        print(threading.current_thread().name, "after barrier", worker_id)
+
+
+NUM_THREADS = 3
+
+barrier = threading.Barrier(NUM_THREADS + 1)
+
+threads = [
+    threading.Thread(
+        name="worker-%s" % i,
+        target=worker,
+        args=(barrier,),
+    )
+    for i in range(NUM_THREADS)
+]
+
+for t in threads:
+    print(t.name, "starting")
+    t.start()
+    time.sleep(0.1)
+
+barrier.abort()
+
+for t in threads:
+    t.join()
+```
+
+This example configures the Barrier to expect one more participating thread than is actually started so that processing in all of the threads is blocked. The abort() call raises an exception in each blocked thread.
+
+```
+$ python3 threading_barrier_abort.py
+worker-0 starting
+worker-0 waiting for barrier with 0 others
+worker-1 starting
+worker-1 waiting for barrier with 1 others
+worker-2 starting
+worker-2 waiting for barrier with 2 others
+worker-2 aborting
+worker-0 aborting
+worker-1 aborting
+```
