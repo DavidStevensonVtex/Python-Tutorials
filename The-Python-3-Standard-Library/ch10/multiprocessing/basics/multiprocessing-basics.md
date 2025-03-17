@@ -65,3 +65,43 @@ Worker: 2
 Worker: 3
 Worker: 4
 ```
+
+### 10.4.2 Importable Target Functions
+
+One difference between the threading and multiprocessing examples is the extra protection for `__main__` used in the multiprocessing examples. Due to the way the new processes are started, the child process needs to be able to import the script containing the target function. Wrapping the main part of the application in a check for `__main__` ensures that it is not run recursively in each child as the module is imported. Another approach is to import the target function from a separate script. For example, multiprocessing_import_main.py uses a worker function defined in a second module.
+
+```
+# multiprocessing_import_main.py
+import multiprocessing
+import multiprocessing_import_worker
+
+if __name__ == "__main__":
+    jobs = []
+    for i in range(5):
+        p = multiprocessing.Process(
+            target=multiprocessing_import_worker.worker,
+        )
+        jobs.append(p)
+        p.start()
+```
+
+The worker function is defined in multiprocessing_import_worker.py.
+
+```
+# multiprocessing_import_worker.py
+def worker():
+    """worker function"""
+    print('Worker')
+    return
+```
+
+Calling the main program produces output similar to the first example.
+
+```
+$ python3 multiprocessing_import_main.py
+Worker
+Worker
+Worker
+Worker
+Worker
+```
