@@ -214,3 +214,51 @@ wait_for_event_timeout: e.is_set()-> False
 main: event is set
 wait_for_event: e.is_set()-> True
 ```
+
+### 10.4.12 Controlling Access to Resources
+
+In situations when a single resource needs to be shared between multiple processes, a Lock can be used to avoid conflicting accesses.
+
+```
+# multiprocessing_lock.py
+import multiprocessing
+import sys
+
+
+def worker_with(lock, stream):
+    with lock:
+        stream.write("Lock acquired via with\n")
+
+
+def worker_no_with(lock, stream):
+    lock.acquire()
+    try:
+        stream.write("Lock acquired directly\n")
+    finally:
+        lock.release()
+
+
+lock = multiprocessing.Lock()
+w = multiprocessing.Process(
+    target=worker_with,
+    args=(lock, sys.stdout),
+)
+nw = multiprocessing.Process(
+    target=worker_no_with,
+    args=(lock, sys.stdout),
+)
+
+w.start()
+nw.start()
+
+w.join()
+nw.join()
+```
+
+In this example, the messages printed to the console may be jumbled together if the two processes do not synchronize their access of the output stream with the lock.
+
+```
+$ python3 multiprocessing_lock.py
+Lock acquired via with
+Lock acquired directly
+```
