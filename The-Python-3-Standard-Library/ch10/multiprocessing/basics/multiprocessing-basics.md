@@ -368,3 +368,91 @@ DURING: <Process name='Process-1' pid=24823 parent=24822 started> True
 TERMINATED: <Process name='Process-1' pid=24823 parent=24822 started> True
 JOINED: <Process name='Process-1' pid=24823 parent=24822 stopped exitcode=-SIGTERM> False
 ```
+
+### 10.4.7 Process Exit Status
+
+The status code produced when the process exits can be accessed via the exitcode attribute. The ranges allowed are listed in the table below.
+
+**Multiprocessing Exit Codes**
+
+```
+Exit Code	Meaning
+
+== 0        no error was produced
+> 0         the process had an error, and exited with that code
+< 0         the process was killed with a signal of -1 * exitcode
+```
+
+```
+# multiprocessing_exitcode.py
+import multiprocessing
+import sys
+import time
+
+
+def exit_error():
+    sys.exit(1)
+
+
+def exit_ok():
+    return
+
+
+def return_value():
+    return 1
+
+
+def raises():
+    raise RuntimeError("There was an error!")
+
+
+def terminated():
+    time.sleep(3)
+
+
+if __name__ == "__main__":
+    jobs = []
+    funcs = [
+        exit_error,
+        exit_ok,
+        return_value,
+        raises,
+        terminated,
+    ]
+    for f in funcs:
+        print("Starting process for", f.__name__)
+        j = multiprocessing.Process(target=f, name=f.__name__)
+        jobs.append(j)
+        j.start()
+
+    jobs[-1].terminate()
+
+    for j in jobs:
+        j.join()
+        print("{:>15}.exitcode = {}".format(j.name, j.exitcode))
+```
+
+Processes that raise an exception automatically get an exitcode of 1.
+
+```
+$ python3 multiprocessing_exitcode.py
+Starting process for exit_error
+Starting process for exit_ok
+Starting process for return_value
+Starting process for raises
+Starting process for terminated
+     exit_error.exitcode = 1
+        exit_ok.exitcode = 0
+   return_value.exitcode = 0
+Process raises:
+Traceback (most recent call last):
+  File "/usr/lib/python3.8/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.8/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "multiprocessing_exitcode.py", line 20, in raises
+    raise RuntimeError("There was an error!")
+RuntimeError: There was an error!
+         raises.exitcode = 1
+     terminated.exitcode = -15
+```
