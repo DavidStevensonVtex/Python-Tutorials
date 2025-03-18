@@ -528,3 +528,40 @@ Doing some work
 [INFO/Process-1] process exiting with exitcode 0
 [INFO/MainProcess] process shutting down
 ```
+
+### 10.4.9 Subclassing Process
+
+Although the simplest way to start a job in a separate process is to use Process and pass a target function, it is also possible to use a custom subclass.
+
+```
+# multiprocessing_subclass.py
+import multiprocessing
+
+
+class Worker(multiprocessing.Process):
+
+    def run(self):
+        print("In {}".format(self.name))
+        return
+
+
+if __name__ == "__main__":
+    jobs = []
+    for i in range(5):
+        p = Worker()
+        jobs.append(p)
+        p.start()
+    for j in jobs:
+        j.join()
+```
+
+The derived class should override run() to do its work.
+
+```
+$ python3 multiprocessing_subclass.py
+In Worker-1
+In Worker-2
+In Worker-3
+In Worker-4
+In Worker-5
+```
