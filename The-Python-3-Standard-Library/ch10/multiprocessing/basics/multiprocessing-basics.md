@@ -456,3 +456,75 @@ RuntimeError: There was an error!
          raises.exitcode = 1
      terminated.exitcode = -15
 ```
+
+### 10.4.8 Logging
+
+When debugging concurrency issues, it can be useful to have access to the internals of the objects provided by multiprocessing. There is a convenient module-level function to enable logging called log_to_stderr(). It sets up a [logger](https://pymotw.com/3/logging/index.html) object using logging and adds a handler so that log messages are sent to the standard error channel.
+
+```
+# multiprocessing_log_to_stderr.py
+import multiprocessing
+import logging
+import sys
+
+
+def worker():
+    print('Doing some work')
+    sys.stdout.flush()
+
+
+if __name__ == '__main__':
+    multiprocessing.log_to_stderr(logging.DEBUG)
+    p = multiprocessing.Process(target=worker)
+    p.start()
+    p.join()
+```
+
+By default, the logging level is set to NOTSET so no messages are produced. Pass a different level to initialize the logger to the level of detail desired.
+
+```
+$ python3 multiprocessing_log_to_stderr.py
+[INFO/Process-1] child process calling self.run()
+Doing some work
+[INFO/Process-1] process shutting down
+[DEBUG/Process-1] running all "atexit" finalizers with priority >= 0
+[DEBUG/Process-1] running the remaining "atexit" finalizers
+[INFO/Process-1] process exiting with exitcode 0
+[INFO/MainProcess] process shutting down
+[DEBUG/MainProcess] running all "atexit" finalizers with priority >= 0
+[DEBUG/MainProcess] running the remaining "atexit" finalizers
+```
+
+To manipulate the logger directly (change its level setting or add handlers), use get_logger().
+
+```
+# multiprocessing_get_logger.py
+import multiprocessing
+import logging
+import sys
+
+
+def worker():
+    print("Doing some work")
+    sys.stdout.flush()
+
+
+if __name__ == "__main__":
+    multiprocessing.log_to_stderr()
+    logger = multiprocessing.get_logger()
+    logger.setLevel(logging.INFO)
+    p = multiprocessing.Process(target=worker)
+    p.start()
+    p.join()
+```
+
+The logger can also be configured through the logging configuration file API, using the name “multiprocessing”.
+
+```
+$ python3 multiprocessing_get_logger.py
+[INFO/Process-1] child process calling self.run()
+Doing some work
+[INFO/Process-1] process shutting down
+[INFO/Process-1] process exiting with exitcode 0
+[INFO/MainProcess] process shutting down
+```
