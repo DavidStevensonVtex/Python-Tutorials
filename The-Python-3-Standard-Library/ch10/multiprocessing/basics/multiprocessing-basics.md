@@ -218,3 +218,111 @@ Exiting : non-daemon 22123
 ```
 
 The daemon process is terminated automatically before the main program exits, which avoids leaving orphaned processes running. This can be verified by looking for the process id value printed when the program runs, and then checking for that process with a command like ps.
+
+### 10.4.5 Waiting for Processes
+
+To wait until a process has completed its work and exited, use the join() method.
+
+```
+# multiprocessing_daemon_join.py
+import multiprocessing
+import time
+import sys
+
+
+def daemon():
+    name = multiprocessing.current_process().name
+    print("Starting:", name)
+    time.sleep(2)
+    print("Exiting :", name)
+
+
+def non_daemon():
+    name = multiprocessing.current_process().name
+    print("Starting:", name)
+    print("Exiting :", name)
+
+
+if __name__ == "__main__":
+    d = multiprocessing.Process(
+        name="daemon",
+        target=daemon,
+    )
+    d.daemon = True
+
+    n = multiprocessing.Process(
+        name="non-daemon",
+        target=non_daemon,
+    )
+    n.daemon = False
+
+    d.start()
+    time.sleep(1)
+    n.start()
+
+    d.join()
+    n.join()
+```
+
+Since the main process waits for the daemon to exit using join(), the “Exiting” message is printed this time.
+
+```
+$ python3 multiprocessing_daemon_join.py
+Starting: daemon
+Starting: non-daemon
+Exiting : non-daemon
+Exiting : daemon
+```
+
+By default, join() blocks indefinitely. It is also possible to pass a timeout argument (a float representing the number of seconds to wait for the process to become inactive). If the process does not complete within the timeout period, join() returns anyway.
+
+```
+# multiprocessing_daemon_join_timeout.py
+import multiprocessing
+import time
+import sys
+
+
+def daemon():
+    name = multiprocessing.current_process().name
+    print("Starting:", name)
+    time.sleep(2)
+    print("Exiting :", name)
+
+
+def non_daemon():
+    name = multiprocessing.current_process().name
+    print("Starting:", name)
+    print("Exiting :", name)
+
+
+if __name__ == "__main__":
+    d = multiprocessing.Process(
+        name="daemon",
+        target=daemon,
+    )
+    d.daemon = True
+
+    n = multiprocessing.Process(
+        name="non-daemon",
+        target=non_daemon,
+    )
+    n.daemon = False
+
+    d.start()
+    n.start()
+
+    d.join(1)
+    print("d.is_alive()", d.is_alive())
+    n.join()
+```
+
+Since the timeout passed is less than the amount of time the daemon sleeps, the process is still “alive” after join() returns.
+
+```
+$ python3 multiprocessing_daemon_join_timeout.py
+Starting: daemon
+Starting: non-daemon
+Exiting : non-daemon
+d.is_alive() True
+```
