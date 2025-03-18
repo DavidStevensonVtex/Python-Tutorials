@@ -1,0 +1,158 @@
+# [Chapter 10: Concurrency with Processes, Threads, and Coroutines](https://pymotw.com/3/concurrency.html)
+
+## [10.4.10 Passing Messages to Processes](https://pymotw.com/3/multiprocessing/communication.html)
+
+As with threads, a common use pattern for multiple processes is to divide a job up among several workers to run in parallel. Effective use of multiple processes usually requires some communication between them, so that work can be divided and results can be aggregated. A simple way to communicate between processes with multiprocessing is to use a Queue to pass messages back and forth. Any object that can be serialized with pickle can pass through a Queue.
+
+```
+# multiprocessing_queue.py
+import multiprocessing
+
+
+class MyFancyClass:
+
+    def __init__(self, name):
+        self.name = name
+
+    def do_something(self):
+        proc_name = multiprocessing.current_process().name
+        print("Doing something fancy in {} for {}!".format(proc_name, self.name))
+
+
+def worker(q):
+    obj = q.get()
+    obj.do_something()
+
+
+if __name__ == "__main__":
+    queue = multiprocessing.Queue()
+
+    p = multiprocessing.Process(target=worker, args=(queue,))
+    p.start()
+
+    queue.put(MyFancyClass("Fancy Dan"))
+
+    # Wait for the worker to finish
+    queue.close()
+    queue.join_thread()
+    p.join()
+```
+
+This short example only passes a single message to a single worker, then the main process waits for the worker to finish.
+
+```
+$ python3 multiprocessing_queue.py
+Doing something fancy in Process-1 for Fancy Dan!
+```
+
+A more complex example shows how to manage several workers consuming data from a JoinableQueue and passing results back to the parent process. The poison pill technique is used to stop the workers. After setting up the real tasks, the main program adds one “stop” value per worker to the job queue. When a worker encounters the special value, it breaks out of its processing loop. The main process uses the task queue’s join() method to wait for all of the tasks to finish before processing the results.
+
+```
+# multiprocessing_producer_consumer.py
+import multiprocessing
+import time
+
+
+class Consumer(multiprocessing.Process):
+
+    def __init__(self, task_queue, result_queue):
+        multiprocessing.Process.__init__(self)
+        self.task_queue = task_queue
+        self.result_queue = result_queue
+
+    def run(self):
+        proc_name = self.name
+        while True:
+            next_task = self.task_queue.get()
+            if next_task is None:
+                # Poison pill means shutdown
+                print("{}: Exiting".format(proc_name))
+                self.task_queue.task_done()
+                break
+            print("{}: {}".format(proc_name, next_task))
+            answer = next_task()
+            self.task_queue.task_done()
+            self.result_queue.put(answer)
+
+
+class Task:
+
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def __call__(self):
+        time.sleep(0.1)  # pretend to take time to do the work
+        return "{self.a} * {self.b} = {product}".format(
+            self=self, product=self.a * self.b
+        )
+
+    def __str__(self):
+        return "{self.a} * {self.b}".format(self=self)
+
+
+if __name__ == "__main__":
+    # Establish communication queues
+    tasks = multiprocessing.JoinableQueue()
+    results = multiprocessing.Queue()
+
+    # Start consumers
+    num_consumers = multiprocessing.cpu_count() * 2
+    print("Creating {} consumers".format(num_consumers))
+    consumers = [Consumer(tasks, results) for i in range(num_consumers)]
+    for w in consumers:
+        w.start()
+
+    # Enqueue jobs
+    num_jobs = 10
+    for i in range(num_jobs):
+        tasks.put(Task(i, i))
+
+    # Add a poison pill for each consumer
+    for i in range(num_consumers):
+        tasks.put(None)
+
+    # Wait for all of the tasks to finish
+    tasks.join()
+
+    # Start printing results
+    while num_jobs:
+        result = results.get()
+        print("Result:", result)
+        num_jobs -= 1
+```
+
+Although the jobs enter the queue in order, their execution is parallelized so there is no guarantee about the order they will be completed.
+
+```
+$ python3 -u multiprocessing_producer_consumer.py
+Creating 8 consumers
+Consumer-1: 0 * 0
+Consumer-3: 2 * 2
+Consumer-2: 3 * 3
+Consumer-4: 4 * 4
+Consumer-5: 5 * 5
+Consumer-8: 1 * 1
+Consumer-7: 6 * 6
+Consumer-6: 7 * 7
+Consumer-4: 8 * 8
+Consumer-5: 9 * 9
+Consumer-3: Exiting
+Consumer-8: Exiting
+Consumer-1: Exiting
+Consumer-6: Exiting
+Consumer-7: Exiting
+Consumer-2: Exiting
+Consumer-4: Exiting
+Consumer-5: Exiting
+Result: 4 * 4 = 16
+Result: 5 * 5 = 25
+Result: 2 * 2 = 4
+Result: 1 * 1 = 1
+Result: 0 * 0 = 0
+Result: 7 * 7 = 49
+Result: 6 * 6 = 36
+Result: 3 * 3 = 9
+Result: 8 * 8 = 64
+Result: 9 * 9 = 81
+```
