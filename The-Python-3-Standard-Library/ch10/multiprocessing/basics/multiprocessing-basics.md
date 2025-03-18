@@ -326,3 +326,45 @@ Starting: non-daemon
 Exiting : non-daemon
 d.is_alive() True
 ```
+
+### 10.4.6 Terminating Processes
+
+Although it is better to use the poison pill method of signaling to a process that it should exit (see [Passing Messages to Processes](https://pymotw.com/3/multiprocessing/communication.html#multiprocessing-queues), later in this chapter), if a process appears hung or deadlocked it can be useful to be able to kill it forcibly. Calling terminate() on a process object kills the child process.
+
+```
+# multiprocessing_terminate.py
+import multiprocessing
+import time
+
+
+def slow_worker():
+    print("Starting worker")
+    time.sleep(0.1)
+    print("Finished worker")
+
+
+if __name__ == "__main__":
+    p = multiprocessing.Process(target=slow_worker)
+    print("BEFORE:", p, p.is_alive())
+
+    p.start()
+    print("DURING:", p, p.is_alive())
+
+    p.terminate()
+    print("TERMINATED:", p, p.is_alive())
+
+    p.join()
+    print("JOINED:", p, p.is_alive())
+```
+
+Note
+
+It is important to join() the process after terminating it in order to give the process management code time to update the status of the object to reflect the termination.
+
+```
+$ python3 multiprocessing_terminate.py
+BEFORE: <Process name='Process-1' parent=24822 initial> False
+DURING: <Process name='Process-1' pid=24823 parent=24822 started> True
+TERMINATED: <Process name='Process-1' pid=24823 parent=24822 started> True
+JOINED: <Process name='Process-1' pid=24823 parent=24822 stopped exitcode=-SIGTERM> False
+```
