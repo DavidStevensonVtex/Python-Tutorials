@@ -327,3 +327,106 @@ stage_2[1] running
 stage_2[2] running
 ```
 
+### 10.4.14 Controlling Concurrent Access to Resources
+
+Sometimes it is useful to allow more than one worker access to a resource at a time, while still limiting the overall number. For example, a connection pool might support a fixed number of simultaneous connections, or a network application might support a fixed number of concurrent downloads. A Semaphore is one way to manage those connections.
+
+```
+# multiprocessing_semaphore.py
+import random
+import multiprocessing
+import time
+
+
+class ActivePool:
+
+    def __init__(self):
+        super(ActivePool, self).__init__()
+        self.mgr = multiprocessing.Manager()
+        self.active = self.mgr.list()
+        self.lock = multiprocessing.Lock()
+
+    def makeActive(self, name):
+        with self.lock:
+            self.active.append(name)
+
+    def makeInactive(self, name):
+        with self.lock:
+            self.active.remove(name)
+
+    def __str__(self):
+        with self.lock:
+            return str(self.active)
+
+
+def worker(s, pool):
+    name = multiprocessing.current_process().name
+    with s:
+        pool.makeActive(name)
+        print("Activating {} now running {}".format(name, pool))
+        time.sleep(random.random())
+        pool.makeInactive(name)
+
+
+if __name__ == "__main__":
+    pool = ActivePool()
+    s = multiprocessing.Semaphore(3)
+    jobs = [
+        multiprocessing.Process(
+            target=worker,
+            name=str(i),
+            args=(s, pool),
+        )
+        for i in range(10)
+    ]
+
+    for j in jobs:
+        j.start()
+
+    while True:
+        alive = 0
+        for j in jobs:
+            if j.is_alive():
+                alive += 1
+                j.join(timeout=0.1)
+                print("Now running {}".format(pool))
+        if alive == 0:
+            # all done
+            break
+```
+
+In this example, the ActivePool class simply serves as a convenient way to track which processes are running at a given moment. A real resource pool would probably allocate a connection or some other value to the newly active process, and reclaim the value when the task is done. Here, the pool is just used to hold the names of the active processes to show that only three are running concurrently.
+
+```
+$ python3 -u multiprocessing_semaphore.py
+Activating 0 now running ['0', '1', '2']
+Activating 1 now running ['0', '1', '2']
+Activating 2 now running ['0', '1', '2']
+Now running ['0', '1', '2']
+Now running ['0', '1', '2']
+Now running ['0', '1', '2']
+Activating 3 now running ['0', '3']
+Now running ['0', '3', '4']
+Activating 4 now running ['0', '3', '4']
+Now running ['0', '3', '4']
+Activating 5 now running ['3', '4', '5']
+Now running ['3', '4', '5']
+Now running ['3', '4', '5']
+Now running ['3', '4', '5']
+Activating 6 now running ['4', '5', '6']
+Now running ['4', '5', '6']
+Activating 7 now running ['5', '6', '7']
+Activating 8 now running ['6', '7', '8']
+Now running ['6', '7', '8']
+Activating 9 now running ['6', '8', '9']
+Now running ['6', '8', '9']
+Now running ['6', '8', '9']
+Now running ['6', '8', '9']
+Now running ['6', '8', '9']
+Now running ['8', '9']
+Now running ['8', '9']
+Now running ['8', '9']
+Now running ['8', '9']
+Now running ['9']
+Now running []
+```
