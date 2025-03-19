@@ -469,3 +469,116 @@ $ python3 multiprocessing_manager_dict.py
 Results: {0: 0, 1: 2, 2: 4, 3: 6, 4: 8, 5: 10, 6: 12, 7: 14, 9: 18, 8: 16}
 ```
 
+### 10.4.16 Shared Namespaces
+
+In addition to dictionaries and lists, a Manager can create a shared Namespace.
+
+```
+# multiprocessing_namespaces.py
+import multiprocessing
+
+
+def producer(ns, event):
+    ns.value = 'This is the value'
+    event.set()
+
+
+def consumer(ns, event):
+    try:
+        print('Before event: {}'.format(ns.value))
+    except Exception as err:
+        print('Before event, error:', str(err))
+    event.wait()
+    print('After event:', ns.value)
+
+
+if __name__ == '__main__':
+    mgr = multiprocessing.Manager()
+    namespace = mgr.Namespace()
+    event = multiprocessing.Event()
+    p = multiprocessing.Process(
+        target=producer,
+        args=(namespace, event),
+    )
+    c = multiprocessing.Process(
+        target=consumer,
+        args=(namespace, event),
+    )
+
+    c.start()
+    p.start()
+
+    c.join()
+    p.join()
+```
+
+Any named value added to the Namespace is visible to all of the clients that receive the Namespace instance.
+
+```
+$ python3 multiprocessing_namespaces.py
+Before event, error: 'Namespace' object has no attribute 'value'
+After event: This is the value
+```
+
+It is important to know that updates to the contents of mutable values in the namespace are not propagated automatically.
+
+```
+# multiprocessing_namespaces_mutable.py
+import multiprocessing
+
+
+def producer(ns, event):
+    # DOES NOT UPDATE GLOBAL VALUE!
+    ns.my_list.append("This is the value")
+    event.set()
+
+
+def consumer(ns, event):
+    print("Before event:", ns.my_list)
+    event.wait()
+    print("After event :", ns.my_list)
+
+
+if __name__ == "__main__":
+    mgr = multiprocessing.Manager()
+    namespace = mgr.Namespace()
+    namespace.my_list = []
+
+    event = multiprocessing.Event()
+    p = multiprocessing.Process(
+        target=producer,
+        args=(namespace, event),
+    )
+    c = multiprocessing.Process(
+        target=consumer,
+        args=(namespace, event),
+    )
+
+    c.start()
+    p.start()
+
+    c.join()
+    p.join()
+```
+
+To update the list, attach it to the namespace object again.
+
+```
+$ python3 multiprocessing_namespaces_mutable.py
+Before event: []
+After event : []
+```
+
+```
+def producer(ns, event):
+    # DOES NOT UPDATE GLOBAL VALUE!
+    # ns.my_list.append("This is the value")
+    ns.my_list = [ "This is a value that will be updated" ]
+    event.set()
+```
+
+```
+$ python3 multiprocessing_namespaces_mutable.py
+Before event: []
+After event : ['This is a value that will be updated']
+```
