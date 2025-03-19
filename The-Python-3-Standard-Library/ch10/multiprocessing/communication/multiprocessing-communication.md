@@ -430,3 +430,42 @@ Now running ['8', '9']
 Now running ['9']
 Now running []
 ```
+
+### 10.4.15 Managing Shared State
+
+In the previous example, the list of active processes is maintained centrally in the ActivePool instance via a special type of list object created by a Manager. The Manager is responsible for coordinating shared information state between all of its users.
+
+```
+# multiprocessing_manager_dict.py
+import multiprocessing
+import pprint
+
+
+def worker(d, key, value):
+    d[key] = value
+
+
+if __name__ == "__main__":
+    mgr = multiprocessing.Manager()
+    d = mgr.dict()
+    jobs = [
+        multiprocessing.Process(
+            target=worker,
+            args=(d, i, i * 2),
+        )
+        for i in range(10)
+    ]
+    for j in jobs:
+        j.start()
+    for j in jobs:
+        j.join()
+    print("Results:", d)
+```
+
+By creating the list through the manager, it is shared and updates are seen in all processes. Dictionaries are also supported.
+
+```
+$ python3 multiprocessing_manager_dict.py
+Results: {0: 0, 1: 2, 2: 4, 3: 6, 4: 8, 5: 10, 6: 12, 7: 14, 9: 18, 8: 16}
+```
+
