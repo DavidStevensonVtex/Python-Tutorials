@@ -262,3 +262,68 @@ $ python3 multiprocessing_lock.py
 Lock acquired via with
 Lock acquired directly
 ```
+
+### 10.4.13 Synchronizing Operations
+
+Condition objects can be used to synchronize parts of a workflow so that some run in parallel but others run sequentially, even if they are in separate processes.
+
+```
+# multiprocessing_condition.py
+import multiprocessing
+import time
+
+
+def stage_1(cond):
+    """perform first stage of work,
+    then notify stage_2 to continue
+    """
+    name = multiprocessing.current_process().name
+    print("Starting", name)
+    with cond:
+        print("{} done and ready for stage 2".format(name))
+        cond.notify_all()
+
+
+def stage_2(cond):
+    """wait for the condition telling us stage_1 is done"""
+    name = multiprocessing.current_process().name
+    print("Starting", name)
+    with cond:
+        cond.wait()
+        print("{} running".format(name))
+
+
+if __name__ == "__main__":
+    condition = multiprocessing.Condition()
+    s1 = multiprocessing.Process(name="s1", target=stage_1, args=(condition,))
+    s2_clients = [
+        multiprocessing.Process(
+            name="stage_2[{}]".format(i),
+            target=stage_2,
+            args=(condition,),
+        )
+        for i in range(1, 3)
+    ]
+
+    for c in s2_clients:
+        c.start()
+        time.sleep(1)
+    s1.start()
+
+    s1.join()
+    for c in s2_clients:
+        c.join()
+```
+
+In this example, two process run the second stage of a job in parallel, but only after the first stage is done.
+
+```
+$ python3 -u multiprocessing_condition.py
+Starting stage_2[1]
+Starting stage_2[2]
+Starting s1
+s1 done and ready for stage 2
+stage_2[1] running
+stage_2[2] running
+```
+
