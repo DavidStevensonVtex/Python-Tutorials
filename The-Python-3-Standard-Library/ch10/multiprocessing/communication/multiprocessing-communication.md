@@ -582,3 +582,111 @@ $ python3 multiprocessing_namespaces_mutable.py
 Before event: []
 After event : ['This is a value that will be updated']
 ```
+
+### 10.4.17 Process Pools
+
+The Pool class can be used to manage a fixed number of workers for simple cases where the work to be done can be broken up and distributed between workers independently. The return values from the jobs are collected and returned as a list. The pool arguments include the number of processes and a function to run when starting the task process (invoked once per child).
+
+```
+# multiprocessing_pool.py
+import multiprocessing
+
+
+def do_calculation(data):
+    return data * 2
+
+
+def start_process():
+    print("Starting", multiprocessing.current_process().name)
+
+
+if __name__ == "__main__":
+    inputs = list(range(10))
+    print("Input   :", inputs)
+
+    builtin_outputs = map(do_calculation, inputs)
+    print("Built-in:", builtin_outputs)
+
+    pool_size = multiprocessing.cpu_count() * 2
+    pool = multiprocessing.Pool(
+        processes=pool_size,
+        initializer=start_process,
+    )
+    pool_outputs = pool.map(do_calculation, inputs)
+    pool.close()  # no more tasks
+    pool.join()  # wrap up current tasks
+
+    print("Pool    :", pool_outputs)
+```
+
+The result of the map() method is functionally equivalent to the built-in map(), except that individual tasks run in parallel. Since the pool is processing its inputs in parallel, close() and join() can be used to synchronize the main process with the task processes to ensure proper cleanup.
+
+```
+$ python3 multiprocessing_pool.py
+Input   : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Built-in: <map object at 0x7fe3a543adf0>
+Starting ForkPoolWorker-1
+Starting ForkPoolWorker-2
+Starting ForkPoolWorker-3
+Starting ForkPoolWorker-4
+Starting ForkPoolWorker-5
+Starting ForkPoolWorker-8
+Starting ForkPoolWorker-7
+Starting ForkPoolWorker-6
+Pool    : [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+```
+
+By default, Pool creates a fixed number of worker processes and passes jobs to them until there are no more jobs. Setting the maxtasksperchild parameter tells the pool to restart a worker process after it has finished a few tasks, preventing long-running workers from consuming ever more system resources.
+
+```
+# multiprocessing_pool_maxtasksperchild.py
+import multiprocessing
+
+
+def do_calculation(data):
+    return data * 2
+
+
+def start_process():
+    print("Starting", multiprocessing.current_process().name)
+
+
+if __name__ == "__main__":
+    inputs = list(range(10))
+    print("Input   :", inputs)
+
+    builtin_outputs = map(do_calculation, inputs)
+    print("Built-in:", builtin_outputs)
+
+    pool_size = multiprocessing.cpu_count() * 2
+    pool = multiprocessing.Pool(
+        processes=pool_size,
+        initializer=start_process,
+        maxtasksperchild=2,
+    )
+    pool_outputs = pool.map(do_calculation, inputs)
+    pool.close()  # no more tasks
+    pool.join()  # wrap up current tasks
+
+    print("Pool    :", pool_outputs)
+```
+
+The pool restarts the workers when they have completed their allotted tasks, even if there is no more work. In this output, eight workers are created, even though there are only 10 tasks, and each worker can complete two of them at a time.
+
+```
+$ python3 multiprocessing_pool_maxtasksperchild.py
+Input   : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Built-in: <map object at 0x7f567bacddf0>
+Starting ForkPoolWorker-1
+Starting ForkPoolWorker-2
+Starting ForkPoolWorker-3
+Starting ForkPoolWorker-4
+Starting ForkPoolWorker-6
+Starting ForkPoolWorker-5
+Starting ForkPoolWorker-7
+Starting ForkPoolWorker-8
+Starting ForkPoolWorker-10
+Starting ForkPoolWorker-11
+Starting ForkPoolWorker-9
+Pool    : [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+```

@@ -5,7 +5,7 @@ import multiprocessing
 def producer(ns, event):
     # DOES NOT UPDATE GLOBAL VALUE!
     # ns.my_list.append("This is the value")
-    ns.my_list = [ "This is a value that will be updated" ]
+    ns.my_list = ["This is a value that will be updated"]
     event.set()
 
 
