@@ -97,3 +97,14 @@ Some people view the data scientist as an unapproachable nerd who performs mirac
  In many respects, the world now views the data scientist as either an adjunct to a developer or as a new type of developer.
 
  From a business perspective, the necessity of fusing data science and application development is obvious.
+
+ #### Working with a multipurpose, simple and efficient language
+
+ Python libraries are its main selling point; however, Python offers more than reuisable code.
+
+ Python supports four different coding styles:
+
+ * Functional: Treats every statement as a mathematical equation and avoids any form of state of mutable data. The main advantage of this approach is having no side effects to consider. In additino, this coding style lends itself better than others to parallel processing because there is not state to consider. Many developers prefer this coding style for recursion and for lambda calculus.
+ * Imperative: Performs comutations as a direct change to program state.
+ * Object-oriented: Relies on data fields that are treated as objects and manipulated only through prescribed methods. Python doesn't fully support this coding form because it can't implement features such as data hiding.
+ * Procedural: Treats tasks as step-by-step iterations where common tasks are placed in functions that are called as needed. This coding style favors iteration, sequencing, selection, and modularization.
