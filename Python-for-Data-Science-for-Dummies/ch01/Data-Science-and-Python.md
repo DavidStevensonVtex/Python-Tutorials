@@ -60,3 +60,11 @@ William S. Cleveland coined th term in 2001 as part of a paper entitled "Data Sc
 Columbia got into the act in 2003 by beginning publication of the [Journal of Data Science](https://jds-online.org/journal/JDS).
 
 However, the mathematical basis behind data science is centuries old because data science is essentially a method of viewing analyzing statisitcs and probability.
+
+#### Outlining the core competencies of a data scientist
+
+It would be hard to find a single person with all the required skills.
+
+* Data capture. Data-modeling skills.
+* Analysis. Use basic statistical tool skills.
+* Presentation. It's important to provide a graphical presentation of these patterns to help others visualize what the numbers mean and how to apply them in a meaningfil way. More important, the presentation must t ell a specific story so that the impact of the data isn't lost.
