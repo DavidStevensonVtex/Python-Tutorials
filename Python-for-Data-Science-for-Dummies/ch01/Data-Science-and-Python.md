@@ -41,3 +41,11 @@ Developers commonly use Python to perform:
 ##### [Literate Programming](https://notebook.community/sfomel/ipython/LiterateProgramming)
 
 "Literate programming is a concept promoted by Donald Knuth, the famous computer scientist (and the author of the Art of Computer Programming.) According to this concept, computer programs should be written in a combination of the programming language (the usual source code) and the natural language, which explains the logic of the program."
+
+#### Commpiling Python
+
+Outside this book, you may find that compiling your Python application is important because doing so can help increase overall application speed.
+
+You do need access to third-party products to compile your code.
+
+[Top 13 Best Python Compilers for Python Developers (2025 Rankings)](https://www.softwaretestinghelp.com/python-compiler/)
