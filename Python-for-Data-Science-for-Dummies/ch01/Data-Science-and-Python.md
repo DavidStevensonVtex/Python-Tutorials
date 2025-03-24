@@ -49,3 +49,14 @@ Outside this book, you may find that compiling your Python application is import
 You do need access to third-party products to compile your code.
 
 [Top 13 Best Python Compilers for Python Developers (2025 Rankings)](https://www.softwaretestinghelp.com/python-compiler/)
+
+
+### Defining Data Science
+
+#### Considering the emergence of data science
+
+William S. Cleveland coined th term in 2001 as part of a paper entitled "Data Science: An Action Plan for Expanding the Technical Areas of the Field of Statistics."
+
+Columbia got into the act in 2003 by beginning publication of the [Journal of Data Science](https://jds-online.org/journal/JDS).
+
+However, the mathematical basis behind data science is centuries old because data science is essentially a method of viewing analyzing statisitcs and probability.
