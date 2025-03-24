@@ -35,3 +35,9 @@ Developers commonly use Python to perform:
   * Interacting with various types of messaging strategies
   * Creating various kinds of lists based on environmental or other inputs
   * Automating tasks like filling out forms
+
+#### Interpreting Python
+
+##### [Literate Programming](https://notebook.community/sfomel/ipython/LiterateProgramming)
+
+"Literate programming is a concept promoted by Donald Knuth, the famous computer scientist (and the author of the Art of Computer Programming.) According to this concept, computer programs should be written in a combination of the programming language (the usual source code) and the natural language, which explains the logic of the program."
