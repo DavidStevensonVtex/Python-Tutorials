@@ -90,3 +90,10 @@ Interestingly enough, the act of moving data around so that someone can perform 
 Given the right sources, analysis requirements, and presentation needs, you can use Python for every part of the data science pipeline.
 
 Python is the most flexible and capable because it supports so many third-party libraries devoted to the task.
+
+#### Considering the shifting profile of data scientists
+
+Some people view the data scientist as an unapproachable nerd who performs miracles on data with math.
+ In many respects, the world now views the data scientist as either an adjunct to a developer or as a new type of developer.
+
+ From a business perspective, the necessity of fusing data science and application development is obvious.
