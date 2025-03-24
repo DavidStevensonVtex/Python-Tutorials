@@ -76,3 +76,12 @@ Interestingly enough, the act of moving data around so that someone can perform 
 * Machine Learning for Dummies, 2nd Edition
 * Artificial Intelligence for Dummies, 2nd Edition
 * [Extract, Load, and Transform (ELT)](https://www.techtarget.com/searchdatamanagement/definition/Extract-Load-Transform-ELT)
+
+### Creating the Data Science Pipeline
+
+* Preparing the data
+* Performing exploratory data analysis
+* Learning from data
+* Visualizing: Visualisation means seeing the patterns in the data and then being able to react to those patterns. It also means being able to see when data is not part of the pattern.
+* Obtaining insights and data products. The process doesn't end until you have a clear understanding of what the data means. For example, you can use the results of an analysis to make a business decision.
+
