@@ -24,3 +24,13 @@ Chapter 3 provides Anaconda installation instructions, which supports Jupyter No
 * [Tutorialspoint Python](https://www.tutorialspoint.com/python/)
 
 This book isn't a math primer. Yes, you do encounter some complex math, but the emphasis is on helping you use Python and data science to perform analysis tasks rather than teaching math theory.
+
+### Beyond the Book
+
+This book isn't the end of your Python or data science experience -- it's really just the beginning. We  provide online content to make this book more flexible and better able to meet your needs.
+
+* [Python for Data Science For Dummies, 3rd Edition](https://www.wiley.com/en-ie/Python+for+Data+Science+For+Dummies%2C+3rd+Edition-p-9781394213092)
+
+* [Python for Data Science For Dummies Cheat Sheet](https://www.dummies.com/article/technology/programming-web-design/python/python-for-data-science-for-dummies-cheat-sheet-207489/)
+
+* [Companion Files](https://www.wiley.com/en-ie/Python+for+Data+Science+For+Dummies%2C+3rd+Edition-p-9781394213092#downloadstab-section)
