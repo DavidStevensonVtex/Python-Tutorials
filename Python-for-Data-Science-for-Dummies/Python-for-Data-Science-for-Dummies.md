@@ -14,3 +14,13 @@ The third edition of this book provides you with updated examples using Python 3
 
 This edition of the book contains updated datasets that better demonstrate how data science works today. This edition also touches on modern concerns, such as removing personally identifiable information and enhancing data security.
 
+### Foolish Assumptions
+
+Chapter 3 provides Anaconda installation instructions, which supports Jupyter Notebook, and Chapter 4 gets you started with Google Colab.
+
+**Python Tutorials**
+
+* [W3Schools - Python](https://www.w3schools.com/python/)
+* [Tutorialspoint Python](https://www.tutorialspoint.com/python/)
+
+This book isn't a math primer. Yes, you do encounter some complex math, but the emphasis is on helping you use Python and data science to perform analysis tasks rather than teaching math theory.
