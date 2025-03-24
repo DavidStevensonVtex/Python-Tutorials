@@ -108,3 +108,20 @@ Some people view the data scientist as an unapproachable nerd who performs mirac
  * Imperative: Performs comutations as a direct change to program state.
  * Object-oriented: Relies on data fields that are treated as objects and manipulated only through prescribed methods. Python doesn't fully support this coding form because it can't implement features such as data hiding.
  * Procedural: Treats tasks as step-by-step iterations where common tasks are placed in functions that are called as needed. This coding style favors iteration, sequencing, selection, and modularization.
+
+
+### Learning to Use Python Fast
+
+The examples in this book rely on a web-based application named Jupyter Notebook.
+
+#### Loading Data
+
+Dataset called [California Housing](https://www.dcc.fc.up.pt/~.torgo/Regression/cal_housing.html)
+
+#### Training a model
+
+The important thing to note is that Python lets you perform the linear regression using just two statements and to place the result in a variable named _hypothesis_.
+
+#### Viewing a result
+
+One of the reasons that this book uses Jupyter Notebook is that the product helps you to create nicely formatted output as part of creating the application. 
