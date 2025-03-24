@@ -67,4 +67,12 @@ It would be hard to find a single person with all the required skills.
 
 * Data capture. Data-modeling skills.
 * Analysis. Use basic statistical tool skills.
-* Presentation. It's important to provide a graphical presentation of these patterns to help others visualize what the numbers mean and how to apply them in a meaningfil way. More important, the presentation must t ell a specific story so that the impact of the data isn't lost.
+* Presentation. It's important to provide a graphical presentation of these patterns to help others visualize what the numbers mean and how to apply them in a meaningful way. More important, the presentation must tell a specific story so that the impact of the data isn't lost.
+
+#### Linking data science, big data, and AI
+
+Interestingly enough, the act of moving data around so that someone can perform analysis on it is a specialty called Extract, Transformation, and Loading (ETL). Tools such as Informatica, MS SSIS, or Teradata.
+
+* Machine Learning for Dummies, 2nd Edition
+* Artificial Intelligence for Dummies, 2nd Edition
+* [Extract, Load, and Transform (ELT)](https://www.techtarget.com/searchdatamanagement/definition/Extract-Load-Transform-ELT)
