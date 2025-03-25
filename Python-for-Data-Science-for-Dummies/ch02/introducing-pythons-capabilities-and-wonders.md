@@ -125,4 +125,14 @@ It provides access to the following sorts of functionality:
 
 You can assume that Scikit-learn is the most important library for the book (even though it relies on other libraries to perform its work).
 
+#### Going for deep learning with Keras and TensorFlow
 
+[Keras](https://keras.io/) is an application programming interface (API) that is used to train deep learning models. An _API_ often specifies a model for doing something, but it doesn' provide an implementation. Consequently, you need an implementation of Keras to perform useful work, which is where the machine learning [TensorFlow] (https://www.tensorflow.org/) comes into play because Keras runs on top of it.
+
+Keras makes things easy by offering the followign features:
+
+* A consistent interface. The Keras interface is optimized for common use cases with an emphasis on actionable feedback for fixing user errors.
+* A building-block approach. Using a black-box approach makes it easy to create models by connecting configurable building blocks together with only a few restrictions on how you can connect them.
+* Extendability. You can easily add custom building blocks to express ideas for research that include new layers, loss functions, and models.
+* Parallel processing: To run applications fast today, you need goo parallel processing support. Keras runs on both CPUs and GPUs. It will also make use of multiple CPUs, when available.
+* Direct Python support.
