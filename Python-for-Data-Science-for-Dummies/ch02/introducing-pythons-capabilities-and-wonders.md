@@ -109,3 +109,20 @@ The [NumPy library](http://www.numpy.org/) provides the means for performing n-d
 #### Performing data analysis using pandas
 
 The [pandas library](http://pandas.pydata.org/) provides support for data structures and data analsysis tools. The library is optimized to perform data science tasks especially fast and efficiently. The basic principle behind pandas is to provide data analysis and modeling support for Python that is similar to other languages, such as R.
+
+### Implementing machine learning using Scikit-learn
+
+The [Scikit-learn library](http://scikit-learn.org/stable/) is one of a number of Scikit libraries that build on the capabilities of NumPy and SciPy to allow Python developers to perform domain-specific tasks. In this case, the library focuses on data mining and data analysis.
+
+It provides access to the following sorts of functionality:
+
+* Classification
+* Regression
+* Clustering
+* Dimensionality reduction
+* Model selection
+* Preprocessing
+
+You can assume that Scikit-learn is the most important library for the book (even though it relies on other libraries to perform its work).
+
+
