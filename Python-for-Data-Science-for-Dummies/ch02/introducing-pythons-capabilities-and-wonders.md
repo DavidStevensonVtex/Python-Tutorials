@@ -83,3 +83,19 @@ dict_keys(['data', 'target', 'frame', 'target_names', 'feature_names', 'DESCR'])
 >>> print(housing.feature_names)
 ['MedInc', 'HouseAge', 'AveRooms', 'AveBedrms', 'Population', 'AveOccup', 'Latitude', 'Longitude']
 ```
+
+### Using the Python Ecosystem for Data Science
+
+#### Accessing scientific tools using SciPy
+
+The [SciPy stack](http://www.scipy.org/) contains a host of other libraries that you can also download separately. These libraries provide support for matematics, science, and engineering. 
+These libraries are:
+
+* NumPy
+* SciPy
+* Matplotlib
+* Jupyter
+* Sympy
+* pandas
+
+The SciPy library itself focuses on numerical routines, such as routines for numerical integration and optimization. SciPy is a general-purpsoe library that provides functionality for multiple problem domains. It also provides support for domain-specific libraries, such as Scikit-learn, Scikit-image, and statsmodels.
