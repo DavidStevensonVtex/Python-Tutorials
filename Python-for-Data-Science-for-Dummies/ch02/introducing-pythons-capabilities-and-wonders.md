@@ -15,3 +15,17 @@ Here are the reasons [ForecastWatch.com](https://forecastwatch.com/) chose Pytho
 * Data access: Forecast.com relies on a MySQL database accessed through the [MySQL for Python](https://sourceforge.net/projects/mysql-python/) library. [MySQL with Python 3.x - mysqlclient](https://pypi.org/project/mysqlclient/).
 * Data display
 
+#### Getting a taste of the language
+
+This book relies on a much better environment, Jupyter Notebook (or Google Colab as an alternative).
+
+#### Understanding the need for indentation
+
+One of the most common errors that developers encounter is not providing the proper indentation for code.
+
+### Working with Jupyter Notebook and Google Colab
+
+The vast majority of this book relies on Jupyter Notebook (with code also tested using Google Colab), which is part of the Anaconda installation you create in Chapter 3.
+
+
+
