@@ -136,3 +136,10 @@ Keras makes things easy by offering the followign features:
 * Extendability. You can easily add custom building blocks to express ideas for research that include new layers, loss functions, and models.
 * Parallel processing: To run applications fast today, you need goo parallel processing support. Keras runs on both CPUs and GPUs. It will also make use of multiple CPUs, when available.
 * Direct Python support.
+
+#### Performing analysis efficiently using XGBoost
+
+You use [XGBoost](https://xgboost.readthedocs.io/en/stable/), which stands for extreme gradient boosting, to perform data analysis in an efficient, flexible, and portable manner. This library makes it easier to preform analysis using gradient boosting, which is explained in Chapter 20. 
+
+You can use this library to solve regression, classification, and ranking problems.
+XGBoost has proven its capabilities by helping individuals and teams win virtually every Kaggle-structured-data competition.
