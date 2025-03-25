@@ -51,3 +51,35 @@ In general, the following factors control the speed of execution for your data s
 * Coding style. To create fast data science applications, you must use best-of-method coding techniques.
 * Machine capability. Running data science applications on a memory constrained system with a slower processor is an extremely painful process akin to sitting in the dentist's chair for a root canal without Novocain. Given that data science applications are both processor and disk bound, you can't really cut corners in any area and expect great results.
 * Analysis algorithm. The algorithm you use determines the kidn of result you obtain and controls execution speed. You must experiment to find the best algorithm for your particular dataset.
+
+### Visualizing Power
+
+`pip install scikit-learn`
+
+```
+$ python3
+>>> from sklearn.utils import Bunch
+>>> items = dir(Bunch)
+>>> for item in items:
+...     if 'key' in item:
+...             print(item)
+... 
+fromkeys
+keys
+```
+
+Scikit-learn datasets appear within _bunches_ (a bunch is a kind of data structure).
+
+Before you can work with a dataset, you must provide access to it in the local environment.
+The following code shows the import process and demonstrates how you can use the _keys()_ function to display a list of keys that you can use to access data within the dataset.
+
+```
+$ python3
+>>> from sklearn.datasets import fetch_california_housing
+>>> housing = fetch_california_housing()
+>>> print(housing.keys())
+dict_keys(['data', 'target', 'frame', 'target_names', 'feature_names', 'DESCR'])
+>>> 
+>>> print(housing.feature_names)
+['MedInc', 'HouseAge', 'AveRooms', 'AveBedrms', 'Population', 'AveOccup', 'Latitude', 'Longitude']
+```
