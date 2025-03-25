@@ -127,7 +127,7 @@ You can assume that Scikit-learn is the most important library for the book (eve
 
 #### Going for deep learning with Keras and TensorFlow
 
-[Keras](https://keras.io/) is an application programming interface (API) that is used to train deep learning models. An _API_ often specifies a model for doing something, but it doesn' provide an implementation. Consequently, you need an implementation of Keras to perform useful work, which is where the machine learning [TensorFlow] (https://www.tensorflow.org/) comes into play because Keras runs on top of it.
+[Keras](https://keras.io/) is an application programming interface (API) that is used to train deep learning models. An _API_ often specifies a model for doing something, but it doesn' provide an implementation. Consequently, you need an implementation of Keras to perform useful work, which is where the machine learning [TensorFlow](https://www.tensorflow.org/) comes into play because Keras runs on top of it.
 
 Keras makes things easy by offering the followign features:
 
@@ -143,3 +143,8 @@ You use [XGBoost](https://xgboost.readthedocs.io/en/stable/), which stands for e
 
 You can use this library to solve regression, classification, and ranking problems.
 XGBoost has proven its capabilities by helping individuals and teams win virtually every Kaggle-structured-data competition.
+
+#### Plotting the data using Matplotlib
+
+The [Matplotlib library](http://matplotlib.org/) gives you a MATLAB-like interface for creating data presentations of the analysis you perform. The library is currently limited to 2-D output, but it still provides you with the means to express graphically the data patterns you see in the data you analyze. Without this library, you couldn't create output that people outside the data science community could easily understand. Chapetr 10 offers a great introduction to Matplotlib.
+
