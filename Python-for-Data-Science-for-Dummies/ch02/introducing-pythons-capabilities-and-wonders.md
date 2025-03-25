@@ -105,3 +105,7 @@ The SciPy library itself focuses on numerical routines, such as routines for num
 The [NumPy library](http://www.numpy.org/) provides the means for performing n-dimensional array manipulation, which is critical for data science work. The California Housing dataset used in the examples in Chapters 1 and 2 is ane example of an n-dimensional array, and you couldn't easily access it without NumPy functions that include support for linear algebra, Fourier transform, and random number generation ([see the listing of functions](http://docs.scipy.org/doc/numpy/reference/routines.html))
 
 * [NumPy user guide](https://numpy.org/doc/stable/user/index.html)
+
+#### Performing data analysis using pandas
+
+The [pandas library](http://pandas.pydata.org/) provides support for data structures and data analsysis tools. The library is optimized to perform data science tasks especially fast and efficiently. The basic principle behind pandas is to provide data analysis and modeling support for Python that is similar to other languages, such as R.
