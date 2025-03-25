@@ -99,3 +99,9 @@ These libraries are:
 * pandas
 
 The SciPy library itself focuses on numerical routines, such as routines for numerical integration and optimization. SciPy is a general-purpsoe library that provides functionality for multiple problem domains. It also provides support for domain-specific libraries, such as Scikit-learn, Scikit-image, and statsmodels.
+
+#### Performing fundamental scientific computing using NumPy
+
+The [NumPy library](http://www.numpy.org/) provides the means for performing n-dimensional array manipulation, which is critical for data science work. The California Housing dataset used in the examples in Chapters 1 and 2 is ane example of an n-dimensional array, and you couldn't easily access it without NumPy functions that include support for linear algebra, Fourier transform, and random number generation ([see the listing of functions](http://docs.scipy.org/doc/numpy/reference/routines.html))
+
+* [NumPy user guide](https://numpy.org/doc/stable/user/index.html)
