@@ -148,3 +148,7 @@ XGBoost has proven its capabilities by helping individuals and teams win virtual
 
 The [Matplotlib library](http://matplotlib.org/) gives you a MATLAB-like interface for creating data presentations of the analysis you perform. The library is currently limited to 2-D output, but it still provides you with the means to express graphically the data patterns you see in the data you analyze. Without this library, you couldn't create output that people outside the data science community could easily understand. Chapetr 10 offers a great introduction to Matplotlib.
 
+#### Creating graphs with NetworkX
+
+To properly study the relationships between complex data in a networked system (such as that used by your GPS setup to discover routes through city streets), you need a library to create, maniuplate, and study the structure of network data in various ways. In addition, the library must provide the means to output the resulting analysis in a form that humans understand, such as graphical data. [NetworkX](https://networkx.github.io/) enables you to perform this sort of analysis. The advantage of NetworkX is that nodes can be anything (ncluding images) and edges can hold arbitrary data.
+
