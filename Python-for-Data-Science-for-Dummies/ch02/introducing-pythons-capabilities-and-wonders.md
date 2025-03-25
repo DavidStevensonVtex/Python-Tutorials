@@ -42,3 +42,12 @@ The following list shows the phases in the order in which you normally perform t
 
 [MATLAB](https://www.mathworks.com/products/matlab.html) is a widely used mathematical modeling program; see MATLAB For Dummies, 2nd Edition.
 
+### Considering the Speed of Execution
+
+In general, the following factors control the speed of execution for your data science application:
+
+* Dataset size. When it comes to making business decisiosn, larger is better in most situations. Underestimating the effect of dataset size is deadly in data science applications, especially those that need to operate in real time (such as self-driving cars).
+* Loading technique. Working with data in memory is always faster than working with data stored on disk. Accessing local data is always faster than accessing it across a network. Performing data science tasks that rely on internet access through web services is probably the slowest method of all.
+* Coding style. To create fast data science applications, you must use best-of-method coding techniques.
+* Machine capability. Running data science applications on a memory constrained system with a slower processor is an extremely painful process akin to sitting in the dentist's chair for a root canal without Novocain. Given that data science applications are both processor and disk bound, you can't really cut corners in any area and expect great results.
+* Analysis algorithm. The algorithm you use determines the kidn of result you obtain and controls execution speed. You must experiment to find the best algorithm for your particular dataset.
