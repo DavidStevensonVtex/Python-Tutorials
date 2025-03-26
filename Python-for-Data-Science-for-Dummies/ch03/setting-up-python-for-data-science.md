@@ -70,3 +70,19 @@ On Linux type:
 
 No matter how you start Jupyter Notebook (or just Notebook, as it appears in the remaidner of the book), the system generally opens a command prompt or internal window to host Notebook. This window contains a server that makes the application work. After you close the browser window when a session is complete, select the server window and press Ctrl+C or Ctrl+Break to stop the server.
 
+To exit the conda environment, type `conda deactivate` and press Enter.
+
+#### Defining the code repository
+
+The code you create and use in this book will reside in a repository on your hard drive. 
+
+##### Defining a new folder
+
+In Jupyter Notebook (see web browser):
+
+1. Choose New->Folder.
+2. Place a check in the box next to Untitled Folder
+3. Click Rename at the top of the page.
+4. Type P4DS4D3 and press Enter.
+
+
