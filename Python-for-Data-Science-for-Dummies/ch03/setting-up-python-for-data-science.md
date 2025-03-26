@@ -103,3 +103,13 @@ Use these steps to create a new notebook.
     A Markdown cell contains documentation text.
 
 2.  Type \# Downloading the Datasets and Example Code and click Run (the button with the right-pointing arrow on the toolbar).
+3.  
+
+##### Exporting a notebook
+
+To perform this task, you must export your notebook from the repository to a file.
+You can then send the file to someone else who will import it into their repository.
+
+You can open this notebook by clicking its entry in the repository list.
+
+To export this code, choose File->Download As->Notebook (.ipnyb). What you see next depends on your browser, but you generally see some sort of dialog box for saving the notebook as a file. Chrome just downloads the file to the Downloads folder.
