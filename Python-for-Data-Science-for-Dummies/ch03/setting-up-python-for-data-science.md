@@ -66,3 +66,7 @@ On Linux type:
 
 `jupyter notebook`
 
+#### Stopping the Jupyter Notebook server
+
+No matter how you start Jupyter Notebook (or just Notebook, as it appears in the remaidner of the book), the system generally opens a command prompt or internal window to host Notebook. This window contains a server that makes the application work. After you close the browser window when a session is complete, select the server window and press Ctrl+C or Ctrl+Break to stop the server.
+
