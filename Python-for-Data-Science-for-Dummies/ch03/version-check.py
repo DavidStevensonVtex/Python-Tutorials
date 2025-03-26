@@ -1,5 +1,5 @@
 import sys
-print('Python Versipn:\n', sys.version)
+print('Python Version:\n', sys.version)
 
 import os
 result = os.popen('conda --version').read()

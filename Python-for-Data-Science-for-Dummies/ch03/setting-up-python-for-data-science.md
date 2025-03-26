@@ -24,7 +24,45 @@ result =os.popen('conda list notebook$').read()
 print('\nJupyter Notebook Version:\n', result)
 ```
 
+```
+$ python3 version-check.py 
+Python Version:
+ 3.10.9 (main, Mar  1 2023, 18:23:06) [GCC 11.2.0]
+
+Anaconda Version: 
+ conda 23.1.0
+
+
+Jupyter Notebook Version:
+ # packages in environment at /home/dstevenson/anaconda3:
+#
+# Name                    Version                   Build  Channel
+notebook                  6.5.2           py310h06a4308_0  
+```
+
 #### Accessing the Anaconda Prompt
 
-You use the Anaconda Prompt to perform many command-line tasks related to working with Jupyter Notebook. The Anaconda Prompt provides a gateway to allowing maximum flexibi9lity withyour Python programming environment, which is a significant advantage over using Google Colab (where it's a take-it-or-leave-it proposition).
+You use the Anaconda Prompt to perform many command-line tasks related to working with Jupyter Notebook. The Anaconda Prompt provides a gateway to allowing maximum flexibility withyour Python programming environment, which is a significant advantage over using Google Colab (where it's a take-it-or-leave-it proposition).
+
+### Installing Anaconda on Windows
+
+### Installing Anaconda on Linux
+
+Before you can perform the install, you must download a copy of the Linux software from the Anaconda site at https://repo.anaconda.com/archive/.
+
+On most Linux systems, you can type 
+
+`curl https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-x86_64.sh --output Anaconda3-2023.03-Linux-x86_64.sh`
+
+### Downloading the Datasets and Example Code
+
+#### Using Jupyter Notebook
+
+The program runs in your browser, so which platform you use for development doesn't matter; as long as it has a browser, you should be OK.
+
+On a Windows system, you choose Start -> Jupyter Notebook or Start | Anaconda3 | Jupyter.
+
+On Linux type:
+
+`jupyter notebook`
 
