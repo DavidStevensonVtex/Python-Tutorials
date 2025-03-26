@@ -23,3 +23,8 @@ print('\nAnaconda Version: \n', result)
 result =os.popen('conda list notebook$').read()
 print('\nJupyter Notebook Version:\n', result)
 ```
+
+#### Accessing the Anaconda Prompt
+
+You use the Anaconda Prompt to perform many command-line tasks related to working with Jupyter Notebook. The Anaconda Prompt provides a gateway to allowing maximum flexibi9lity withyour Python programming environment, which is a significant advantage over using Google Colab (where it's a take-it-or-leave-it proposition).
+
