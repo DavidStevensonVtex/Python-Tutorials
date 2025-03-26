@@ -113,3 +113,19 @@ You can then send the file to someone else who will import it into their reposit
 You can open this notebook by clicking its entry in the repository list.
 
 To export this code, choose File->Download As->Notebook (.ipnyb). What you see next depends on your browser, but you generally see some sort of dialog box for saving the notebook as a file. Chrome just downloads the file to the Downloads folder.
+
+##### Removing a notebook
+
+Seometimes notebooks get outdated or you simply don't need to work them any longer.
+
+Use these steps to remove the file:
+
+1. Select the check box next to the PDS4D3_03_Sample.ipynb entry.
+2. Click the Delete (trashcan) icon.
+
+    You see a Delete notebook warning message.
+
+3. Click Delete
+
+    Notebook removes the notebook file from the list.
+
