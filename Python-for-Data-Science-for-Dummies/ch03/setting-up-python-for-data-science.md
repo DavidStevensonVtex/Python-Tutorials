@@ -129,3 +129,11 @@ Use these steps to remove the file:
 
     Notebook removes the notebook file from the list.
 
+##### Importing a notebook
+
+To use the source code from this book, you must import the downloaded files into your repository. 
+
+1. Click Upload on the Notebook PSDS4D3 page
+2. Navigate to the directory containging the files you want to import into Notebook.
+3. Highlight one or more files to import and click the Open (or other, similar) button to begin the upload process.
+4. Click Upload.
