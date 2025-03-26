@@ -137,3 +137,16 @@ To use the source code from this book, you must import the downloaded files into
 2. Navigate to the directory containging the files you want to import into Notebook.
 3. Highlight one or more files to import and click the Open (or other, similar) button to begin the upload process.
 4. Click Upload.
+
+
+#### Understanding the datasets used in this book
+
+This book uses a number of datasets, all of which appear i the Scikit-learn library.
+These datasets demonstrate various ways in which you can interact with data, and you use them in the examples to perform a variety of tasks. The he following list provies a quick overview of the functdions used to import datasets into your Python code:
+
+* fetch_openml(): An open repository for machine learnign data and experiments. Anyone can upload open datasets to allow access to them.
+* fetch_california_housing(): Regress analysis with the California housing dataset.
+* Datasets: https://archive.ics.uci.edu/datasets
+* https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data Analysis with the German Credit dataset described at 
+* Palmer Penguins https://archive.ics.uci.edu/dataset/690/palmer+penguins-3
+* Movie Lens dataset: https://files.grouplens.org/datasets/movielens/
