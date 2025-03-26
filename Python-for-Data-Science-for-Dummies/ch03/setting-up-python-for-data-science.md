@@ -95,3 +95,11 @@ Use these steps to create a new notebook.
 2. Choose New->Python 3 (ipykernel).
 3. Click Untitled on the page.
 4. Type P4DS4D3_Sample and press Enter.
+
+##### Adding notebook content
+
+1. Choose Markdown from the drop-down list that currently contains the word Code.
+   
+    A Markdown cell contains documentation text.
+
+2.  Type \# Downloading the Datasets and Example Code and click Run (the button with the right-pointing arrow on the toolbar).
