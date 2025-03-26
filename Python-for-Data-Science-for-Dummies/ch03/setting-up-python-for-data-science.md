@@ -85,4 +85,13 @@ In Jupyter Notebook (see web browser):
 3. Click Rename at the top of the page.
 4. Type P4DS4D3 and press Enter.
 
+#### Creating a new notebook
 
+Every new notebook is like a file folder. You can place individual examples in the file folder, just as you would sheets of paper into a physical file folder.
+
+Use these steps to create a new notebook.
+
+1. Click the P4DS4D3 entry on the Home page.
+2. Choose New->Python 3 (ipykernel).
+3. Click Untitled on the page.
+4. Type P4DS4D3_Sample and press Enter.
