@@ -31,3 +31,15 @@ All this flexibility comes at the price of speed and ergonomics. In reviewing th
 When workign with Colab, you have options to downlaod your source files only as .ipynb or .py files. Colab doesn't include all the other download options, inclduing (but not limited to) HTML, LaTeX, and PDF. Consequently, your options for creating presentations from the online content are also limited to some extent.
 
 A Markdown cell in Notebook is a Text cell in Colab.
+
+#### Using local runtime support
+
+The only time you really need local runtime support is when you want to work within a team environment and you need the speed or resource access advantage offered by a local runtime. When using the local runtime support, Colab connects to a local copy of Notebook, so you have to have Notebook installed on your system. Using a local runtime normally produces better speed than you obtain when relying on the cloud. 
+
+A local runtime also gives you control over the version of Notebo9ok used to execute code.
+
+[Colaboratory - Local runtimes](https://research.google.com/colaboratory/local-runtimes.html)
+
+The local runtime option won't work with your laptop or tablet unless you laptop has Windows, Linux, or OS X and the appropriate version of Notebook installed. Your laptop or tablet will also need an appropriate browser.
+
+When working with Colab on using local runtime support and Firefox, you must perform some specal setups.
