@@ -43,3 +43,41 @@ A local runtime also gives you control over the version of Notebo9ok used to exe
 The local runtime option won't work with your laptop or tablet unless you laptop has Windows, Linux, or OS X and the appropriate version of Notebook installed. Your laptop or tablet will also need an appropriate browser.
 
 When working with Colab on using local runtime support and Firefox, you must perform some specal setups.
+
+### Working with Notebooks
+
+Colab is built on notebooks. [Welcome Page](https://colab.research.google.com/notebooks/welcome.ipynb)
+
+You can also move cells around and copy the resulting material to your Google Drive.
+
+* [Google AI Studio](https://aistudio.google.com/prompts/new_chat)
+
+* [Create an API key](https://aistudio.google.com/app/apikey)
+* [Get_started.ipynb](https://colab.research.google.com/github/google-gemini/cookbook/blob/main/quickstarts/Get_started.ipynb)
+
+
+```
+import os
+from google.colab import userdata
+
+os.environ['GOOGLE_API_KEY'] = userdata.get('GOOGLE_API_KEY')
+```
+
+[Start here with link to Colab](https://colab.research.google.com/)
+
+
+#### Creating a new Notebook
+
+* [Working with Notebooks in Colab](https://colab.research.google.com/notebooks/basic_features_overview.ipynb)
+* [Overview of Colab Features](https://colab.research.google.com/notebooks/basic_features_overview.ipynb)
+* [Guide to Markdown](https://colab.research.google.com/notebooks/markdown_guide.ipynb)
+* [Importing libraries and installing dependencies](https://colab.research.google.com/notebooks/snippets/importing_libraries.ipynb)
+* [Saving and loading notebooks in GitHub](https://colab.research.google.com/github/googlecolab/colabtools/blob/main/notebooks/colab-github-demo.ipynb)
+* [Interactive forms](https://colab.research.google.com/notebooks/forms.ipynb)
+* [Interactive widgets](https://colab.research.google.com/notebooks/widgets.ipynb)
+
+Working with Data
+
+* [Loading data: Drive, Sheets, and Google Cloud Storage](https://colab.research.google.com/notebooks/io.ipynb)
+* [Charts: visualizing data](https://colab.research.google.com/notebooks/charts.ipynb)
+* [Getting started with BigQuery](https://colab.research.google.com/notebooks/bigquery.ipynb)
