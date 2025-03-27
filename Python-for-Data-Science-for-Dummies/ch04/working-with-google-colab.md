@@ -20,3 +20,14 @@ The other reason that you really need to know about Colab is that you can use it
 
 Google Colab generally doesn't work with browsers other than Chrome or Firefox.
 
+#### Considering the online coding difference
+
+For the most part, you use Colab just as you would Notebook. However, some features work differently. For example, to execute the code within a cell, you select that cell and click the Run button (right-facing arrow) for that cell. The current cell reamins selected, which means that you msut actually initiate the selection of the next cell as a separate action.
+
+You can upload code from your local drive as desired and then save it to a Google Drive or GitHub. The code becomes accessible from any device at this point by accessing those same sources. All you need to do is load Colab to access it.
+
+All this flexibility comes at the price of speed and ergonomics. In reviewing the various options, a local copy of Notebook generally executes the code in this book faster than a copy of Colab using any of the available configurations (even when working with a local copy of the .ipynb file). So, you trade speed for flexibility when working with Colab.
+
+When workign with Colab, you have options to downlaod your source files only as .ipynb or .py files. Colab doesn't include all the other download options, inclduing (but not limited to) HTML, LaTeX, and PDF. Consequently, your options for creating presentations from the online content are also limited to some extent.
+
+A Markdown cell in Notebook is a Text cell in Colab.
