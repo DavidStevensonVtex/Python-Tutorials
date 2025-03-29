@@ -550,3 +550,9 @@ Using a single question mark causes Python to clip long content. If you want to 
 Every time you perform a task in your notebook, you create variables, import modules, and perform a wealth of other tasks that modify the environemtn. At some point, you can't really be sure that something is working as it should. To overcome this problem, you save your document by clicking Save and Checkpoint (the button containing a floppy disk symbol), and then click Restart Kernel (the button with an open circle with an arrow at one end).
 
 Whenever you click Restart Kernel, you see a warning message. Make sure to pay attention to the warning because you could lose temporary changes during a kernel restart. Always save your document before you restart the kernel.
+
+#### Restoring a checkpoint
+
+At some point, you may find that you made a mistake. Notebook is notably missing an Undo button: You won't find one anywhere. Instead, you create checkpoints each time you finish a tas. Creating checkpoints when your document is stable and workign properly helps you recover faster from mistakes.
+
+To restore your setup to the condition contained in a checkpoint, choose File-> Revert to Checkpoint. You see a listing of available checkpoints. Simply select the one you want to use. When you select the checkpoint, you see a warning message. When you click Revert, any old information is gone and the information found in the checkpoint becomes the current information.
