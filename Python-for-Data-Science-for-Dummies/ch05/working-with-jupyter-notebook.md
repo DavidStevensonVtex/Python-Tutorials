@@ -545,3 +545,8 @@ Using a single question mark causes Python to clip long content. If you want to 
 
 `mylist??`
 
+#### Restarting the kernel
+
+Every time you perform a task in your notebook, you create variables, import modules, and perform a wealth of other tasks that modify the environemtn. At some point, you can't really be sure that something is working as it should. To overcome this problem, you save your document by clicking Save and Checkpoint (the button containing a floppy disk symbol), and then click Restart Kernel (the button with an open circle with an arrow at one end).
+
+Whenever you click Restart Kernel, you see a warning message. Make sure to pay attention to the warning because you could lose temporary changes during a kernel restart. Always save your document before you restart the kernel.
