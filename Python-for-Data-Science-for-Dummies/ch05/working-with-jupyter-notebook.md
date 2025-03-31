@@ -556,3 +556,7 @@ Whenever you click Restart Kernel, you see a warning message. Make sure to pay a
 At some point, you may find that you made a mistake. Notebook is notably missing an Undo button: You won't find one anywhere. Instead, you create checkpoints each time you finish a tas. Creating checkpoints when your document is stable and workign properly helps you recover faster from mistakes.
 
 To restore your setup to the condition contained in a checkpoint, choose File-> Revert to Checkpoint. You see a listing of available checkpoints. Simply select the one you want to use. When you select the checkpoint, you see a warning message. When you click Revert, any old information is gone and the information found in the checkpoint becomes the current information.
+
+### Performing Multimedia and Graphic Integration
+
+Pictures say a lot of things that words can't say (or at least they do it with far less effort). Notebook is both a coding platform and presentation platform.
