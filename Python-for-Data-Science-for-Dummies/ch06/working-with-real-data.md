@@ -18,3 +18,16 @@ You load the data into memory from the storage location and then interact with i
 This is the technique the book uses to access all the toy datasets found in the Scikit-learn library, so you see this technique used relatively often in the b ook.
 
 Data scientists  call the columns in a database _features_ or _variables_.
+
+#### Uploading small amounts of data into memory
+
+The most convenient method that you can use to work with data is to load it directly into memory.
+
+```
+with open("Colors.txt", 'r') as open_file:
+    print('Colors.txt content:\n' + open_file.read())
+```
+
+The loading process will fail if your system lacks sufficient memory to hold the data set.
+
+You won't normally experience any problems when working with the toy datasets in the Scikit-learn library.
