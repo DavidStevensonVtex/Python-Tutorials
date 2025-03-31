@@ -578,3 +578,37 @@ However, the documentation at https:/pypi.org/project/matplotlib-inline/ still i
 Because some examples you see online can be hard to understand unless you have them loaded on your own system, you should also keep the `%load` magic function in mind. All you need is the URL of an example you want to see on  your system. For example try `%load https://matplotlib.org/_downloads/pyplot_text.py`.
 
 When you click Run Cell, Notebook loads the example directly in the cell and comments the `%load` call out. You can then run the example and see the output from it on your own system.
+
+#### Obtaining online graphics and multimedia
+
+A lot of the functionality required to perform special multimedia and graphics processing appears within the `Jupyter.display`. By importing a required class, you can perform tasks such as embedding images into your notebook. Here's an example of embedding oen of the pictures from the author's blog into the notebook for this chapter.
+
+```
+from urllib.request import Request, urlopen
+from IPython import display
+
+req = Request('http://blog.johnmuellerbooks.com/' +
+    'wp-content/uploads/2015/04/Layer-Hens.jpg', 
+              headers={'User-Agent': 'XYZ/3.0'})
+image = urlopen(req, timeout=10).read()
+
+display.Image(image)
+```
+
+When workign with embedded images on a regular basis, you might want to set the form in which the images are embedded. For example, you may prefer to embed them as PDFs. To perform this task, you use code similar to this:
+
+```
+from IPython.display import set_matplotlib_formats
+set_matplotlib_formats('pdf', 'svg')
+```
+
+```
+$ python
+Python 3.10.9 (main, Mar  1 2023, 18:23:06) [GCC 11.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from IPython.display import set_matplotlib_formats
+>>> set_matplotlib_formats('pdf', 'svg')
+<stdin>:1: DeprecationWarning: `set_matplotlib_formats` is deprecated since IPython 7.23, directly use `matplotlib_inline.backend_inline.set_matplotlib_formats()`
+```
+
+[Jupyter example notebooks](https://nbviewer.org/github/ipython/ipython/tree/1.x/examples/notebooks/)
