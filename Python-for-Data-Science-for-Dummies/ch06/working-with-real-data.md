@@ -41,3 +41,25 @@ with open("Colors.txt", 'r') as open_file:
     for observation in open_file:
         print('Reading Data: ' + observation, end="")
 ```
+
+#### Generating variatiosn on image data
+
+Sometimes you need to import and analyze image data. The source and type of the image does make a difference.
+
+A good starting point is to simply read a local image in, obtain statistics about that image, and isplay the image onscreen, as shown in the following code:
+
+```
+import matplotlib.pyplot as plt
+import matplotlib.image as img
+%matplotlib inline
+
+image = img.imread("Colorblk.jpg")
+print(image.shape)
+print(image.size)
+plt.imshow(image)
+plt.show()
+```
+
+This example begins by importing two _matplotlib_ libraries, _image_ and _pyplot_.
+
+After the code reads the file, it begins by displaying the image _shape_ property - the number of horizontal pixels, vertical pixels, and pixel depth (the number of bits used to represent colors).
