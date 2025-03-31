@@ -63,3 +63,28 @@ plt.show()
 This example begins by importing two _matplotlib_ libraries, _image_ and _pyplot_.
 
 After the code reads the file, it begins by displaying the image _shape_ property - the number of horizontal pixels, vertical pixels, and pixel depth (the number of bits used to represent colors).
+
+#### Sampling data in different ways
+
+Data streaming obtains all the records from a data source.
+
+Sampling data (retrieving records a set number of records apart, such as every fifth record).
+
+```
+n = 2
+with open("Colors.txt", 'r') as open_file:
+    for j, observation in enumerate(open_file):
+        if j % n==0:
+            print('Reading Line: ' + str(j) +
+            ' Content: ' + observation, end="")
+```
+
+```
+from random import random
+sample_size = 0.25
+with open("Colors.txt", 'r') as open_file:
+    for j, observation in enumerate(open_file):
+        if random()<=sample_size:
+            print('Reading Line: ' + str(j) +
+            ' Content: ' + observation, end="")
+```
