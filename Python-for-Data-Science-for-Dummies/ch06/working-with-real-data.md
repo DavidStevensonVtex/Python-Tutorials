@@ -31,3 +31,13 @@ with open("Colors.txt", 'r') as open_file:
 The loading process will fail if your system lacks sufficient memory to hold the data set.
 
 You won't normally experience any problems when working with the toy datasets in the Scikit-learn library.
+
+#### Streaming large amounts of data into memory
+
+Some datasets will be so large that you won't be able to fit them entirely in memory at one time. In addition, you may find that some datasets load slowly because they reside on a remote site. Streaming solves both issues by enabling you to work with the data a little at a time. You download individual pieces so that you can work with just part of the data as you receive it, rather than waiting for the entire dataset to download.
+
+```
+with open("Colors.txt", 'r') as open_file:
+    for observation in open_file:
+        print('Reading Data: ' + observation, end="")
+```
