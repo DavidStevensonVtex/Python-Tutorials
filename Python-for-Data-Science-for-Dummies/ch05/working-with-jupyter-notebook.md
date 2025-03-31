@@ -560,3 +560,15 @@ To restore your setup to the condition contained in a checkpoint, choose File-> 
 ### Performing Multimedia and Graphic Integration
 
 Pictures say a lot of things that words can't say (or at least they do it with far less effort). Notebook is both a coding platform and presentation platform.
+
+#### Embedding plots and other images
+
+All the graphics examples in the book appear as part of the code.
+Fortunately, you can perform some more magic by using the `%matplotlib` 
+magic function. The possible values for this function are 'gtk', 'gtk3', 'inline', 'nbagg', 'osx', 'qt', 'qt4', 'qt5', 'tk', and 'wx', each of which defines a different plotting backend (the code used to actually render the plot) used to present information onscreen.
+
+When you run `%matplotlib inline`, any plots you create appear as part of the document.
+
+Note that, according to https://stackoverflow.com/questions/65934740/is-matplotlib-inline-still-needed, there are situations in which you no longer need to run %matplotlib inline with newer versions of Python and its associated libraries.
+
+However, the documentation at https:/pypi.org/project/matplotlib-inline/ still includes this reature and states outright that third-party libraries may continue to need it, so the book will continue to use `%matplotlib inline` to insure that the examples still work as intended.
