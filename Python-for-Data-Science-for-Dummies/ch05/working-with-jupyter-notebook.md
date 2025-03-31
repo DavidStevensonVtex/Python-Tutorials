@@ -572,3 +572,9 @@ When you run `%matplotlib inline`, any plots you create appear as part of the do
 Note that, according to https://stackoverflow.com/questions/65934740/is-matplotlib-inline-still-needed, there are situations in which you no longer need to run %matplotlib inline with newer versions of Python and its associated libraries.
 
 However, the documentation at https:/pypi.org/project/matplotlib-inline/ still includes this reature and states outright that third-party libraries may continue to need it, so the book will continue to use `%matplotlib inline` to insure that the examples still work as intended.
+
+#### Loading examples from online sites
+
+Because some examples you see online can be hard to understand unless you have them loaded on your own system, you should also keep the `%load` magic function in mind. All you need is the URL of an example you want to see on  your system. For example try `%load https://matplotlib.org/_downloads/pyplot_text.py`.
+
+When you click Run Cell, Notebook loads the example directly in the cell and comments the `%load` call out. You can then run the example and see the output from it on your own system.
