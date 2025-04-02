@@ -170,3 +170,47 @@ Notice that the parser of choice this time is `read_csv()`, which understands CS
 To create the output as a list, you simply change the third line of code to read 
 
 `X = titanic[['age']].values`
+
+#### Reading Excel and other Microsoft Office files
+
+When you work with Excel or other Microsoft Office products, you begin to experience some complexity. For example, an Excel file can contain more than one worksheet, so you need to tell pandas which worksheet to process. In fact, you can choose to process multiple worksheets, if desired. When working with other Office products, you have to be specific about what to process.
+
+Installing Python module for reading Excel files:
+
+`pip install xlrd
+
+Here's an example of workign with the _Values.xls_ file:
+
+```
+import pandas as pd
+xls = pd.ExcelFile("Values.xls")
+trig_values = xls.parse('Sheet1', index_col=None,
+                        na_values=['NA'])
+print(trig_values)
+```
+
+```
+    Angle (Degrees)      Sine    Cosine    Tangent
+0        138.550574  0.661959 -0.749540  -0.883153
+1        305.535745 -0.813753  0.581211  -1.400100
+2        280.518695 -0.983195  0.182556  -5.385709
+3        216.363795 -0.592910 -0.805269   0.736289
+4         36.389247  0.593268  0.805005   0.736974
+..              ...       ...       ...        ...
+67       324.199562 -0.584964  0.811059  -0.721234
+68       187.948172 -0.138277 -0.990394   0.139619
+69       270.678249 -0.999930  0.011837 -84.472139
+70       270.779159 -0.999908  0.013598 -73.530885
+71       200.213513 -0.345520 -0.938412   0.368196
+
+[72 rows x 4 columns]
+```
+
+[Pandas Excel parser options](http://pandas.pydata.org/docs/reference/api/pandas.ExcelFile.parse.html)
+
+You don't have to use the two-step process described above.
+You can also perform the task using a single step like this:
+
+`trig_values = pd.read_excel("Values.xls", 'Sheet1', index_col=None, na_values=['Na'])`
+
+Because Excel files are more complex, using the two-step process is often more conventient and efficient because you don't have to reopen the file for each read of the data.
