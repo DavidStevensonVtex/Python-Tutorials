@@ -99,3 +99,24 @@ The least formatted and therefore easiest-to-read flat-file format is the text f
 
 Working with structure data is easier because you know where each field begins and ends.
 
+#### Reading from a text file
+
+Text files can use a variety of storage formats. 
+
+```
+import pandas as pd
+color_table = pd.io.parsers.read_table("Colors.txt")
+print(color_table)
+```
+
+```
+    Color  Value
+0     Red      1
+1  Orange      2
+2  Yellow      3
+3   Green      4
+4    Blue      5
+5  Purple      6
+6   Black      7
+7   White      8
+```
