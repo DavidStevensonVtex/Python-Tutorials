@@ -120,3 +120,53 @@ print(color_table)
 6   Black      7
 7   White      8
 ```
+
+Notice that the parser correctly interprets the first row as consisting of filed names. It numbers the records from 0 through 7. Using` read_table()`  method arguments, you can adjust how the parser interprets the input file, but the default settings usually work best. 
+
+[pandas documentation](https://pandas.pydata.org/docs/)
+
+[Pandas read_table()](https://pandas.pydata.org/docs/reference/api/pandas.read_table.html)
+
+#### Reading CSV delimited format
+
+A CSV file provides more formatting that a simple text file. In fact, CSV files can become quite complicated. 
+
+* A header defines each of the fields
+* Fields are separated by commas.
+* Records are separated by linefeeds.
+* Strings are enclosed in double quotes.
+* Integers and real numbers appear without double quotes.
+
+Pands makes it easy to work with the CSV file as formatted data:
+
+```
+import pandas as pd
+titanic = pd.io.parsers.read_csv("titanic.csv")
+X = titanic[['age']]
+print(X)
+```
+
+```
+            age
+0       29.0000
+1        0.9167
+2        2.0000
+3       30.0000
+4       25.0000
+...         ...
+1304    14.5000
+1305  9999.0000
+1306    26.5000
+1307    27.0000
+1308    29.0000
+
+[1309 rows x 1 columns]
+```
+
+Notice that the parser of choice this time is `read_csv()`, which understands CSV files and provides you with new options for working with it. 
+
+[Pandas read_csv()](https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html)
+
+To create the output as a list, you simply change the third line of code to read 
+
+`X = titanic[['age']].values`
