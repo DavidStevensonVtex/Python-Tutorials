@@ -214,3 +214,66 @@ You can also perform the task using a single step like this:
 `trig_values = pd.read_excel("Values.xls", 'Sheet1', index_col=None, na_values=['Na'])`
 
 Because Excel files are more complex, using the two-step process is often more conventient and efficient because you don't have to reopen the file for each read of the data.
+
+### Sending Data in Unstructured File Form
+
+Unstructured data files consist of a series of bits. 
+Unstructured file formats rely on the file user to know how to interpret the data. For example, each pixel of a picture file could consist of three 32-bit fields. 
+Knowing that each field is 32-bits is up to you.
+
+To work with images, you need to access the Scikit-image library (https://scikit-image.org/), which is a free-of-charge collection of algorithms for image processing. You can find a tutorial for this collection of algorithms used for image processing. You can find a tutorial for this library at http://scipy-lectures.org/packages/scikit-image/.
+
+```
+from skimage.io import imread
+from skimage.transform import resize
+from matplotlib import pyplot as plt
+import matplotlib.cm as cm
+
+example_file = ("http://upload.wikimedia.org/" +
+    "wikipedia/commons/7/7d/Dog_face.png")
+image = imread(example_file, as_gray=True)
+plt.imshow(image, cmap=cm.gray)
+plt.show()
+```
+
+```
+print("data type: %s, shape: %s" %
+      (type(image), image.shape))
+```
+
+```
+data type: <class 'numpy.ndarray'>, shape: (90, 90)
+```
+
+If you want to crop an image, you can use the following code:
+
+```
+image2 = image[5:70,0:70]
+plt.imshow(image2, cmap=cm.gray)
+plt.show()
+```
+
+You can also resize the image:
+
+```
+image3 = resize(image2, (30, 30), mode='symmetric')
+plt.imshow(image3, cmap=cm.gray)
+print("data type: %s, shape: %s" %
+      (type(image3), image3.shape))
+```
+
+```
+data type: <class 'numpy.ndarray'>, shape: (30, 30)
+```
+
+The following code flattens image 3 so that it becomes an array of 900 elements tat is stored in image_row.
+
+```
+image_row = image3.flatten()
+print("data type: %s, shape: %s" %
+      (type(image_row), image_row.shape))
+```
+
+```
+data type: <class 'numpy.ndarray'>, shape: (900,)
+```
