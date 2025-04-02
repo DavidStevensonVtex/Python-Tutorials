@@ -88,3 +88,14 @@ with open("Colors.txt", 'r') as open_file:
             print('Reading Line: ' + str(j) +
             ' Content: ' + observation, end="")
 ```
+
+### Accessing Data in Structured Flat-File Form
+
+In many cases, the data you need to work with won't appear within a library, such as the toy datasets in the Scikit-learn library. Real-world data usually appears in a file of some type, and a flat file presents the easiest kind of file to work with. In a flat file the data appears as a simple list of entries that you can read one at a time, if desired, into memory. Depending on the requirements for your project, you can read all or part of the file.
+
+The pandas library used in the se ctions that follow makes it much easier to read and understand flat-file data. Classes and methods in the padas library interpret (parse) the flat-file data to make it easier to manipulate.
+
+The least formatted and therefore easiest-to-read flat-file format is the text file. However, a text file als treats all data as strings, so you often have to convert numeric data into other forms. A comma-separated value (CSV) file provides more formatting and more informatino, but it requires a little more effort to read. At the high end of flat-file formatting are custom data formats, such as an Excel file,which contains extensive formatting and could include multiple datasets in a single file.
+
+Working with structure data is easier because you know where each field begins and ends.
+
