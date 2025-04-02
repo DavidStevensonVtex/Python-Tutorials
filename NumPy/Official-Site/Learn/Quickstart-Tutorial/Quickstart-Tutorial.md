@@ -46,3 +46,36 @@ NumPy’s array class is called _ndarray_. It is also known by the alias _array_
 * ndarray.data
 
     the buffer containing the actual elements of the array. Normally, we won’t need to use this attribute because we will access the elements in an array using indexing facilities.
+
+### An example
+
+```
+$ python3 
+Python 3.10.9 (main, Mar  1 2023, 18:23:06) [GCC 11.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import numpy as np
+
+a>>> a = np.arange(15).reshape(3, 5)
+>>> a
+array([[ 0,  1,  2,  3,  4],
+       [ 5,  6,  7,  8,  9],
+       [10, 11, 12, 13, 14]])
+>>> a.shape
+(3, 5)
+>>> a.dtype.name
+'int64'
+>>> a.itemsize
+8
+>>> a.size
+15
+>>> type(a)
+<class 'numpy.ndarray'>
+>>> b = np.array([6, 7, 8])
+>>> b
+array([6, 7, 8])
+>>> type(b)
+<class 'numpy.ndarray'>
+>>> type(a)
+<class 'numpy.ndarray'>
+>>> 
+```
