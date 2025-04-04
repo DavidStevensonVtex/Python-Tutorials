@@ -339,3 +339,12 @@ for i in range(0,4):
 
 print(df)
 ```
+
+### Using the JSON Alternative
+
+One of the most popular today is [JavaScript Object Notation (JSON)](https://www.w3schools.com/js/js_json_xml.asp).
+
+Some data formatting techniques emphasize human readability.
+
+* [Other Alternatives](https://slashdot.org/software/p/XML/alternatives)
+* [Yet Another Markup Language (YAML)](https://yaml.org/spec/1.2.2/)
