@@ -237,3 +237,134 @@ To disable this behaviour and force NumPy to print the entire array, you can cha
 >>> import sys
 >>> np.set_printoptions(threshold=sys.maxsize)  # sys module should be imported
 ```
+
+### Basic Operations
+
+Arithmetic operators on arrays apply elementwise. A new array is created and filled with the result.
+
+```
+>>> import numpy as np
+>>> a = np.array([20, 30, 40, 50])
+>>> b = np.arange(4)
+>>> b
+array([0, 1, 2, 3])
+>>> c = a - b
+>>> c
+array([20, 29, 38, 47])
+>>> b**2
+array([0, 1, 4, 9])
+>>> 10 * np.sin(a)
+array([ 9.12945251, -9.88031624,  7.4511316 , -2.62374854])
+>>> a < 35
+array([ True,  True, False, False])
+```
+
+Unlike in many matrix languages, the product operator \* operates elementwise in NumPy arrays. The matrix product can be performed using the \@ operator (in python >=3.5) or the dot function or method:
+
+```
+>>> A = np.array([[1, 1],
+...               [0, 1]])
+>>> B = np.array([[2, 0],
+...               [3, 4]])
+>>> A * B     # elementwise product
+array([[2, 0],
+       [0, 4]])
+>>> A @ B     # matrix product
+array([[5, 4],
+       [3, 4]])
+>>> A.dot(B)  # another matrix product
+array([[5, 4],
+       [3, 4]])
+```
+
+
+
+[what is a matrix product](https://www.google.com/search?q=what+is+a+matrix+product&oq=what+is+a+matrix+product&gs_lcrp=EgZjaHJvbWUyCQgAEEUYORiABDIICAEQABgWGB4yCAgCEAAYFhgeMggIAxAAGBYYHjIICAQQABgWGB4yCAgFEAAYFhgeMggIBhAAGBYYHjIICAcQABgWGB4yCAgIEAAYFhgeMggICRAAGBYYHtIBCDMxMDNqMGo3qAIIsAIB8QUpw1SR20dvAvEFKcNUkdtHbwI&sourceid=chrome&ie=UTF-8)
+
+#### Why is a matrix product useful
+
+Matrix products are useful because they allow efficient representation and manipulation of linear transformations, solving systems of equations, and processing data in various fields like computer graphics, machine learning, and network theory. 
+
+--
+
+Some operations, such as += and *=, act in place to modify an existing array rather than create a new one.
+
+```
+>>> rg = np.random.default_rng(1)  # create instance of default random number generator
+>>> a = np.ones((2, 3), dtype=int)
+>>> b = rg.random((2, 3))
+>>> a *= 3
+>>> a
+array([[3, 3, 3],
+       [3, 3, 3]])
+>>> b += a
+>>> b
+array([[3.51182162, 3.9504637 , 3.14415961],
+       [3.94864945, 3.31183145, 3.42332645]])
+>>> a += b  # b is not automatically converted to integer type
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+numpy.core._exceptions._UFuncOutputCastingError: Cannot cast ufunc 'add' output from dtype('float64') to dtype('int64') with casting rule 'same_kind'
+```
+
+When operating with arrays of different types, the type of the resulting array corresponds to the more general or precise one (a behavior known as upcasting).
+
+```
+>>> from math import pi
+>>> a = np.ones(3, dtype=np.int32)
+>>> b = np.linspace(0, pi, 3)
+>>> b.dtype.name
+'float64'
+>>> b
+array([0.        , 1.57079633, 3.14159265])
+>>> a
+array([1, 1, 1], dtype=int32)
+>>> c = a + b
+>>> c
+array([1.        , 2.57079633, 4.14159265])
+>>> c.dtype.name
+'float64'
+>>> d = np.exp(c * 1j)
+>>> d
+array([ 0.54030231+0.84147098j, -0.84147098+0.54030231j,
+       -0.54030231-0.84147098j])
+```
+
+The numpy.exp() function calculates the exponential of all elements in an input array. When dealing with complex numbers, numpy.exp() correctly applies the exponential function, leveraging Euler's formula to handle the imaginary component.
+
+Euler's formula states that e^(ix) = cos(x) + i*sin(x), where e is the base of the natural logarithm, i is the imaginary unit, and x is a real number. When applied to a complex number z = a + bi, the exponential function becomes:
+
+`e^z = e^(a + bi) = e^a * e^(bi) = e^a * (cos(b) + i*sin(b))`.
+
+Many unary operations, such as computing the sum of all the elements in the array, are implemented as methods of the ndarray class.
+
+```
+>>> a = rg.random((2, 3))
+>>> a
+array([[0.82770259, 0.40919914, 0.54959369],
+       [0.02755911, 0.75351311, 0.53814331]])
+>>> a.sum()
+3.1057109529998157
+>>> a.min()
+0.027559113243068367
+>>> a.max()
+0.8277025938204418
+```
+
+By default, these operations apply to the array as though it were a list of numbers, regardless of its shape. However, by specifying the axis parameter you can apply an operation along the specified axis of an array:
+
+```
+>>> b = np.arange(12).reshape(3, 4)
+>>> b
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11]])
+>>> b.sum(axis=0)     # sum of each column
+array([12, 15, 18, 21])
+>>> b.min(axis=1)     # min of each row
+array([0, 4, 8])
+>>> b.cumsum(axis=1)  # cumulative sum along each row
+array([[ 0,  1,  3,  6],
+       [ 4,  9, 15, 22],
+       [ 8, 17, 27, 38]])
+```
