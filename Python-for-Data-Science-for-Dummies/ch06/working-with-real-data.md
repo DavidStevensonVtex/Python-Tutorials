@@ -302,3 +302,40 @@ The _sqlalchemy_ library provides support for a broad range of SQL databases. Th
 * [MongoDB](https://www.mongodb.org/)
 * [PyMongo](https://pypi.org/project/pymongo/)
 
+### Accessing Data from the Web
+
+A _web service_ is a kind of application that provides a means to ask questions and receive answers.
+
+Another type of query system is the microservice.
+
+One of the most beneficial data access techniques to know when working with web data is accessing XML. All sorts of content types rely on XML, even some web pages.
+
+#### APIs and Other Web Entities
+
+* [jQuery](https://jquery.com)
+* [Lxml is a Python library for processing XML and HTML documents](https://lxml.de/)
+
+Sample XML code:
+
+```
+from lxml import objectify
+import pandas as pd
+
+xml = objectify.parse(open('XMLData.xml'))
+root = xml.getroot()
+
+df = pd.DataFrame(columns=('Number', 'String', 
+                           'Boolean'))
+
+for i in range(0,4):
+    obj = root.getchildren()[i].getchildren()
+    row = dict(zip(['Number', 'String', 'Boolean'],
+                   [obj[0].text, obj[1].text,
+                    obj[2].text]))
+    row_s = pd.Series(row)
+    row_s.name = i
+    row_s = row_s.to_frame().transpose()
+    df = pd.concat([df, row_s])
+
+print(df)
+```
