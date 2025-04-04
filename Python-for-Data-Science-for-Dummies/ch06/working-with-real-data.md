@@ -277,3 +277,22 @@ print("data type: %s, shape: %s" %
 ```
 data type: <class 'numpy.ndarray'>, shape: (900,)
 ```
+
+### Managing Data from Relational Databases
+
+```
+from sqlalchemy import create_engine
+engine = create_engine('sqlite:///:memory:')
+```
+
+The _sqlalchemy_ library provides support for a broad range of SQL databases. The following list contains just a few of them.
+
+* SQLite
+* MySQL
+* PostgreSQL
+* SQL Server
+* Other relational databases, such as those you can connect to using Open Database Connectivity.
+
+[Working with databases using sqlalchemy](https://docs.sqlalchemy.org/en/latest/core/engines.html)
+
+[The Python SQL Toolkit and Object Relational Mapper - sqlalchemy](https://www.sqlalchemy.org/)
