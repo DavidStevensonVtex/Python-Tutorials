@@ -296,3 +296,9 @@ The _sqlalchemy_ library provides support for a broad range of SQL databases. Th
 [Working with databases using sqlalchemy](https://docs.sqlalchemy.org/en/latest/core/engines.html)
 
 [The Python SQL Toolkit and Object Relational Mapper - sqlalchemy](https://www.sqlalchemy.org/)
+
+### Interacting with Data from NoSQL Databases
+
+* [MongoDB](https://www.mongodb.org/)
+* [PyMongo](https://pypi.org/project/pymongo/)
+
