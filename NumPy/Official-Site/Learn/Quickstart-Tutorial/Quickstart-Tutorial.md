@@ -690,3 +690,5 @@ array([[7., 2., 4., 9., 9., 7., 5., 2., 1., 9., 5., 1.],
        [9.]]), array([[9., 7., 5., 2., 1., 9., 5., 1.],
        [0., 5., 4., 0., 6., 8., 5., 2.]])]
 ```
+
+[vsplit](https://numpy.org/doc/stable/reference/generated/numpy.vsplit.html#numpy.vsplit) splits along the vertical axis, and [array_split](https://numpy.org/doc/stable/reference/generated/numpy.array_split.html#numpy.array_split) allows one to specify along which axis to split.
