@@ -127,3 +127,92 @@ print(df.drop_duplicates())
 1      2  Second   False
 2      3   Third    True
 ```
+
+#### Creating a data map and data plan
+
+You need to know about your dataset -- that is, how it looks statistically. A _data map_ is an overview of the dataset. You use it to spot potential problems in your data, such as
+
+* Redundant variables
+* Possible errors
+* Missing values
+* Variable transformations
+
+Checking for these problems goes into a _data plan_, which is a list of tasks you have to perform to ensure the integrity of your data. The following example shows a data map, A, with two datasets, B and C:
+
+```
+import pandas as pd
+pd.set_option('display.width', 55)
+
+df = pd.DataFrame({'A': [0,0,0,0,0,1,1],
+                   'B': [1,2,3,5,4,2,5],
+                   'C': [5,3,4,1,1,2,3]})
+
+a_group_desc = df.groupby('A').describe()
+print(a_group_desc)
+```
+
+In this case, the data map uses 0s for the first series and 1s for the second series. 
+The _groupby()_ function places the datasets, B and C, into groups.
+To determine whether the data map is viable, you obtain statistics using _describe()_.
+What you end up with is a dataset B with two series 0 and 1 and a dataset C also with series 0 and 1, as shown in the following output.
+
+```
+      B                                            \
+  count mean       std  min   25%  50%   75%  max   
+A                                                   
+0   5.0  3.0  1.581139  1.0  2.00  3.0  4.00  5.0   
+1   2.0  3.5  2.121320  2.0  2.75  3.5  4.25  5.0   
+
+      C                                            
+  count mean       std  min   25%  50%   75%  max  
+A                                                  
+0   5.0  2.8  1.788854  1.0  1.00  3.0  4.00  5.0  
+1   2.0  2.5  0.707107  2.0  2.25  2.5  2.75  3.0  
+```
+
+These statistics tell you about the two dataset series. The breakup of the two datasets using specific cases is the _data plan_. As you can see, the statistics tell you that this data plan may not be viable because some statistics are relatively far apart.
+
+The default output from _describe()_ shows the data unstacked (printed horizontally).
+Unfortunately, the unstacked data can print out with an unfortunate break, making it very hard to read. To keep this form happening, you set the width you want to use for the data by calling _pd.set_option('display.width', 55)_. [You can set a number of pandas options this way](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.set_option.html).
+
+Although the unstacked data is relatively easy to read and compare, you may prefer a more compact presentation. In this case, you can stack the data using the following code:
+
+```
+stacked = a_group_desc.stack()
+print(stacked)
+```
+
+```
+                B         C
+A                          
+0 count  5.000000  5.000000
+  mean   3.000000  2.800000
+  std    1.581139  1.788854
+  min    1.000000  1.000000
+  25%    2.000000  1.000000
+  50%    3.000000  3.000000
+  75%    4.000000  4.000000
+  max    5.000000  5.000000
+1 count  2.000000  2.000000
+  mean   3.500000  2.500000
+  std    2.121320  0.707107
+  min    2.000000  2.000000
+  25%    2.750000  2.250000
+  50%    3.500000  2.500000
+  75%    4.250000  2.750000
+  max    5.000000  3.000000
+```
+
+You may not want all the data that _describe()_ provides. Perhaps you really just want to see the number of items in each series and their mean. 
+
+```
+print(a_group_desc.loc[:,(slice(None),['count','mean']),])
+```
+
+```
+      B          C     
+  count mean count mean
+A                      
+0   5.0  3.0   5.0  2.8
+1   2.0  3.5   2.0  2.5
+```
