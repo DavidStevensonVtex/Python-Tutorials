@@ -300,3 +300,34 @@ Categories (3, object): ['Blue', 'Green', 'Red']
 dtype: bool
 ```
 
+#### Renaming Levels
+
+There are times when the naming of the categories you use is inconvenient or otherwise wrong for a particular need. Fortunately, you can rename the categories as needed using the technique shown in the following example.
+
+```
+import pandas as pd
+
+car_colors = pd.Series(['Blue', 'Red', 'Green'],
+                       dtype='category')
+car_data = pd.Series(
+    pd.Categorical(
+        ['Blue', 'Green', 'Red', 'Blue', 'Red'],
+        categories=car_colors, ordered=False))
+
+car_data = car_data.cat.rename_categories(
+    ["Purple", "Yellow", "Mauve"])
+
+print(car_data)
+```
+
+All you really need to do is set the _cat_ property to a new value, as shown. Here is the output from this example.
+
+```
+0    Purple
+1    Yellow
+2     Mauve
+3    Purple
+4     Mauve
+dtype: category
+Categories (3, object): ['Purple', 'Yellow', 'Mauve']
+```
