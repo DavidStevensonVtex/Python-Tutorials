@@ -39,3 +39,9 @@ The majority of a data scientist's time is actually spent preparing data because
 * Create data subsets
 * Clean the data
 * Develop a single dataset by merging various datasets together
+
+### Validating Your Data
+
+You must validate your data before you use it to ensure that the data is at least close to what you expect it to be.
+
+What validation does is ensure that you can perform an analysis of the data and reasonably expect that analysis to succeed.
