@@ -13,3 +13,9 @@ The goal of some types of data shaping is to create a larger dataset. In many ca
 ### Juggling between NumPy and pandas
 
 There is no question that you need NumPy at all times. The pandas library is actually built on top of NumPy. However, you do need to make a choice between NumPy and pandas when performing tasks. You need the low-level functionality of NumPy to perform some tasks, but pandas makes things so much easier that you want to use it as often as possible.
+
+#### Knowing when to use NumPy
+
+Developers built pandas on top of NumPy. As a result, every task you perform using pandas also goes through NumPy. [To obtain the benefits of pandas, you pay a performance penalty in most cases](https://towardsdatascience.com/speed-testing-pandas-vs-numpy-ffbf80070ee7).
+
+The speed issue may not be a concern at times, but when speed is essential, NumPy is always the better choice.
