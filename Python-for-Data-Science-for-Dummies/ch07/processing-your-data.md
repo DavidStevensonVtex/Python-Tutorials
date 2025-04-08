@@ -331,3 +331,51 @@ All you really need to do is set the _cat_ property to a new value, as shown. He
 dtype: category
 Categories (3, object): ['Purple', 'Yellow', 'Mauve']
 ```
+
+#### Combining Levels
+
+A particular categorical level may be too small to offer significant data for analysis. Perhaps there are only a few of the values, which may not be enough to create a statistical difference. In this case, combining several small categories may offer better analysis results.
+
+```
+import pandas as pd
+
+car_colors = pd.Series(['Blue', 'Red', 'Green'],
+    dtype='category')
+car_data = pd.Series(
+    pd.Categorical(
+       ['Blue', 'Green', 'Red', 'Green', 'Red', 'Green'],
+       categories=car_colors, ordered=False))
+
+car_data = car_data.cat.set_categories(
+    ["Blue", "Red", "Green", "Blue_Red"])
+print(car_data.loc[car_data.isin(['Red'])])
+car_data.loc[car_data.isin(['Red'])] = 'Blue_Red'
+car_data.loc[car_data.isin(['Blue'])] = 'Blue_Red'
+
+car_data = car_data.cat.set_categories(
+    ["Green", "Blue_Red"])
+print(f"\n{car_data}")
+```
+
+What this example shows you is that there is only one _Blue_ item and only two _Red_ items, but there are three _Green_ items, which places _Green_ in the majority.
+
+Combining _Blue_ and _Red_ together is a two-step process. First, you add the `Blue_Red` category to `car_data`. Then you change the _Red_ and _blue_ entrioes to `Blue_Red`, which creates a combined category. As a final step, you can remove the unneeded categories.
+
+```
+2    Red
+4    Red
+dtype: category
+Categories (4, object): ['Blue', 'Red', 'Green', 'Blue_Red']
+
+0    Blue_Red
+1       Green
+2    Blue_Red
+3       Green
+4    Blue_Red
+5       Green
+dtype: category
+Categories (2, object): ['Green', 'Blue_Red']
+```
+
+Notice that there are now three `Blue_Red` entries and three _Green_ entires. The _Blue_ and _Red_ categories are no longer in use. The resultis thatthe levels are now combined as expected.
+
