@@ -666,3 +666,27 @@ When used with arrays as arguments, [r_](https://numpy.org/doc/stable/reference/
 ##### See also
 
 hstack, vstack, column_stack, concatenate, c_, r_
+
+
+#### Splitting one array into several smaller ones
+
+Using [hsplit](https://numpy.org/doc/stable/reference/generated/numpy.hsplit.html#numpy.hsplit), you can split an array along its horizontal axis, either by specifying the number of equally shaped arrays to return, or by specifying the columns after which the division should occur:
+
+```
+>>> a = np.floor(10 * rg.random((2, 12)))
+>>> a
+array([[7., 2., 4., 9., 9., 7., 5., 2., 1., 9., 5., 1.],
+       [6., 7., 6., 9., 0., 5., 4., 0., 6., 8., 5., 2.]])
+>>> # Split `a` into 3
+>>> np.hsplit(a, 3)
+[array([[7., 2., 4., 9.],
+       [6., 7., 6., 9.]]), array([[9., 7., 5., 2.],
+       [0., 5., 4., 0.]]), array([[1., 9., 5., 1.],
+       [6., 8., 5., 2.]])]
+>>> # Split `a` after the third and the fourth column
+>>> np.hsplit(a, (3, 4))
+[array([[7., 2., 4.],
+       [6., 7., 6.]]), array([[9.],
+       [9.]]), array([[9., 7., 5., 2., 1., 9., 5., 1.],
+       [0., 5., 4., 0., 6., 8., 5., 2.]])]
+```
