@@ -96,3 +96,34 @@ The duplicated rows contain a Rtue next to their row number.
 3    True
 dtype: bool
 ```
+
+#### Removing duplicates
+
+To get a clean dataset, you want to remove the duplicates from it. 
+
+```
+from lxml import objectify
+import pandas as pd
+
+xml = objectify.parse(open('XMLData2.xml'))
+root = xml.getroot()
+df = pd.DataFrame(columns=('Number', 'String', 'Boolean'))
+for i in range(0,4):
+    obj = root.getchildren()[i].getchildren()
+    row = dict(zip(['Number', 'String', 'Boolean'],
+                   [obj[0].text, obj[1].text,
+                    obj[2].text]))
+    row_s = pd.Series(row)
+    row_s.name = i
+    row_s = row_s.to_frame().transpose()
+    df = pd.concat([df, row_s])
+
+print(df.drop_duplicates())
+```
+
+```
+  Number  String Boolean
+0      1   First    True
+1      2  Second   False
+2      3   Third    True
+```
