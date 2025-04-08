@@ -29,3 +29,13 @@ pandas can be useful for performing such tasks as _binning_ and workign with a _
 In Chapter 9, you discover how to perform both discretization and binning.
 
 Chaper 13 shows actual binning examples, such as obtaining a frequency for each categorical variable of a data set. In fact, many of the examples in Chapter 13 don't work without binnning.
+
+#### It's All in the Preparation
+
+The majority of a data scientist's time is actually spent preparing data becauset he data is seldom in any order to actually perform analysis. To prepare data for use, a data scientist must:
+
+* Get the data
+* Aggregate the data
+* Create data subsets
+* Clean the data
+* Develop a single dataset by merging various datasets together
