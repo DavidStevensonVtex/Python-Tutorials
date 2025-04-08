@@ -216,3 +216,11 @@ A
 0   5.0  3.0   5.0  2.8
 1   2.0  3.5   2.0  2.5
 ```
+
+### Manipulating Categorical Variables
+
+In data science, a _categorical variable_ is one that has a specific value from a limited selection of values. The number of values is usually fixed. Many developers will know categorical variables by the moniker _enumerations_. Each of the potential values that a categorical variable can assume is a _level_.
+
+To understand how categorical variables work, say that you have a variable expressing the color of an object, such as a car, and that the user can select blue, red or green. To express the car's color in a way that computers can represent and effectively compute, an application assigns each color a numerical value, so blue is 1, red is 2, and green is 3. Normally, when you print each color, you see the value rather than the color.
+
+If you use [pandas.DataFrame](https://pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html), you can still see the symbolic value (blue, red, and green), even though the compuetr stores it as a numeric value.
