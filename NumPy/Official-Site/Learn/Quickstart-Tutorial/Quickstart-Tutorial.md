@@ -597,3 +597,72 @@ array([[5., 9., 1., 9.],
 #### See also
 
 ndarray.shape, reshape, resize, ravel
+
+#### Stacking together different arrays
+
+Several arrays can be stacked together along different axes:
+
+```
+>>> a = np.floor(10 * rg.random((2, 2)))
+>>> a
+array([[3., 7.],
+       [3., 4.]])
+>>> b = np.floor(10 * rg.random((2, 2)))
+>>> b
+array([[1., 4.],
+       [2., 2.]])
+>>> np.vstack((a, b))
+array([[3., 7.],
+       [3., 4.],
+       [1., 4.],
+       [2., 2.]])
+>>> np.hstack((a, b))
+array([[3., 7., 1., 4.],
+       [3., 4., 2., 2.]])
+```
+
+The function [column_stack](https://numpy.org/doc/stable/reference/generated/numpy.column_stack.html#numpy.column_stack) stacks 1D arrays as columns into a 2D array. It is equivalent to [hstack](https://numpy.org/doc/stable/reference/generated/numpy.hstack.html#numpy.hstack) only for 2D arrays:
+
+```
+>>> from numpy import newaxis
+>>> np.column_stack((a, b))  # with 2D arrays
+array([[3., 7., 1., 4.],
+       [3., 4., 2., 2.]])
+>>> a = np.array([4., 2.])
+>>> b = np.array([3., 8.])
+>>> np.column_stack((a, b))  # returns a 2D array
+array([[4., 3.],
+       [2., 8.]])
+>>> np.hstack((a, b))        # the result is different
+array([4., 2., 3., 8.])
+>>> a[:, newaxis]  # view `a` as a 2D column vector
+array([[4.],
+       [2.]])
+>>> np.column_stack((a[:, newaxis], b[:, newaxis]))
+array([[4., 3.],
+       [2., 8.]])
+>>> np.hstack((a[:, newaxis], b[:, newaxis]))  # the result is the same
+array([[4., 3.],
+       [2., 8.]])
+```
+
+In general, for arrays with more than two dimensions, [hstack](https://numpy.org/doc/stable/reference/generated/numpy.hstack.html#numpy.hstack) stacks along their second axes, [vstack](https://numpy.org/doc/stable/reference/generated/numpy.vstack.html#numpy.vstack) stacks along their first axes, and [concatenate](https://numpy.org/doc/stable/reference/generated/numpy.concatenate.html#numpy.concatenate) allows for an optional arguments giving the number of the axis along which the concatenation should happen.
+
+In NumPy, axes are the dimensions of an array. For a 2D array, the first axis (axis 0) runs vertically downwards across rows, and the second axis (axis 1) runs horizontally across columns. The number of axes is referred to as the rank of the array. For higher-dimensional arrays, the axes are numbered starting from 0, with each axis corresponding to a dimension of the array. For example, in a 3D array, axis 0 represents depth, axis 1 represents rows, and axis 2 represents columns.
+
+[Understanding axes in NumPy](https://stackoverflow.com/questions/46855793/understanding-axes-in-numpy)
+
+Note
+
+In complex cases, [r_](https://numpy.org/doc/stable/reference/generated/numpy.r_.html#numpy.r_) and [c_](https://numpy.org/doc/stable/reference/generated/numpy.c_.html#numpy.c_) are useful for creating arrays by stacking numbers along one axis. They allow the use of range literals :.
+
+```
+>>> np.r_[1:4, 0, 4]
+array([1, 2, 3, 0, 4])
+```
+
+When used with arrays as arguments, [r_](https://numpy.org/doc/stable/reference/generated/numpy.r_.html#numpy.r_) and [c_](https://numpy.org/doc/stable/reference/generated/numpy.c_.html#numpy.c_) are similar to [vstack](https://numpy.org/doc/stable/reference/generated/numpy.vstack.html#numpy.vstack) and [hstack](https://numpy.org/doc/stable/reference/generated/numpy.hstack.html#numpy.hstack) in their default behavior, but allow for an optional argument giving the number of the axis along which to concatenate.
+
+##### See also
+
+hstack, vstack, column_stack, concatenate, c_, r_
