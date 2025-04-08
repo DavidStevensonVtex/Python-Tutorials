@@ -224,3 +224,30 @@ In data science, a _categorical variable_ is one that has a specific value from 
 To understand how categorical variables work, say that you have a variable expressing the color of an object, such as a car, and that the user can select blue, red or green. To express the car's color in a way that computers can represent and effectively compute, an application assigns each color a numerical value, so blue is 1, red is 2, and green is 3. Normally, when you print each color, you see the value rather than the color.
 
 If you use [pandas.DataFrame](https://pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html), you can still see the symbolic value (blue, red, and green), even though the compuetr stores it as a numeric value.
+
+#### Checking Your Version of pandas
+
+The categorical variable examples in this section depend on your having a minimum version of pandas 1.5.0 installed on your system.
+
+```
+import pandas as pd
+print(pd.__version__)
+```
+
+```
+1.5.3
+```
+
+```
+$ pip show pandas
+Name: pandas
+Version: 1.5.3
+Summary: Powerful data structures for data analysis, time series, and statistics
+Home-page: https://pandas.pydata.org
+Author: The Pandas Development Team
+Author-email: pandas-dev@python.org
+License: BSD-3-Clause
+Location: /home/dstevenson/anaconda3/lib/python3.10/site-packages
+Requires: numpy, python-dateutil, pytz
+Required-by: datashader, holoviews, hvplot, seaborn, statsmodels, xarray
+```
