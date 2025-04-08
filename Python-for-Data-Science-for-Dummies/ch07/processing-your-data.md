@@ -251,3 +251,52 @@ Location: /home/dstevenson/anaconda3/lib/python3.10/site-packages
 Requires: numpy, python-dateutil, pytz
 Required-by: datashader, holoviews, hvplot, seaborn, statsmodels, xarray
 ```
+
+#### Creating Categorical Variables
+
+Categorical variables have a specific number of values, which makes them incredibly valuable in performing a number of data science tasks.
+
+```
+import pandas as pd
+
+car_colors = pd.Series(['Blue', 'Red', 'Green'],
+                       dtype='category')
+
+car_data = pd.Series(
+    pd.Categorical(
+        ['Yellow', 'Green', 'Red', 'Blue', 'Purple'], 
+        categories=car_colors, ordered=False))
+
+find_entries = pd.isnull(car_data)
+
+print(car_colors)
+print(f"\n{car_data}")
+print(f"\n{find_entries[find_entries == True]}")
+```
+
+The example begins by creating a categorical varialbe, `car_colors`. The variable contains the values _Blue_, _Red_, and _Green as colors that are acceptable. Notice that you must specify a _dtype_ property value of _category_.
+
+The next step is to create another series. This one uses a list of actual car colors, named `car_data`, as input. Not all the car colors match the predefined acceptable values. When this problem occurs, pandas otuputs Not a Number(NaN) instead of the car color.
+
+In this case, you ask pandas which entries are null using _isnull()_ and place them in `find_entries`. You can then output just those entries that are actually null.
+
+```
+0     Blue
+1      Red
+2    Green
+dtype: category
+Categories (3, object): ['Blue', 'Green', 'Red']
+
+0      NaN
+1    Green
+2      Red
+3     Blue
+4      NaN
+dtype: category
+Categories (3, object): ['Blue', 'Green', 'Red']
+
+0    True
+4    True
+dtype: bool
+```
+
