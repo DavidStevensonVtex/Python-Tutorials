@@ -526,3 +526,74 @@ However, if one wants to perform an operation on each element in the array, one 
 #### See also
 
 Indexing on ndarrays, Indexing routines (reference), newaxis, ndenumerate, indices
+
+### Shape manipulation
+
+#### Changing the shape of an array
+
+An array has a shape given by the number of elements along each axis:
+
+```
+>>> import numpy as np
+>>> rg = np.random.default_rng(1)
+>>> a = np.floor(10 * rg.random((3, 4)))
+>>> a
+array([[5., 9., 1., 9.],
+       [3., 4., 8., 4.],
+       [5., 0., 7., 5.]])
+>>> a.shape
+(3, 4)
+>>> a.dtype
+dtype('float64')
+```
+
+The shape of an array can be changed with various commands. Note that the following three commands all return a modified array, but do not change the original array:
+
+```
+>>> a.ravel()  # returns the array, flattened
+array([5., 9., 1., 9., 3., 4., 8., 4., 5., 0., 7., 5.])
+>>> a.reshape(6, 2)  # returns the array with a modified shape
+array([[5., 9.],
+       [1., 9.],
+       [3., 4.],
+       [8., 4.],
+       [5., 0.],
+       [7., 5.]])
+>>> a.T  # returns the array, transposed
+array([[5., 3., 5.],
+       [9., 4., 0.],
+       [1., 8., 7.],
+       [9., 4., 5.]])
+>>> a.T.shape
+(4, 3)
+>>> a.shape
+(3, 4)
+```
+
+The order of the elements in the array resulting from ravel is normally “C-style”, that is, the rightmost index “changes the fastest”, so the element after a[0, 0] is a[0, 1]. If the array is reshaped to some other shape, again the array is treated as “C-style”. NumPy normally creates arrays stored in this order, so ravel will usually not need to copy its argument, but if the array was made by taking slices of another array or created with unusual options, it may need to be copied. The functions ravel and reshape can also be instructed, using an optional argument, to use FORTRAN-style arrays, in which the leftmost index changes the fastest.
+
+The [reshape](https://numpy.org/doc/stable/reference/generated/numpy.reshape.html#numpy.reshape) function returns its argument with a modified shape, whereas the [ndarray.resize](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.resize.html#numpy.ndarray.resize) method modifies the array itself:
+
+```
+>>> a
+array([[5., 9., 1., 9.],
+       [3., 4., 8., 4.],
+       [5., 0., 7., 5.]])
+>>> a.resize((2, 6))
+>>> a
+array([[5., 9., 1., 9., 3., 4.],
+       [8., 4., 5., 0., 7., 5.]])
+```
+
+If a dimension is given as -1 in a reshaping operation, the other dimensions are automatically calculated:
+
+```
+>>> a.reshape(3, -1)
+array([[5., 9., 1., 9.],
+       [3., 4., 8., 4.],
+       [5., 0., 7., 5.]])
+```
+
+#### See also
+
+ndarray.shape, reshape, resize, ravel
