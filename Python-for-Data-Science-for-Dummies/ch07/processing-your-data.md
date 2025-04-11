@@ -379,3 +379,10 @@ Categories (2, object): ['Green', 'Blue_Red']
 
 Notice that there are now three `Blue_Red` entries and three _Green_ entires. The _Blue_ and _Red_ categories are no longer in use. The resultis thatthe levels are now combined as expected.
 
+### Dealing with Dates in Your Data
+
+Dates can present problems in data. For one thing, dates are stored as numeric values. However, the precise value of the number depends on the representation for the particular platform and could even depend on users' preferences.
+
+[Excel users can choose to start dates in 1900 or 1904](https://learn.microsoft.com/en-us/office/troubleshoot/excel/1900-and-1904-date-system). The numeric encoding for each is different so the samedate can have two numeric values depending on the starting date.
+
+Creating a time v alue format that represents a value the user can understand is hard. For example, you may need to use Greenwich Mean Time (GMT) in some situations but a local time zone in others.
