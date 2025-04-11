@@ -692,3 +692,20 @@ array([[7., 2., 4., 9., 9., 7., 5., 2., 1., 9., 5., 1.],
 ```
 
 [vsplit](https://numpy.org/doc/stable/reference/generated/numpy.vsplit.html#numpy.vsplit) splits along the vertical axis, and [array_split](https://numpy.org/doc/stable/reference/generated/numpy.array_split.html#numpy.array_split) allows one to specify along which axis to split.
+
+### Copies and Views
+
+When operating and manipulating arrays, their data is sometimes copied into a new array and sometimes not. This is often a source of confusion for beginners. There are three cases:
+
+#### No copy at all
+
+Simple assignments make no copy of objects or their data.
+
+```
+>>> a = np.array([[ 0,  1,  2,  3],
+...               [ 4,  5,  6,  7],
+...               [ 8,  9, 10, 11]])
+>>> b = a            # no new object is created
+>>> b is a 
+True
+```
