@@ -436,3 +436,36 @@ For example, a customer record may be missing an age.
 
 Having a strategy for dealing with missing data is important.
 
+#### Finding the missing data
+
+The following code shows how you can obtain a listing of missing values without too much effort.
+
+```
+import pandas as pd
+import numpy as np
+
+s = pd.Series([1, 2, 3, np.NaN, 5, 6, None])
+
+print(s.isnull())
+print(f"\n{s[s.isnull()]}")
+```
+
+isnull() is a function in pandas that detects missing values in a Series object. It returns a boolean Series of the same shape as the input Series, where True indicates a missing value (NaN) and False indicates a non-missing value. isna() is an alias for isnull() and performs the same operation.
+
+To enable the interpretation of square brackets [] with a Python class, the `__getitem__` method needs to be defined within the class. This special method allows instances of the class to behave like sequences (e.g., lists, tuples) or mappings (e.g., dictionaries) when accessed using square brackets.
+
+
+```
+0    False
+1    False
+2    False
+3     True
+4    False
+5    False
+6     True
+dtype: bool
+
+3   NaN
+6   NaN
+dtype: float64
+```
