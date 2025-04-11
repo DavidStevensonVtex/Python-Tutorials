@@ -386,3 +386,23 @@ Dates can present problems in data. For one thing, dates are stored as numeric v
 [Excel users can choose to start dates in 1900 or 1904](https://learn.microsoft.com/en-us/office/troubleshoot/excel/1900-and-1904-date-system). The numeric encoding for each is different so the samedate can have two numeric values depending on the starting date.
 
 Creating a time v alue format that represents a value the user can understand is hard. For example, you may need to use Greenwich Mean Time (GMT) in some situations but a local time zone in others.
+
+#### Formatting date and time values
+
+Pyuthon provides two common methods of formatting date and time. The first technique is to call `str()`, which simply turns a datatime value into a string without any formatting. The `strftime()` function requires more work because you must define how you want the _datetime_ value to appear after conversion.
+
+[Python strftime cheatsheet](https://strftime.org/)
+
+```
+import datetime as dt
+
+now = dt.datetime.now()
+
+print(str(now))
+print(now.strftime('%a, %d %B %Y'))
+```
+
+```
+2025-04-11 13:55:07.315438
+Fri, 11 April 2025
+```
