@@ -709,3 +709,15 @@ Simple assignments make no copy of objects or their data.
 >>> b is a 
 True
 ```
+
+Python passes mutable objects as references, so function calls make no copy.
+
+```
+>>> def f(x):
+...     print(id(x))
+... 
+>>> id(a)  # id is a unique identifier of an object
+139932100777552
+>>> f(a) 
+139932100777552
+```
