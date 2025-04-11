@@ -428,3 +428,11 @@ print(timevalue - now)
 15:57:43
 2:00:00
 ```
+
+### Dealing with Missing Data
+
+Sometimes the data you receive is missing information in specific fields.
+For example, a customer record may be missing an age.
+
+Having a strategy for dealing with missing data is important.
+
