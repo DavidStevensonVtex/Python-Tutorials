@@ -469,3 +469,47 @@ dtype: bool
 6   NaN
 dtype: float64
 ```
+
+#### Encoding missingness
+
+After you figure out that your dataset is missing information, you need to consider what to do about it. The three possibilities are:
+
+* to ignore the issue
+* fill in the missing items
+* or remove (drop) the missing entries from the dataset
+
+```
+import pandas as pd
+import numpy as np
+
+s = pd.Series([1, 2, 3, np.NaN, 5, 6, None])
+
+print(s.fillna(int(s.mean())))
+print(f"\n{s.dropna()}")
+```
+
+The fillna() method replaces NaN (Not a Number) values in a Series with a specified value or using a specified method.
+
+In pandas, a Series is a one-dimensional labeled array capable of holding data of any type. The mean() method, when applied to a pandas Series, calculates the arithmetic mean (average) of its elements. It sums all the values in the Series and divides by the number of non-missing values. 
+
+dropna is a function in the pandas library used to remove missing values (NaNs) from a Series. It returns a new Series with the missing values removed. The original Series remains unchanged unless the inplace parameter is set to True.
+
+```
+0    1.0
+1    2.0
+2    3.0
+3    3.0
+4    5.0
+5    6.0
+6    3.0
+dtype: float64
+
+0    1.0
+1    2.0
+2    3.0
+4    5.0
+5    6.0
+dtype: float64
+```
+
+Working with a series is straightforward because the dataset is so simple. When working with a DataFrame, however, the problem becomes significantly more complicated. You still have the option of dropping the entire row.
