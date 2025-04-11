@@ -406,3 +406,25 @@ print(now.strftime('%a, %d %B %Y'))
 2025-04-11 13:55:07.315438
 Fri, 11 April 2025
 ```
+
+#### Using the right time transformation
+
+Time zones and differences in local time can cause all sorts of problems when performing analysis. For that matter, some times of calculatiosn simply require a time shift in order to get the right results.
+
+
+```
+import datetime as dt
+
+now = dt.datetime.now()
+timevalue = now + dt.timedelta(hours=2)
+
+print(now.strftime('%H:%M:%S'))
+print(timevalue.strftime('%H:%M:%S'))
+print(timevalue - now)
+```
+
+```
+13:57:43
+15:57:43
+2:00:00
+```
