@@ -513,3 +513,43 @@ dtype: float64
 ```
 
 Working with a series is straightforward because the dataset is so simple. When working with a DataFrame, however, the problem becomes significantly more complicated. You still have the option of dropping the entire row.
+
+#### Imputing missing data
+
+The previous section hints at the process of imputing missing data (ascribing characteristics based on how the data is used). The technique you use depends on the sort of data you're working with.
+
+```
+import pandas as pd
+import numpy as np
+from sklearn.impute import SimpleImputer
+
+s = pd.DataFrame([1, 2, 3, np.nan, 5, 6, np.nan])
+
+imp = SimpleImputer(missing_values=np.nan,
+                    add_indicator=True,
+                    strategy='mean')
+
+imp.fit(s)
+x = imp.transform(s)
+print(x)
+```
+
+In this example, s is missing some values. The code creates an Imputer to replace these missing values. The `missing_values` parameter defines what to look for, which is `np.nan`. The add_indicator parameter creates a new binary featuer that will mark the imputed values, which is incredibly useful for many meachine learning models to show both the original values and the manipulated ones.
+
+[Simple Imputer](https://scikit-learn.org/stable/modules/generated/sklearn.impute.SimpleImputer.html)
+
+Before you can impute anything you must provide statistics for the Imputer to use by calling `fit()`. The code then calls `transform()` on s to fill in the missing values.
+
+What does sklearn fit() do?
+
+The fit method is a fundamental part of the Scikit-Learn library. It's used to train a machine learning model on a dataset. Specifically, the fit method takes in a dataset (typically represented as a 2D array or matrix) and a set of labels, and then fits the model to the data.
+
+```
+[[1.  0. ]
+ [2.  0. ]
+ [3.  0. ]
+ [3.4 1. ]
+ [5.  0. ]
+ [6.  0. ]
+ [3.4 1. ]]
+```
