@@ -721,3 +721,11 @@ Python passes mutable objects as references, so function calls make no copy.
 >>> f(a) 
 139932100777552
 ```
+
+#### View or shallow copy
+
+Different array objects can share the same data. The view method creates a new array object that looks at the same data.
+
+```
+
+```
