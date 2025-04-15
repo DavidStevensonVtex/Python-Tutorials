@@ -564,3 +564,22 @@ You perform two steps to obtain just the data you need to perform a particular t
 2.  Select data columns that contain the data you need to analyze.
 
 The act of slicing and dicing data, gives you a subset of the data suitable for analysis.
+
+#### Slicing rows
+
+Slicing can occur in multiple ways when working with data, but the technique of interest in this section is to slice data from a row of 2-D or 3-D data. A 2-D array may contain temperatures (x axis) over a specific time frame (y axis). Slicing a row would mean seeing the temperatures at a specific time. 
+
+A 3-D array may include an axiss for place (x-axis), product (y axis), and time (z axis), so that you can see sales over time. Perhaps you wantto track whether sales of an item are increasing, and specifically where they are increasing. Slicing a row would mean seeing all the sales for one specific product for all locations at any time.
+
+```
+x = np.array([[[1, 2, 3], [4, 5, 6], [7, 8, 9],],
+             [[11,12,13], [14,15,16], [17,18,19],],
+             [[21,22,23], [24,25,26], [27,28,29]]])
+x[1]
+```
+
+```
+array([[11, 12, 13],
+       [14, 15, 16],
+       [17, 18, 19]])
+```
