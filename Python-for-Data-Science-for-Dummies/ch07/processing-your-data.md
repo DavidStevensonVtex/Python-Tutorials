@@ -553,3 +553,14 @@ The fit method is a fundamental part of the Scikit-Learn library. It's used to t
  [6.  0. ]
  [3.4 1. ]]
 ```
+
+### Slicing and Dicing: Filtering and Selecting Data
+
+You may not need to work with all the data in a dataset. In fact, looking at just one particular column may be beneficial, such as age, or a set of rows with a significant amount of information.
+
+You perform two steps to obtain just the data you need to perform a particular task:
+
+1.  Filter rows to create a subset of the data that meets the criterion you select.
+2.  Select data columns that contain the data you need to analyze.
+
+The act of slicing and dicing data, gives you a subset of the data suitable for analysis.
