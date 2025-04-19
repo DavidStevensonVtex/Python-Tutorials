@@ -10,10 +10,13 @@ class PhoneCustomer:
         self.FirstName = "David"
         self.LastName = "Stevenson"
 
+    def MethodName(self):
+        return f"Day to send Bill: {self.DayOfSendingBill} Customer ID: {self.CustomerID}\n" \
+            f"First Name: {self.FirstName} Last Name: {self.LastName}"
+
 pc = PhoneCustomer()
-print(F"Day of Sending Bill: {pc.DayOfSendingBill} Customer ID: {pc.CustomerID}")
-print(f"FirstName: '{pc.FirstName}' LastName: '{pc.LastName}'")
+print(pc.MethodName())
 
 # $ python PhoneCustomer.py 
-# Day of Sending Bill: Monday Customer ID: 123
-# FirstName: 'David' LastName: 'Stevenson'
+# Day to send Bill: Monday Customer ID: 123
+# First Name: David Last Name: Stevenson
