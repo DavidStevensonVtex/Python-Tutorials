@@ -1,8 +1,14 @@
 class PhoneCustomer:
-    DayOfSendingBill = "Monday"
-    CustomerID = 123
-    FirstName = "David"
-    LastName = "Stevenson"
+    # DayOfSendingBill = "Monday"
+    # CustomerID = 123
+    # FirstName = "David"
+    # LastName = "Stevenson"
+
+    def __init__(self):
+        self.DayOfSendingBill = "Monday"
+        self.CustomerID = 123
+        self.FirstName = "David"
+        self.LastName = "Stevenson"
 
 pc = PhoneCustomer()
 print(F"Day of Sending Bill: {pc.DayOfSendingBill} Customer ID: {pc.CustomerID}")
