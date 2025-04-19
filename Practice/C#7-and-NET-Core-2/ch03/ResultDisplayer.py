@@ -14,3 +14,7 @@ rd = ResultDisplayer()
 rd.DisplayResult("The rain in Spain")
 
 rd.DisplayResult(1234)
+
+# $ python ResultDisplayer.py 
+# string: The rain in Spain
+# integer: 1234
