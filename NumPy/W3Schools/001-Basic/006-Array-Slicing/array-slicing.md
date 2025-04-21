@@ -107,3 +107,50 @@ print(arr[::2])
 $ python slice-every-other-element.py 
 # [1 3 5 7]
 ```
+
+### Slicing 2-D Arrays
+
+```
+# From the second element, slice elements from index 1 to index 4 (not included):
+
+import numpy as np
+
+arr = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+
+print(arr[1, 1:4])
+
+# $ python slice-2d-array.py 
+# [7 8 9]
+```
+
+Note: Remember that second element has index 1.
+
+```
+# From both elements, return index 2:
+
+import numpy as np
+
+arr = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+
+print(arr[0:2, 2])
+
+# $ python slice-column-2.py 
+# [3 8]
+```
+
+From both elements, slice index 1 to index 4 (not included), this will return a 2-D array:
+
+```
+# From both elements, slice index 1 to index 4 (not included), 
+# this will return a 2-D array:pyth
+
+import numpy as np
+
+arr = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+
+print(arr[0:2, 1:4])
+
+# $ python slice-columns-2-3-4.py 
+# [[2 3 4]
+#  [7 8 9]]
+```
