@@ -45,6 +45,24 @@ class Rectangle(Shape):
     def move(self, newPosition):
         super().move(newPosition)
 
+    def resize(self, width, height):
+        self.size.width = width
+        self.size.height = height
+
+class Ellipse(Shape):
+    def __init__(self, position, size):
+        super().__init__(position, size)
+
+    def draw(self):
+        print(f"Ellipse with {self.position}, size: {self.size}")
+
+    def move(self, newPosition):
+        super().move(newPosition)
+
+    def resize(self, width, height):
+        self.size.width = width
+        self.size.height = height
+
 # TypeError: Can't instantiate abstract class Rectangle with abstract method resize
 r = Rectangle(Position(12, 34), Size(5, 7))
 r.draw()
@@ -54,4 +72,16 @@ r.draw()
 r.resize(25, 29)
 r.draw()
 
-# TypeError: Can't instantiate abstract class Rectangle with abstract method resize
+print()
+e = Ellipse(Position(56, 78), Size(11, 13))
+e.draw()
+e.resize(31, 37)
+e.draw()
+
+# $ python shape.py
+# Rectangle with (x: 12, y: 34), size: (width: 5 height: 7)
+# Rectangle with (x: 123, y: 456), size: (width: 5 height: 7)
+# Rectangle with (x: 123, y: 456), size: (width: 25 height: 29)
+
+# Ellipse with (x: 56, y: 78), size: (width: 11 height: 13)
+# Ellipse with (x: 56, y: 78), size: (width: 31 height: 37)
