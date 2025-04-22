@@ -33,5 +33,81 @@ Below is a list of all data types in NumPy and the characters used to represent 
 The NumPy array object has a property called dtype that returns the data type of the array:
 
 ```
+# Get the data type of an array object:
 
+import numpy as np
+
+arr = np.array([1, 2, 3, 4])
+
+print(arr.dtype)
+
+# $ python array-data-type.py 
+# int64
+```
+
+```
+# Get the data type of an array containing strings:
+
+import numpy as np
+
+arr = np.array(['apple', 'banana', 'cherry'])
+
+print(arr.dtype)
+
+# $ python array-data-type-string.py 
+# <U6
+```
+
+### Creating Arrays With a Defined Data Type
+
+We use the array() function to create arrays, this function can take an optional argument: dtype that allows us to define the expected data type of the array elements:
+
+```
+# Create an array with data type string:
+
+import numpy as np
+
+arr = np.array([1, 2, 3, 4], dtype='S')
+
+print(arr)
+print(arr.dtype)
+
+# $ python defined-data-type.py 
+# [b'1' b'2' b'3' b'4']
+# |S1
+```
+
+For i, u, f, S and U we can define size as well.
+
+```
+# Create an array with data type 4 bytes integer:
+
+import numpy as np
+
+arr = np.array([1, 2, 3, 4], dtype='i4')
+
+print(arr)
+print(arr.dtype)
+
+# $ python i4-data-type.py 
+# [1 2 3 4]
+# int32
+```
+
+### What if a Value Can Not Be Converted?
+
+If a type is given in which elements can't be casted then NumPy will raise a ValueError.
+
+ValueError: In Python ValueError is raised when the type of passed argument to a function is unexpected/incorrect.
+
+```
+# A non integer string like 'a' can not be converted to integer (will raise an error):
+
+import numpy as np
+
+arr = np.array(['a', '2', '3'], dtype='i')
+
+# $ python value-error.py 
+#     arr = np.array(['a', '2', '3'], dtype='i')
+# ValueError: invalid literal for int() with base 10: 'a'
 ```
