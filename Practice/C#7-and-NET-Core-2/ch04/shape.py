@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class Position:
     def __init__(self, x, y):
         self.x = x
@@ -33,7 +34,7 @@ class Shape(ABC):
     @abstractmethod
     def resize(self, width, height):
         pass
-        
+
 
 class Rectangle(Shape):
     def __init__(self, position, size):
@@ -49,6 +50,7 @@ class Rectangle(Shape):
         self.size.width = width
         self.size.height = height
 
+
 class Ellipse(Shape):
     def __init__(self, position, size):
         super().__init__(position, size)
@@ -62,6 +64,7 @@ class Ellipse(Shape):
     def resize(self, width, height):
         self.size.width = width
         self.size.height = height
+
 
 # TypeError: Can't instantiate abstract class Rectangle with abstract method resize
 r = Rectangle(Position(12, 34), Size(5, 7))
