@@ -1,4 +1,4 @@
-# NumPy Array Shape
+# [NumPy Array Shape](https://www.w3schools.com/python/numpy/numpy_array_shape.asp)
 
 ## Shape of an Array
 
