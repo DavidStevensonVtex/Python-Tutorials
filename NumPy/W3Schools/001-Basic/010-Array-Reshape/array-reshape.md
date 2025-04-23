@@ -138,3 +138,24 @@ print(newarr)
 ```
 
 **Note:** We can not pass -1 to more than one dimension.
+
+### Flattening the arrays
+
+Flattening array means converting a multidimensional array into a 1D array.
+
+We can use reshape(-1) to do this.
+
+```
+# Convert the array into a 1D array:
+
+import numpy as np
+
+arr = np.array([[1, 2, 3], [4, 5, 6]])
+
+newarr = arr.reshape(-1)
+
+print(newarr)
+
+# $ python flatten-the-arrays.py
+# [1 2 3 4 5 6]
+```
