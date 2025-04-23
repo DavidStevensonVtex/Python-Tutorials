@@ -64,3 +64,13 @@ print(newarr)
 #   [ 9 10]
 #   [11 12]]]
 ```
+
+### Can We Reshape Into any Shape?
+
+Yes, as long as the elements required for reshaping are equal in both shapes.
+
+We can reshape an 8 elements 1D array into 4 elements in 2 rows 2D array but we cannot reshape it into a 3 elements 3 rows 2D array as that would require 3x3 = 9 elements.
+
+```
+
+```
