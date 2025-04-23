@@ -205,3 +205,45 @@ a = A()
 a.foo = 42  # Works
 a.bar = 'Ex-parrot'  # Fails type checking
 ```
+
+## When you’re puzzled or when things are complicated
+
+```
+from typing import Union, Any, Optional, TYPE_CHECKING, cast
+
+# To find out what type mypy infers for an expression anywhere in
+# your program, wrap it in reveal_type().  Mypy will print an error
+# message with the type; remove it again before running the code.
+reveal_type(1)  # Revealed type is "builtins.int"
+
+# If you initialize a variable with an empty container or "None"
+# you may have to help mypy a bit by providing an explicit type annotation
+x: list[str] = []
+x: str | None = None
+
+# Use Any if you don't know the type of something or it's too
+# dynamic to write a type for
+x: Any = mystery_function()
+# Mypy will let you do anything with x!
+x.whatever() * x["you"] + x("want") - any(x) and all(x) is super  # no errors
+
+# Use a "type: ignore" comment to suppress errors on a given line,
+# when your code confuses mypy or runs into an outright bug in mypy.
+# Good practice is to add a comment explaining the issue.
+x = confusing_function()  # type: ignore  # confusing_function won't return None here because ...
+
+# "cast" is a helper function that lets you override the inferred
+# type of an expression. It's only for mypy -- there's no runtime check.
+a = [4]
+b = cast(list[int], a)  # Passes fine
+c = cast(list[str], a)  # Passes fine despite being a lie (no runtime check)
+reveal_type(c)  # Revealed type is "builtins.list[builtins.str]"
+print(c)  # Still prints [4] ... the object is not changed or casted at runtime
+
+# Use "TYPE_CHECKING" if you want to have code that mypy can see but will not
+# be executed at runtime (or to have code that mypy can't see)
+if TYPE_CHECKING:
+    import json
+else:
+    import orjson as json  # mypy is unaware of this
+```
