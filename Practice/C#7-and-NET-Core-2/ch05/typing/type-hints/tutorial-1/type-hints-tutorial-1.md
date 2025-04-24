@@ -31,3 +31,55 @@ Python allows you to document types with type hints. They look like this:
 def double(x: int) -> int:
     return x + x
 ```
+
+The x: int part means that the function expects an int object to be passed to the function; and the -> int means that the function will return an int object.
+
+A tool like mypy or pyright can now check that you're not doing something shady, like here:
+
+```
+def double(x: int) -> int:
+    return x + "FizzBuzz"  # error!
+```
+
+The types aren't checked at runtime, though — when you run the Python script, the interpreter **doesn't care about type hints**.
+
+The interpreter doesn't do any optimizations based on annotations. Again, only programmers and type-checking tools give them meaning.
+
+Python embraces what's called "gradual typing". You can typehint only part of your code and leave some parts untyped (as before), for example if they're impossible or very hard to annotate.
+
+## Tooling
+
+### PyCharm
+
+PyCharm already has its own custom type checker.
+
+### Installing Mypy
+
+You can install mypy — one of the tools that does type checking — by following the instructions [here](https://mypy.readthedocs.io/en/stable/getting_started.html);
+
+### Installing Pyright
+
+Pyright (which is the tool I personally prefer) can be installed [here](https://github.com/Microsoft/pyright#installation).
+
+### Using Pylance
+
+If you're using Visual Studio Code, you can [install the Pylance extension](https://github.com/Microsoft/pyright#using-pyright-with-vs-code-python-extension) which uses Pyright for typechecking.
+
+## The very basics
+
+### Where do you put them?
+
+First, you can put them on an individual variable:
+
+`answer: int = 42`
+
+Most of the times it's redundant. Type checkers know that 42 is an int.
+
+Type hints are useful on functions, to explain what the function takes as input and what it returns:
+
+```
+def double(x: int) -> int:
+    return x + x
+
+def print(*args: Any, end: str = " ") -> None:
+```
