@@ -155,3 +155,91 @@ Don't overuse Any, though — there are often better ways.
 Sometimes you accept several types, not just one!
 
 In that case, you can use typing.Union.
+
+```
+from typing import Union
+
+def print_thing(thing: Union[str, int]) -> None:
+    if isinstance(thing, str):
+        print("string", thing)
+    else:
+        print("number", thing)
+
+print_thing("abc")
+print_thing(123)
+```
+
+It means that you can do this:
+
+```
+from typing import Union
+
+
+def print_thing(thing: Union[str, int]) -> None:
+    if isinstance(thing, str):
+        print("string", thing)
+    else:
+        print("number", thing)
+
+
+print_thing("abc")
+print_thing(123)
+```
+
+and the type checker will understand that in the first if clause thing has type str, and in the second clause it has type int.
+
+Here we've seen that some types can be parametrized — you can pass arguments to a type to configure it. It's not special syntax — it's just using subscription, like you do on lists and dictionaries.
+
+#### Optional
+
+Optional[YourType] is just a shorthand for Union[YourType, None]. Union with None is very commonly used to indicate a potentially missing result. For example, when you call .get(some_key) on a dictionary, you get either an item or None.
+
+Let's typehint this function that implements translation from Russian to English, but caches the results. It will encode an unknown word as None.
+
+```
+from typing import Optional
+
+_cache: dict[str, str] = {"питон": "python"}
+
+def fetch_translation(word: str, target_lang: str, default_lang: str) -> Optional[str]:
+    return None
+
+def translate(word: str) -> Optional[str]:
+    from_cache: Optional[str] = _cache.get(word)
+    if from_cache is not None:
+        return from_cache
+    fetched: Optional[str] = fetch_translation(word, "ru", "en")
+    if fetched is None:
+        return None
+    _cache[word] = fetched
+    return fetched
+
+print(translate("питон"))
+```
+
+As you can see, it's not always straight-forward; but hopefully it matches your issues of what kind of value each variable holds at what point.
+
+#### List, Dict, Set, ...
+
+What if you want to add two lists of numbers elementwise? You might do this:
+
+```
+def zip_add(list1: list, list2: list) -> list:
+    if len(list1) != len(list2):
+        raise ValueError("Expected lists of the same length")
+
+    return [a + b for a, b in zip(list1, list2)]
+
+
+zip_add([1, 2, 3], ["abc", "def", "ghi"])
+```
+
+This is better than nothing — the type checker will complain if you'll try to zip_add an integer and a string. But it will happily allow you to zip_add a list of integers and a list of strings. There must be a better way!
+
+#### List
+
+This is where typing.List comes in — it allows you to say what elements the list must contain.
+
+```
+
+```
