@@ -110,3 +110,48 @@ numbers = [1, 2, 3, 4]
 ```
 
 Inference is not "guessing" as the name may suggest. A more correct synonym would be deduction — figuring the type precisely by following an algorithm.
+
+### Basic Types
+
+All the types you're familiar with — int, str, float, range, list etc. — are valid type hints.
+
+#### None
+
+None is special — you annotate it simply as None.
+
+```
+my_salary: None
+my_salary = None
+```
+
+### The `typing` module
+
+The typing module provides some more sophisticated type hints.
+
+#### Any
+
+Sometimes you don't want to specify a type:
+
+You can't express it in the Python's type hint system;
+It would be verbose and confusing, requiring lots of extra code;
+You really don't care what the type is — consider the print function.
+Any denotes the "wildcard type". It can be treated as any type, and any value can be treated as Any.
+
+```
+from typing import Any
+
+def print_twice(something: Any) -> None:
+    print(something, something, "!")
+
+print_twice(1.234)
+```
+
+(note: you may not have to write the -> None here — Pyright [and mypy if you set the appropriate option] will infer it for you)
+
+Don't overuse Any, though — there are often better ways.
+
+#### Union
+
+Sometimes you accept several types, not just one!
+
+In that case, you can use typing.Union.
