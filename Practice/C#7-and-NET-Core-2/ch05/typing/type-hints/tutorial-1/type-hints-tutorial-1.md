@@ -78,8 +78,15 @@ Most of the times it's redundant. Type checkers know that 42 is an int.
 Type hints are useful on functions, to explain what the function takes as input and what it returns:
 
 ```
+from typing import Any
+
 def double(x: int) -> int:
     return x + x
 
-def print(*args: Any, end: str = " ") -> None:
+def myprint(*args: Any, end: str = " ") -> None:
+    for arg in args:
+        print(arg, end=" ")
+    print()
+
+myprint("The", "rain", "in", "Spain", "falls", "mainly", "in", "the", "plain")
 ```
