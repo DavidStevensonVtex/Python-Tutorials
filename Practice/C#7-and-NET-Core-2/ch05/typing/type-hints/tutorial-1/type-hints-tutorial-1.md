@@ -304,5 +304,102 @@ The type hint says that print_salaries accepts a dictionary where all keys are s
 A similar pattern applies to Set, Frozenset, Deque, OrderedDict, DefaultDict, Counter, ChainMap:
 
 ```
+from typing import Set
+
+
+def extract_bits(numbers: Set[int]) -> Set[int]:
+    return numbers & {0, 1}
+
+
+print(extract_bits({0, 1, 2, 3, 4, 5}))
+
+# $ python set-1.py
+# {0, 1}
+
+# $ pyright set-1.py
+# 0 errors, 0 warnings, 0 informations
+# $ mypy set-1.py
+# Success: no issues found in 1 source file
+```
+
+### Changes in Python 3.9
+
+Since Python 3.9, ordinary types like list, dict, tuple, type, set, frozenset, ... allow being subscripted. So our first example would look like this:
 
 ```
+def zip_add(list1: list[int], list2: list[int]) -> list[int]:
+    if len(list1) != len(list2):
+        raise ValueError("Expected lists of the same length")
+
+    return [a + b for a, b in zip(list1, list2)]
+```
+
+No import from typing required — just index into the list class!
+
+### Tuples
+
+Tuples are a bit more complicated, because they're used for different purposes:
+
+-   a 'heterogenous record' of fixed size (like ('alice', 420) or (1, 2) [meaning a point on a 2D grid])
+-   an immutable list of values having the same type (like (1, 2, 3, 4, 5))
+
+Type hints for tuples support both cases.
+
+#### Tuples as records
+
+Let's start with the first usage. We'll need to import typing.Tuple (or, if you're on 3.9 or above, just use tuple), and simply pass the expected types in order (there can be as many as you want.
+
+```
+from typing import Tuple
+
+def print_salary_entry(entry: Tuple[str, int]) -> None:
+    name, salary = entry
+    print(f"Salary of {name}: {salary}")
+
+print_salary_entry(("Joe Q. Employee", 123456))
+
+# $ python tuple-1.py
+# Salary of Joe Q. Employee: 123456
+# $ pyright tuple-1.py
+# 0 errors, 0 warnings, 0 informations
+# $ mypy tuple-1.py
+# Success: no issues found in 1 source file
+```
+
+This type hint means that print_salary_entry accepts a tuple of length 2 where the first element is a string and the second element is an integer.
+
+You can nest types as deeply as you want. For example, you might have volunteers, not just employees:
+
+```
+from typing import Tuple, Optional
+
+
+def print_salary_entry(entry: Tuple[str, Optional[int]]) -> None:
+    name, salary = entry
+    if salary is None:
+        print(f"{name} is a volunteer")
+    else:
+        print(f"Salary of {name}: {salary}")
+
+
+print_salary_entry(("Joe Q. Employee", 123456))
+print_salary_entry(("Joe Q. Employee", None))
+
+# $ python tuple-2.py
+# Salary of Joe Q. Employee: 123456
+# Joe Q. Employee is a volunteer
+# $ pyright tuple-2.py
+# 0 errors, 0 warnings, 0 informations
+# $ mypy tuple-2.py
+# Success: no issues found in 1 source file
+```
+
+Here the type hint means that the print_salary_entry accepts a tuple of length 2 where the first element is a string and the second element is an integer or None.
+
+#### Tuples as immutable lists
+
+Sometimes a tuple is used as an immutable list. For example, you might want to store a sequence of objects and make sure it doesn't change. Another use is in arbitrary arguments (usually spelled as \*args). In this case, the tuple value is annotated as Tuple[YourType, ...]. ... is an ellipsis — a very niche object that found its use here. Example:
+
+### Python 3.9
+
+As I said before, in Python 3.9 and higher you can simply use tuple instead of typing.Tuple.
