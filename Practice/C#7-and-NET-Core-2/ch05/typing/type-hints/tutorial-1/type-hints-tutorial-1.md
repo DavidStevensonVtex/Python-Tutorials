@@ -298,3 +298,11 @@ print_salaries({"alice": 420, "bob": 420})
 ```
 
 The type hint says that print_salaries accepts a dictionary where all keys are strings, and all values are integers. An example would be {"alice": 420, "bob": 420}.
+
+#### Other data structures
+
+A similar pattern applies to Set, Frozenset, Deque, OrderedDict, DefaultDict, Counter, ChainMap:
+
+```
+
+```
