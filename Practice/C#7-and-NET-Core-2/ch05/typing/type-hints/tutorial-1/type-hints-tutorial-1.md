@@ -90,3 +90,23 @@ def myprint(*args: Any, end: str = " ") -> None:
 
 myprint("The", "rain", "in", "Spain", "falls", "mainly", "in", "the", "plain")
 ```
+
+...and on class attributes, to explain the types of objects stored in those attributes.
+
+```
+class Point:
+    x: int
+    y: int
+```
+
+### Inference
+
+When you're assigning something to a variable, the type checker (remember — just a tool, separate from Python) will infer the type of the variable.
+
+```
+numbers: list[int]
+
+numbers = [1, 2, 3, 4]
+```
+
+Inference is not "guessing" as the name may suggest. A more correct synonym would be deduction — figuring the type precisely by following an algorithm.
