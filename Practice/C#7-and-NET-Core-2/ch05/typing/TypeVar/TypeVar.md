@@ -99,3 +99,16 @@ scream_with_exlamation = triple("A") + "!"
 ```
 
 "If you pass in str, you get str. If you pass in bytes, you get bytes" -- sounds like a job for a type variable.
+
+```
+from typing import TypeVar
+
+AnyString = TypeVar("AnyString")
+
+
+def triple(string: AnyString) -> AnyString:
+    # Operator "*" not supported for types "AnyString@triple" and "Literal[3]"Pylance
+    return string * 3
+```
+
+That's fair enough -- not all types support multiplication. We can put a restriction that our type variable should only accept str or bytes (and their subclasses, of course).
