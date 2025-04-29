@@ -160,3 +160,7 @@ def remove_falsey(items: Iterable[T]) -> Iterator[T]:
 # $ pyright remove-falsey.py
 # 0 errors, 0 warnings, 0 informations
 ```
+
+## Links
+
+-   [mypy documentation on generic functions](https://mypy.readthedocs.io/en/stable/generics.html#generic-functions)
