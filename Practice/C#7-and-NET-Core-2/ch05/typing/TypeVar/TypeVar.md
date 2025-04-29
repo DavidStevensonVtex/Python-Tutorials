@@ -42,3 +42,33 @@ def identity_list_str(arg: list[str]) -> list[str]:
 1.  This doesn't scale well. Are you going to replicate the same function 10 times? Will you remember to keep them in sync?
 
 2.  What if this is a library function? You won't be able to predict all the ways people will use this function.
+
+## The solution: type variables
+
+Type variables allow you to link several types together. This is how you can use a type variable to annotate the identity function:
+
+```
+from typing import TypeVar
+
+T = TypeVar("T")
+
+
+def identity(arg: T) -> T:
+    return arg
+
+
+number = identity(42)
+# Operator "+" not supported for types "int" and "Literal['!']"Pylance
+print(number + "!")
+
+# $ mypy identity-solution.py
+# identity-solution.py:12: error: Unsupported operand types for + ("int" and "str")  [operator]
+# Found 1 error in 1 file (checked 1 source file)
+
+# $ pyright identity-solution.py
+# d:\drs\Python\GitHub\Python-Tutorials\Practice\C#7-and-NET-Core-2\ch05\typing\TypeVar\identity-solution.py
+#   d:\drs\Python\GitHub\Python-Tutorials\Practice\C#7-and-NET-Core-2\ch05\typing\TypeVar\identity-solution.py:12:7 - error: Operator "+" not supported for types "int" and "Literal['!']" (reportOperatorIssue)
+# 1 error, 0 warnings, 0 informations
+```
+
+Here the return type is "linked" to the parameter type: whatever you put into the function, the same thing comes out.
