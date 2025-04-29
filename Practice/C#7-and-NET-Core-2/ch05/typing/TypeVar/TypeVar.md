@@ -72,3 +72,30 @@ print(number + "!")
 ```
 
 Here the return type is "linked" to the parameter type: whatever you put into the function, the same thing comes out.
+
+## Putting constraints on a type variable
+
+Is this a well-typed function?
+
+```
+def triple(string: Union[str, bytes]) -> Union[str, bytes]:
+    return string * 3
+```
+
+Not really: if you pass in a string, you always get a string, same with bytes. This will cause you some pain, because you know when you get a str and when you get a bytes back.
+
+```
+from typing import Union
+
+
+def triple(string: Union[str, bytes]) -> Union[str, bytes]:
+    return string * 3
+
+
+scream = triple("A")
+# Operator "+" not supported for types "str | bytes" and "Literal['!']"
+#   Operator "+" not supported for types "bytes" and "Literal['!']"Pylance
+scream_with_exlamation = triple("A") + "!"
+```
+
+"If you pass in str, you get str. If you pass in bytes, you get bytes" -- sounds like a job for a type variable.
